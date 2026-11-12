@@ -6,9 +6,12 @@ import { ShaderPass } from "three/addons/postprocessing/ShaderPass.js";
 import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
 import { SAOPass } from "three/addons/postprocessing/SAOPass.js";
 import { SMAAPass } from "three/addons/postprocessing/SMAAPass.js";
+import { agMaps, brushMaps } from "./pbr-maps.js";
 import {
   buildBars,
+  buildBlock,
   buildBoard,
+  buildCell,
   buildDie,
   buildFinfet,
   buildLattice,
@@ -410,13 +413,18 @@ function attachOrbit(canvas, camera, reduced) {
 
 export function makeMaterials(tier) {
   const rich = tier !== "low";
+  const brush = brushMaps();
+  const ag = agMaps();
   const frame = new THREE.MeshPhysicalMaterial({
     color: 0xdfe3e8,
     metalness: rich ? 1 : 0.55,
-    roughness: 0.32,
-    clearcoat: rich ? 0.35 : 0,
-    clearcoatRoughness: 0.4,
-    anisotropy: rich ? 0.85 : 0,
+    roughness: 0.38,
+    roughnessMap: brush.rough,
+    normalMap: brush.normal,
+    normalScale: new THREE.Vector2(0.35, 0.35),
+    clearcoat: rich ? 0.25 : 0,
+    clearcoatRoughness: 0.45,
+    anisotropy: rich ? 0.9 : 0,
   });
   const glass = new THREE.MeshPhysicalMaterial({
     color: 0xffffff,
@@ -451,18 +459,44 @@ export function makeMaterials(tier) {
   });
   const silicon = new THREE.MeshPhysicalMaterial({
     color: 0x243044,
-    metalness: 0.62,
-    roughness: 0.22,
+    metalness: 0.45,
+    roughness: 0.35,
+    roughnessMap: brush.rough,
   });
-  const copper = new THREE.MeshStandardMaterial({ color: 0xb87333, metalness: rich ? 0.85 : 0.4, roughness: 0.28 });
+  const dielectric = new THREE.MeshPhysicalMaterial({
+    color: 0x6e8ea8,
+    metalness: 0.02,
+    roughness: 0.18,
+    clearcoat: rich ? 0.4 : 0,
+    transparent: true,
+    opacity: 0.72,
+  });
+  const hik = new THREE.MeshPhysicalMaterial({
+    color: 0xd7e4c4,
+    metalness: 0.05,
+    roughness: 0.22,
+    emissive: 0x8aa86a,
+    emissiveIntensity: 0.15,
+  });
+  const copper = new THREE.MeshStandardMaterial({
+    color: 0xb87333,
+    metalness: rich ? 0.92 : 0.4,
+    roughness: 0.32,
+    roughnessMap: brush.rough,
+    normalMap: brush.normal,
+    normalScale: new THREE.Vector2(0.2, 0.2),
+  });
   const gold = new THREE.MeshStandardMaterial({ color: 0xe2c56a, metalness: rich ? 0.9 : 0.4, roughness: 0.22 });
   const battery = new THREE.MeshStandardMaterial({ color: 0x232824, roughness: 0.7, metalness: 0.15 });
   const rear = new THREE.MeshPhysicalMaterial({
     color: 0x8a558f,
-    metalness: 0.08,
-    roughness: 0.34,
-    clearcoat: rich ? 0.62 : 0.2,
-    clearcoatRoughness: 0.38,
+    metalness: 0.06,
+    roughness: 0.55,
+    roughnessMap: ag.rough,
+    normalMap: ag.normal,
+    normalScale: new THREE.Vector2(0.22, 0.22),
+    clearcoat: rich ? 0.45 : 0.15,
+    clearcoatRoughness: 0.48,
   });
   const lens = new THREE.MeshPhysicalMaterial({
     color: 0x0a1020,
@@ -483,7 +517,24 @@ export function makeMaterials(tier) {
     emissiveIntensity: 0.55,
     roughness: 0.4,
   });
-  return { frame, glass, screen, pcb, silicon, copper, gold, battery, rear, lens, substrate, die, accent, tier };
+  return {
+    frame,
+    glass,
+    screen,
+    pcb,
+    silicon,
+    dielectric,
+    hik,
+    copper,
+    gold,
+    battery,
+    rear,
+    lens,
+    substrate,
+    die,
+    accent,
+    tier,
+  };
 }
 
 export async function applyMetalPlate(materials) {
@@ -514,7 +565,9 @@ export async function applyMetalPlate(materials) {
 
 export {
   buildBars,
+  buildBlock,
   buildBoard,
+  buildCell,
   buildDie,
   buildFinfet,
   buildLattice,

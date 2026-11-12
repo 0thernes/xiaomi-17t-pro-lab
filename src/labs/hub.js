@@ -6,6 +6,27 @@ import { getSpecs, openItems, parseDieMm, parsePackageMm } from "../specs.js";
 import { buildPhone, makeMaterials, mountView } from "../graphics/view.js";
 import { referenceCards } from "../ref-card.js";
 
+const LAUNCH_RGB = {
+  Black: "#1c1e22",
+  "Deep Violet": "#8a558f",
+  "Deep Blue": "#1d4e8a",
+};
+
+function launchColors(device, materials) {
+  const names = device.colors_official?.value;
+  if (!Array.isArray(names)) return [];
+  return names.map((name) => {
+    const button = el("button", { type: "button", "aria-pressed": name === "Deep Violet" ? "true" : "false" }, [name]);
+    button.addEventListener("click", () => {
+      materials.rear.color.set(LAUNCH_RGB[name] || "#8a558f");
+      button.parentElement?.querySelectorAll("button").forEach((other) => {
+        if (names.includes(other.textContent)) other.setAttribute("aria-pressed", other === button ? "true" : "false");
+      });
+    });
+    return button;
+  });
+}
+
 export async function mount(main, { cap }) {
   const specs = getSpecs();
   const device = specs.device;
@@ -123,7 +144,11 @@ export async function mount(main, { cap }) {
       "Flagship launch lab for the Xiaomi 17T Pro and Dimensity 9500. The body size is cited. The teardown follows the repair manual’s named stack. Die areas are Kurnal’s, arranged here as a reconstruction. Reference photographs are not included.",
     ]),
     stage,
-    el("div", { class: "hero-tools" }, [el("label", { class: "slider" }, ["Pull the stack apart", explode]), toggle]),
+    el("div", { class: "hero-tools" }, [
+      el("label", { class: "slider" }, ["Pull the stack apart", explode]),
+      toggle,
+      ...launchColors(device, materials),
+    ]),
     refs,
     el("div", { class: "grid cols-2" }, [
       panel("This browser", [

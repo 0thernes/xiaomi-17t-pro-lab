@@ -376,25 +376,58 @@ export function buildDie(materials) {
   if (!plan || !die) return group;
   const slabMesh = box(die.widthMm, die.heightMm, 0.2, materials.die, 0, 0, 0);
   group.add(slabMesh);
-  const colors = { cpu: 0xc4552a, gpu: 0x3d6ea8, npu: 0x7a5aaa };
+  const tints = { cpu: 0xc4552a, gpu: 0x3d6ea8, npu: 0x7a5aaa };
   for (const block of plan.blocks) {
-    const mesh = box(
-      block.widthMm * 0.96,
-      block.heightMm * 0.9,
-      0.12,
-      new THREE.MeshStandardMaterial({
-        color: colors[block.id],
-        roughness: 0.42,
-        metalness: 0.35,
-        map: materials.die.map,
-      }),
-      block.xMm + block.widthMm / 2 - die.widthMm / 2,
-      block.yMm + block.heightMm / 2 - die.heightMm / 2,
-      0.16,
+    const x = block.xMm + block.widthMm / 2 - die.widthMm / 2;
+    const y = block.yMm + block.heightMm / 2 - die.heightMm / 2;
+    const bodyMat = materials.silicon.clone();
+    bodyMat.color.set(tints[block.id]);
+    const body = box(block.widthMm * 0.96, block.heightMm * 0.9, 0.16, bodyMat, x, y, 0.12);
+    body.name = block.id;
+    group.add(body);
+    group.add(box(block.widthMm * 0.9, block.heightMm * 0.82, 0.04, materials.dielectric, x, y, 0.22));
+    group.add(
+      box(block.widthMm * 0.72, block.heightMm * 0.08, 0.03, materials.copper, x, y + block.heightMm * 0.12, 0.26),
     );
-    mesh.name = block.id;
-    group.add(mesh);
+    group.add(box(block.widthMm * 0.08, block.heightMm * 0.55, 0.03, materials.gold, x - block.widthMm * 0.2, y, 0.26));
   }
+  return group;
+}
+
+/** One published block, opened. Metal lines sit on a dielectric over silicon. */
+export function buildBlock(materials) {
+  const plan = floorplan();
+  const cpu = plan?.blocks.find((block) => block.id === "cpu");
+  const group = new THREE.Group();
+  group.name = "block";
+  const w = 14;
+  const h = 8;
+  group.add(box(w, h, 1.2, materials.silicon, 0, 0, 0));
+  group.add(box(w * 0.96, h * 0.94, 0.28, materials.dielectric, 0, 0, 0.74));
+  for (let i = 0; i < 9; i++) {
+    group.add(box(w * 0.9, 0.22, 0.12, materials.copper, 0, -h / 2 + 0.8 + i * 0.8, 0.94));
+  }
+  for (let i = 0; i < 6; i++) {
+    group.add(box(0.16, h * 0.8, 0.1, materials.gold, -w / 2 + 1.2 + i * 2, 0, 1.02));
+  }
+  group.userData.area = cpu?.areaMm2;
+  return group;
+}
+
+/** Textbook 6T drawing. Not a traced MediaTek bitcell. */
+export function buildCell(materials) {
+  const group = new THREE.Group();
+  group.name = "cell";
+  group.add(box(8, 0.2, 3.2, materials.silicon, 0, 0, 0));
+  group.add(box(7.4, 0.08, 2.6, materials.dielectric, 0, 0.16, 0));
+  for (let i = 0; i < 6; i++) {
+    const x = -2.5 + i * 1;
+    group.add(box(0.35, 0.9, 0.35, materials.silicon, x, 0.6, 0));
+    group.add(box(0.5, 0.12, 0.7, materials.hik, x, 1.05, 0));
+    group.add(box(0.22, 0.35, 0.22, materials.gold, x, 1.28, 0));
+  }
+  group.add(box(6.2, 0.08, 0.12, materials.copper, 0, 1.55, 0.5));
+  group.add(box(6.2, 0.08, 0.12, materials.copper, 0, 1.55, -0.5));
   return group;
 }
 
@@ -405,16 +438,19 @@ export function buildFinfet(materials) {
   const group = new THREE.Group();
   group.name = "finfet";
   const u = 0.08;
-  for (let i = 0; i < 7; i++) {
-    const fin = new THREE.Mesh(new THREE.CapsuleGeometry(pitch * u * 0.08, 6, 4, 8), materials.silicon);
-    fin.position.set((i - 3) * pitch * u, 0, 0);
+  const gap = pitch * u;
+  for (let i = 0; i < 3; i++) {
+    const x = (i - 1) * gap;
+    const fin = new THREE.Mesh(new THREE.CapsuleGeometry(0.22, 4.8, 6, 10), materials.silicon);
+    fin.position.set(x, 0.4, 0);
     group.add(fin);
+    group.add(box(0.7, 0.55, 0.7, materials.gold, x, -1.6, 1.1));
+    group.add(box(0.7, 0.55, 0.7, materials.gold, x, -1.6, -1.1));
+    group.add(box(0.55, 1.5, 0.28, materials.hik, x, 1.15, 0));
+    group.add(box(0.7, 1.7, 0.45, materials.frame, x, 1.35, 0));
   }
-  group.add(box(pitch * u * 7.2, 1.2, 3.4, materials.copper, 0, 2.4, 0));
-  group.add(box(1.4, 1.6, 2.2, materials.gold, -pitch * u * 3.2, -1.2, 0));
-  group.add(box(1.4, 1.6, 2.2, materials.gold, pitch * u * 3.2, -1.2, 0));
-  for (let i = 0; i < 6; i++) {
-    group.add(box(metal * u * 0.45, 0.2, 8, materials.accent, 0, 3.3, (i - 2.5) * metal * u));
+  for (let i = 0; i < 5; i++) {
+    group.add(box(metal * u * 0.7, 0.12, 6.2, materials.copper, 0, 2.5 + i * (metal / pitch) * 0.9, 0));
   }
   return group;
 }

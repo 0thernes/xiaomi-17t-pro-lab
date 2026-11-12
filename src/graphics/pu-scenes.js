@@ -354,51 +354,106 @@ export function sceneFinfet(materials) {
   const specs = getSpecs();
   const pitch = specs.soc.process_n3e_cpp_nm.value;
   const group = new THREE.Group();
-  const u = 0.09;
-  const fins = new THREE.InstancedMesh(new THREE.CapsuleGeometry(pitch * u * 0.07, 5.5, 4, 8), materials.silicon, 6);
-  const dummy = new THREE.Object3D();
-  for (let i = 0; i < 6; i++) {
-    dummy.position.set((i - 2.5) * pitch * u, 0, 0);
-    dummy.updateMatrix();
-    fins.setMatrixAt(i, dummy.matrix);
+  for (let i = 0; i < 3; i++) {
+    const x = (i - 1) * 2.4;
+    const fin = new THREE.Mesh(new THREE.CapsuleGeometry(0.28, 6, 8, 12), materials.silicon);
+    fin.position.set(x, 1.2, 0);
+    group.add(fin);
+    group.add(box(0.9, 0.7, 0.9, materials.gold, x, 0.2, 1.4));
+    group.add(box(0.9, 0.7, 0.9, materials.gold, x, 0.2, -1.4));
+    group.add(box(0.7, 2.2, 0.22, materials.hik, x, 2.4, 0));
+    group.add(box(0.9, 2.4, 0.4, materials.frame, x, 2.6, 0));
   }
-  group.add(fins);
-  group.add(box(pitch * u * 6.4, 0.9, 2.8, materials.copper, 0, 2.2, 0));
-  group.add(box(1.2, 0.35, 2.2, materials.gold, 0, 2.8, 0));
   const gaa = new THREE.Group();
-  for (let i = 0; i < 3; i++) gaa.add(box(4.2, 0.18, 1.1, materials.accent, 0, i * 0.45, 0));
-  gaa.position.set(8, 0, 0);
+  for (let i = 0; i < 3; i++) gaa.add(box(3.2, 0.16, 1.2, materials.accent, 0, i * 0.45, 0));
+  gaa.position.set(8, 2, 0);
   group.add(gaa);
   return {
     group,
-    note: `N3P FinFET. Gate pitch ${pitch} nm is the cited N3E rule N3P keeps. Fin count and fin pitch are unpublished, so the six fins are a drawing. The sheets on the right are TSMC N2 GAA, a comparison, not this die.`,
+    eye: { theta: 0.55, phi: 1.32, radius: 9, target: [0, 2, 0] },
+    note: `N3P FinFET. Gate pitch ${pitch} nm is the cited N3E rule N3P keeps. Gold pads are source and drain, the pale wrap is a high-k dielectric, and the metal over it is the gate. Fin count, fin height, and the high-k thickness are not published. The sheets on the right are TSMC N2 GAA, a comparison, not this die.`,
     update() {},
   };
 }
 
 export function sceneBeol(materials) {
+  const specs = getSpecs();
+  const minPitch = specs.soc.process_n3e_min_metal_pitch_nm.value;
   const group = new THREE.Group();
-  const pitches = [23, 28, 36, 48, 64, 80, 100, 130];
-  pitches.forEach((pitch, i) => {
-    const w = 1.2 + i * 0.55;
-    group.add(box(w * 3.2, 0.12, w, i === 0 ? materials.gold : materials.copper, 0, i * 0.55, 0));
+  const ratios = [1, 1.25, 1.6, 2.1, 3, 4.2, 6, 8];
+  const names = ["M0", "M1", "M2", "M3", "Mx", "My", "Mz", "top"];
+  ratios.forEach((ratio, i) => {
+    const pitch = minPitch * ratio;
+    const y = i * 1.15;
+    const width = 0.35 + ratio * 0.22;
+    group.add(box(8, 0.08, 6, materials.dielectric, 0, y, 0));
+    for (let line = 0; line < 4; line++) {
+      const along = i % 2 === 0;
+      const offset = (line - 1.5) * (0.7 + ratio * 0.15);
+      if (along) group.add(box(7.2, 0.1, width, materials.copper, 0, y + 0.12, offset));
+      else group.add(box(width, 0.1, 5.2, materials.copper, offset, y + 0.12, 0));
+    }
+    if (i < ratios.length - 1) {
+      for (let v = 0; v < 5; v++) {
+        group.add(box(0.16, 0.9, 0.16, materials.gold, -2 + v, y + 0.55, (v % 2) * 1.2 - 0.6));
+      }
+    }
+    const plate = callout(`${names[i]} ${Math.round(pitch)} nm`);
+    plate.position.set(5.2, y + 0.4, 0);
+    group.add(plate);
   });
   return {
     group,
-    note: "Only the 23 nm minimum metal pitch is cited. The taller layers use wider pitches as a reconstruction of a typical BEOL, not a TSMC N3P deck. Dielectrics between the sheets are not a published stack.",
+    eye: { theta: 0.7, phi: 1.25, radius: 10, target: [0, 4, 0] },
+    note: `M0 uses the cited ${minPitch} nm minimum metal pitch. Every layer above is a wider reconstruction, not a published N3P deck. Vias are the gold posts. Dielectric sheets between metals are not a TSMC stack.`,
     update() {},
   };
 }
 
+function scannerCutaway(materials) {
+  const group = new THREE.Group();
+  group.add(box(2.2, 1.4, 1.6, materials.frame, 0, 4.2, 0));
+  group.add(new THREE.Mesh(new THREE.SphereGeometry(0.45, 18, 12), materials.accent));
+  group.children.at(-1).position.set(0, 4.2, 0);
+  group.add(box(3.4, 0.12, 1.2, materials.dielectric, 0, 3.1, 0));
+  group.add(box(2.4, 0.08, 1.4, materials.gold, 0, 2.2, 0));
+  group.add(box(3.6, 0.1, 1.6, materials.frame, -0.4, 1.2, 0.3));
+  group.add(box(3.2, 0.1, 1.5, materials.frame, 0.5, 0.4, -0.2));
+  const wafer = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.5, 0.12, 28), materials.silicon);
+  wafer.position.set(0, -0.8, 0);
+  group.add(wafer);
+  group.add(box(2.6, 0.06, 2.6, materials.hik, 0, -0.68, 0));
+  return group;
+}
+
+function resistSurface(materials, intensity) {
+  const n = intensity.length;
+  const geo = new THREE.PlaneGeometry(6, 2.4, n - 1, 12);
+  const pos = geo.attributes.position;
+  for (let i = 0; i < pos.count; i++) {
+    const x = i % n;
+    pos.setZ(i, intensity[x] * 1.4);
+  }
+  geo.computeVertexNormals();
+  const mesh = new THREE.Mesh(geo, materials.hik);
+  mesh.position.set(5.5, 0.2, 0);
+  return mesh;
+}
+
 export function sceneLitho(materials) {
-  const image = aerialImage({ na: 0.33, pitchNm: 40, sigma: 0.5, n: 64, periods: 2 });
-  const group = bars(Array.from(image.intensity), materials.accent, 3.2);
+  const specs = getSpecs();
+  const na = specs.soc.euv_numerical_aperture.value;
+  const image = aerialImage({ na, pitchNm: 40, sigma: 0.5, n: 64, periods: 2 });
+  const group = new THREE.Group();
+  const scanner = scannerCutaway(materials);
+  scanner.position.set(-3.2, 0, 0);
+  group.add(scanner);
+  group.add(resistSurface(materials, image.intensity));
   return {
     group,
-    note: `Live Abbe aerial image at NA 0.33, pitch 40 nm. Contrast ${image.contrast.toFixed(3)}. High-NA 0.55 is not claimed for N3P. Bar height is the computed intensity.`,
-    update(dt) {
-      group.rotation.y += dt * 0.2;
-    },
+    eye: { theta: 0.6, phi: 1.2, radius: 12, target: [1, 1.5, 0] },
+    note: `EUV cutaway at the cited NA ${na}. The plasma, collector, reticle, and two projection mirrors are a schematic of a 0.33 NA scanner, not an ASML drawing. The surface on the right is the live Abbe intensity at pitch 40 nm. Contrast ${image.contrast.toFixed(3)}. High-NA 0.55 is not claimed for N3P.`,
+    update() {},
   };
 }
 

@@ -5,10 +5,12 @@ import { el, kv, note, panel } from "../dom.js";
 import { fmt } from "../format.js";
 import { provCited, provComputed } from "../provenance.js";
 import { mountSketch } from "../p5-loader.js";
+import { sceneLitho } from "../graphics/pu-scenes.js";
+import { makeMaterials, mountView } from "../graphics/view.js";
 
 const ASML = "https://www.asml.com/en/technology/lithography-principles/rayleigh-criterion";
 
-export async function mount(main) {
+export async function mount(main, ctx = {}) {
   const ref = euvReference();
   const state = { na: NA_LOW, k1: 0.4, pitch: 60, sigma: 0 };
   const readouts = el("div");
@@ -42,6 +44,10 @@ export async function mount(main) {
       note(
         "The physical limit k1 = 0.25 is tighter than the coherent two-beam cutoff at k1 = 0.5. A coherent image of equal lines and spaces loses the first orders once the half-pitch drops below 0.5 λ/NA.",
       ),
+    ]),
+    panel("Scanner and resist", [
+      await scannerStage(ctx.cap),
+      note("Software-friendly cutaway. The resist surface is the same Abbe intensity as the plot below."),
     ]),
     panel("Aerial image", [plotHost]),
   );
@@ -85,6 +91,27 @@ export async function mount(main) {
   for (const control of [k1, pitch, sigma]) control.input.addEventListener("input", recompute);
   recompute();
   return { dispose: () => sketch.dispose() };
+}
+
+async function scannerStage(cap) {
+  const stage = el("div", { class: "stage" });
+  const canvas = el("canvas", { "aria-label": "EUV scanner cutaway and live resist intensity" });
+  stage.append(canvas);
+  try {
+    const view = await mountView(canvas, cap || { tier: "medium", pixelRatio: 1 });
+    const built = sceneLitho(makeMaterials(cap?.tier || "medium"));
+    view.root.add(built.group);
+    view.scene.background = new view.THREE.Color(0x1a2430);
+    view.scene.fog = null;
+    built.group.scale.setScalar(2.2);
+    view.release();
+    view.orbit.set(34, new view.THREE.Vector3(1, 1.6, 0));
+    view.orbit.pose(0.55, 1.15);
+    view.setFrame(() => built.update?.(0.016));
+  } catch (error) {
+    stage.append(note(error.message));
+  }
+  return stage;
 }
 
 function range(label, min, max, step, value) {
