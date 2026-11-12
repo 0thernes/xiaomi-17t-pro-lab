@@ -21,6 +21,29 @@ function roundedRect(w, h, r) {
   return shape;
 }
 
+function asHole(shape) {
+  const hole = new THREE.Path();
+  const pts = shape.getPoints(32);
+  for (let i = pts.length - 1; i >= 0; i--) {
+    if (i === pts.length - 1) hole.moveTo(pts[i].x, pts[i].y);
+    else hole.lineTo(pts[i].x, pts[i].y);
+  }
+  return hole;
+}
+
+/** Side wall only. No bevel, so the silhouette stays a clean rounded band. */
+function frameBand(w, h, depth, radius, lip, material) {
+  const outer = roundedRect(w, h, radius);
+  outer.holes.push(asHole(roundedRect(w - lip * 2, h - lip * 2, Math.max(1.2, radius - lip))));
+  const geo = new THREE.ExtrudeGeometry(outer, { depth, bevelEnabled: false, curveSegments: 28 });
+  geo.translate(0, 0, -depth / 2);
+  geo.computeVertexNormals();
+  const mesh = new THREE.Mesh(geo, material);
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  return mesh;
+}
+
 function slab(w, h, depth, radius, material) {
   const geo = new THREE.ExtrudeGeometry(roundedRect(w, h, radius), {
     depth,
@@ -199,11 +222,12 @@ export function buildPhone(materials, explode = 0) {
   const group = new THREE.Group();
   group.name = "phone";
 
-  const body = slab(W, H, T, CORNER_MM, materials.frame);
+  const lip = 2.6;
+  const body = frameBand(W, H, T, CORNER_MM, lip, materials.frame);
   group.add(body);
 
-  const rear = slab(W - 1.4, H - 1.4, 0.55, CORNER_MM - 0.4, materials.rear);
-  rear.position.z = -T / 2 - 0.62 - e * 18;
+  const rear = slab(W - lip * 2 + 0.4, H - lip * 2 + 0.4, 0.45, CORNER_MM - lip, materials.rear);
+  rear.position.z = -T / 2 + 0.42 - e * 18;
   group.add(rear);
 
   const glass = slab(W - 3.2, H - 3.2, 0.4, CORNER_MM - 1, materials.glass);
@@ -215,7 +239,7 @@ export function buildPhone(materials, explode = 0) {
   group.add(screen);
 
   const plateau = new THREE.Group();
-  plateau.position.set(-W * 0.18, H * 0.28, -T / 2 - 1.2 - e * 28);
+  plateau.position.set(-W * 0.18, H * 0.28, -T / 2 - 1.35 - e * 28);
   const island = slab(38, 38, 2.5, 9, materials.frame);
   plateau.add(island);
   const iz = -1.45;
@@ -227,12 +251,12 @@ export function buildPhone(materials, explode = 0) {
   pill.position.set(24, 2, -0.2);
   plateau.add(pill);
   group.add(plateau);
-  const leica = wordmark("LEICA", 16, 2.6);
-  leica.position.set(-W * 0.18, H * 0.28 - 26, -T / 2 - 1.05 - e * 20);
+  const leica = wordmark("LEICA", 28, 4.6);
+  leica.position.set(-W * 0.18, H * 0.28 - 28, -T / 2 - 0.15 - e * 20);
   group.add(leica);
-  const brand = wordmark("XIAOMI", 20, 2.8);
+  const brand = wordmark("XIAOMI", 36, 5.2);
   brand.rotation.z = Math.PI / 2;
-  brand.position.set(6, -8, -T / 2 - 1.0 - e * 14);
+  brand.position.set(10, -6, -T / 2 - 0.12 - e * 14);
   group.add(brand);
 
   const power = new THREE.Mesh(new THREE.CapsuleGeometry(0.75, 15, 6, 12), materials.frame);

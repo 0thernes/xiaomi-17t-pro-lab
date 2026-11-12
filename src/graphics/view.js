@@ -63,7 +63,9 @@ export async function mountView(canvas, cap) {
   key.castShadow = shadows;
   if (shadows) {
     key.shadow.mapSize.set(2048, 2048);
-    key.shadow.radius = 3;
+    key.shadow.radius = 2;
+    key.shadow.bias = -0.0004;
+    key.shadow.normalBias = 0.04;
     key.shadow.camera.near = 1;
     key.shadow.camera.far = 200;
     key.shadow.camera.left = -140;
@@ -196,6 +198,9 @@ export async function mountView(canvas, cap) {
     frame(object, fill = 0.9) {
       framed = { object, fill };
       fit(object, fill);
+    },
+    release() {
+      framed = null;
     },
     clear() {
       root.clear();

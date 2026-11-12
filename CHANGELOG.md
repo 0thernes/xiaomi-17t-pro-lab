@@ -6,7 +6,7 @@ All notable changes to this project are documented here. The format is based on 
 
 ### Changed
 
-- The WebGL2 path is the look: AgX, a studio PMREM, bloom, SMAA, and a gentle SAO pass that multiplies onto the beauty pass only after it has been drawn. The hero turntable shows the full phone, then the Deep Violet back and camera plateau, then the exploded stack. CPU, GPU, and NPU views draw instanced SRAM, a scaled 48 nm fin row, a 23 nm metal stack, live pipeline packets, live tile bins, and a live INT8 MAC array.
+- The WebGL2 path is the look: AgX, a studio PMREM, bloom, SMAA, and a gentle SAO pass that multiplies onto the beauty pass only after it has been drawn. The phone frame is a bevel-free rounded band with a Deep Violet back and readable LEICA and XIAOMI marks. CPU, GPU, and NPU cameras sit inside the block: fins and the metal stack at eye level, tile bins as a wall, MAC columns as towers, with fog and emissive packet streaks.
 - three.js r187 is vendored. p5.js is 2.4 and sketches use a high-DPI pixel density up to 2.
 - The phone body is a 10 mm rounded profile (the published corner radius is still unpublished, so this radius is a reconstruction) with an anisotropic aluminum frame, AG clearcoat back, iridescent lenses, side buttons, and a USB-C port.
 

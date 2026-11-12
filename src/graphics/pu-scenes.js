@@ -209,48 +209,58 @@ function callout(text) {
   );
 }
 
+function streak(materials, count) {
+  const beads = [];
+  for (let i = 0; i < count; i++) {
+    const bead = new THREE.Mesh(new THREE.SphereGeometry(0.22, 12, 8), materials.accent.clone());
+    bead.material.emissiveIntensity = 0.7 + (i % 4) * 0.2;
+    beads.push(bead);
+  }
+  return beads;
+}
+
+const EYE = {
+  cpu: { theta: 0.22, phi: 1.42, radius: 8.5, target: [0.4, 2.4, 1] },
+  gpu: { theta: 0.35, phi: 1.38, radius: 7.5, target: [0, 2.2, 4] },
+  npu: { theta: -0.2, phi: 1.4, radius: 8, target: [1, 3.2, 0] },
+};
+
 export function sceneUltra(materials) {
   const specs = getSpecs();
   const group = new THREE.Group();
-  group.add(box(18, 0.28, 10, materials.substrate, 0, -0.4, 0));
   const laneMat = new THREE.MeshPhysicalMaterial({
     color: 0xff7a1a,
-    metalness: 0.25,
-    roughness: 0.32,
+    metalness: 0.2,
+    roughness: 0.3,
     emissive: 0xff7a1a,
-    emissiveIntensity: 0.65,
+    emissiveIntensity: 0.8,
   });
-  for (let i = 0; i < 10; i++) group.add(box(0.7, 1.8, 0.7, laneMat, -5.4 + i * 1.15, 1.2, 2.4));
-  for (let i = 0; i < 23; i++) group.add(box(0.18, 2.4, 0.36, materials.copper, -6.2 + i * 0.55, -0.2, -2.6));
-  group.add(sramGrid(materials.gold, 28, 14, 0.22, { x: -3.1, y: 0.15, z: -1.2 }));
-  const metal = [23, 32, 48, 70, 96];
-  metal.forEach((pitch, i) => {
-    group.add(
-      box(0.15 + pitch / 80, 0.12, 3.2, i === 0 ? materials.gold : materials.copper, 8.2, -1.2 + i * 0.28, 1.2),
-    );
-  });
-  const finMat = materials.silicon.clone();
-  const fins = new THREE.InstancedMesh(new THREE.BoxGeometry(0.12, 0.9, 2.2), finMat, 8);
+  for (let i = 0; i < 10; i++) group.add(box(0.55, 7.5, 0.55, laneMat, -6 + i * 0.7, 3.6, -6));
+  for (let i = 0; i < 12; i++) {
+    const h = 9 + (i % 3);
+    group.add(box(0.22, h, 6.5, materials.silicon, -4.2 + i * 0.42, h / 2, 2));
+  }
+  group.add(box(0.35, 0.45, 6.8, materials.frame, -1.9, 4.2, 2));
+  for (let i = 0; i < 8; i++) {
+    group.add(box(7.5, 0.16, 4.2, i === 0 ? materials.gold : materials.copper, 6.5, 0.4 + i * 1.15, -1));
+  }
+  const wall = new THREE.InstancedMesh(new THREE.BoxGeometry(0.28, 0.28, 0.12), materials.gold, 18 * 10);
   const dummy = new THREE.Object3D();
-  for (let i = 0; i < 8; i++) {
-    dummy.position.set(-8.2 + i * 0.28, 0.5, 2.2);
-    dummy.updateMatrix();
-    fins.setMatrixAt(i, dummy.matrix);
+  let n = 0;
+  for (let y = 0; y < 10; y++) {
+    for (let x = 0; x < 18; x++) {
+      dummy.position.set(-7.2 + x * 0.36, 0.6 + y * 0.4, 6.2);
+      dummy.updateMatrix();
+      wall.setMatrixAt(n++, dummy.matrix);
+    }
   }
-  group.add(fins);
-  const gate = box(2.4, 0.22, 0.35, materials.frame, -7.2, 1.15, 2.2);
-  group.add(gate);
-  const packets = [];
-  for (let i = 0; i < 8; i++) {
-    const bead = new THREE.Mesh(new THREE.SphereGeometry(0.16, 14, 10), materials.accent.clone());
-    bead.material.emissiveIntensity = 0.4 + i * 0.08;
-    packets.push(bead);
-    group.add(bead);
-  }
+  group.add(wall);
+  const packets = streak(materials, 14);
+  packets.forEach((bead) => group.add(bead));
   const metalLabel = callout("23 nm metal, scaled");
-  metalLabel.position.set(8.2, 0.8, 3.1);
-  const finLabel = callout("48 nm gate pitch");
-  finLabel.position.set(-7.2, 1.9, 3.4);
+  metalLabel.position.set(6.5, 5.2, 1.4);
+  const finLabel = callout("48 nm fins");
+  finLabel.position.set(-1.8, 5.4, 5.2);
   group.add(metalLabel, finLabel);
   const sim = createPipeline(
     [
@@ -261,9 +271,14 @@ export function sceneUltra(materials) {
   );
   let acc = 0;
   const text = specs.soc.c1_ultra_frontend_width?.value || "10-wide decode";
+  group.traverse((obj) => {
+    obj.castShadow = false;
+    obj.receiveShadow = false;
+  });
   return {
     group,
-    note: `C1-Ultra reconstruction. Cited: ${text}. L1I ${specs.soc.l1i_kb_c1_ultra.value} KB, L1D ${specs.soc.l1d_kb_c1_ultra.value} KB. Ten lanes are the decode width. Twenty-three copper posts are the issue ports. The SRAM field, the 23 nm metal stack, and the 48 nm fins are scaled drawings, not a die photo. Packets follow a live in-order pipeline.`,
+    eye: EYE.cpu,
+    note: `Inside a C1-Ultra reconstruction. Cited: ${text}. L1I ${specs.soc.l1i_kb_c1_ultra.value} KB, L1D ${specs.soc.l1d_kb_c1_ultra.value} KB. The tall orange posts are the 10-wide decode. The fins are a scaled 48 nm gate pitch. The copper sheets are a scaled 23 nm metal stack. Packets follow a live in-order pipeline. Not a die photo.`,
     update(dt) {
       acc += dt;
       if (acc > 0.28) {
@@ -272,8 +287,8 @@ export function sceneUltra(materials) {
       }
       const t = performance.now() * 0.001;
       packets.forEach((bead, i) => {
-        const u = (t * 0.35 + i / packets.length) % 1;
-        bead.position.set(-5.4 + u * 10.2, 2.3, 2.4);
+        const u = (t * 0.22 + i / packets.length) % 1;
+        bead.position.set(-1.2 + Math.sin(u * 8 + i) * 0.35, 2.1, -7 + u * 14);
       });
     },
   };
@@ -453,43 +468,53 @@ export function sceneGpuCore(materials) {
     { width: 32, height: 32, tileSize: 8 },
   );
   const group = new THREE.Group();
-  group.add(box(9.2, 0.2, 4.2, materials.substrate, 0, -0.3, 0));
   for (let i = 0; i < 12; i++) {
-    const core = box(1.35, 0.7, 1.15, materials.silicon, (i % 4) * 1.7 - 2.55, 0.35, Math.floor(i / 4) * 1.35 - 1.2);
-    group.add(core);
+    const col = i % 4;
+    const row = Math.floor(i / 4);
+    group.add(box(2.1, 5.2, 2.1, materials.silicon, col * 3.1 - 4.6, 2.6, row * 3.2 - 2));
   }
   const tiles = shaded.tilesX * shaded.tilesY;
   const tileMat = new THREE.MeshStandardMaterial({
     color: 0xffffff,
     emissive: 0xff7a1a,
     roughness: 0.35,
-    metalness: 0.15,
+    metalness: 0.1,
   });
-  const mesh = new THREE.InstancedMesh(new THREE.BoxGeometry(0.42, 0.2, 0.42), tileMat, tiles);
+  const mesh = new THREE.InstancedMesh(new THREE.BoxGeometry(0.7, 0.7, 0.2), tileMat, tiles);
   const dummy = new THREE.Object3D();
   const color = new THREE.Color();
   for (let i = 0; i < tiles; i++) {
     const x = i % shaded.tilesX;
     const y = Math.floor(i / shaded.tilesX);
     const count = shaded.bins[i].length;
-    dummy.position.set(x * 0.5 - 0.75, 0.2 + count * 0.22, y * 0.5 + 2.3);
-    dummy.scale.set(1, 0.4 + count * 1.4, 1);
+    dummy.position.set(x * 0.85 - 1.2, 0.8 + y * 0.85, 8.2);
     dummy.updateMatrix();
     mesh.setMatrixAt(i, dummy.matrix);
-    color.set(count ? 0xff7a1a : 0x243044);
+    color.set(count ? 0xffb070 : 0x1c2838);
     mesh.setColorAt(i, color);
   }
   group.add(mesh);
-  group.add(box(6.4, 0.28, 0.7, materials.gold, 0, 0.1, -2.3));
+  const packets = streak(materials, 10);
+  packets.forEach((bead) => group.add(bead));
   const label = callout("Live tile bins");
-  label.position.set(0, 1.6, 4.3);
+  label.position.set(0, 4.6, 7.6);
   group.add(label);
+  group.traverse((obj) => {
+    obj.castShadow = false;
+    obj.receiveShadow = false;
+  });
   return {
     group,
-    note: `Twelve shader cores, the cited MC12 count, and a 2 MiB L2 bar. The tiles are this lab’s binner: ${shaded.touched} bins touched, ${shaded.shaded} pixels shaded. Lit tiles are the ones that received a triangle. This is not a Mali floorplan. GPU block area is 24.23 mm².`,
-    update(dt) {
-      const pulse = 0.35 + 0.65 * (0.5 + 0.5 * Math.sin(performance.now() * 0.004));
+    eye: EYE.gpu,
+    note: `Inside the twelve shader cores, the cited MC12 count. The wall ahead is this lab’s binner: ${shaded.touched} bins touched, ${shaded.shaded} pixels shaded. Lit tiles received a triangle. This is not a Mali floorplan. GPU block area is 24.23 mm².`,
+    update() {
+      const pulse = 0.4 + 0.6 * (0.5 + 0.5 * Math.sin(performance.now() * 0.004));
       mesh.material.emissiveIntensity = pulse;
+      const t = performance.now() * 0.001;
+      packets.forEach((bead, i) => {
+        const u = (t * 0.25 + i / packets.length) % 1;
+        bead.position.set(-2 + (i % 3), 1.6 + (i % 4) * 0.4, -3 + u * 10);
+      });
     },
   };
 }
@@ -506,34 +531,56 @@ export function sceneNpu(materials) {
   let max = 1e-6;
   for (const v of C) max = Math.max(max, Math.abs(v));
   const group = new THREE.Group();
-  group.add(box(n + 1.2, 0.16, n + 1.2, materials.substrate, 0, -0.2, 0));
   const cells = [];
   for (let y = 0; y < n; y++) {
     for (let x = 0; x < n; x++) {
       const mag = Math.abs(C[y * n + x]) / max;
-      const mesh = box(0.62, 0.18 + mag * 1.6, 0.62, materials.accent, x - n / 2 + 0.5, mag * 0.45, y - n / 2 + 0.5);
+      const h = 1.2 + mag * 8;
+      const mesh = box(0.7, h, 0.7, materials.accent, x * 1.15 - n * 0.55, h / 2, y * 1.15 - n * 0.55);
       mesh.material = materials.accent.clone();
       mesh.userData.mag = mag;
       cells.push(mesh);
       group.add(mesh);
     }
   }
-  group.add(sramGrid(materials.gold, 18, 8, 0.28, { x: -6.6, y: 0.2, z: -1.1 }));
-  for (let i = 0; i < (counts.mdla || 4); i++) {
-    group.add(box(1.5, 0.55, 1.1, materials.silicon, -6.4, 0.5, 2.2 + i * 1.25));
+  const wall = new THREE.InstancedMesh(new THREE.BoxGeometry(0.22, 0.22, 0.22), materials.gold, 16 * 12);
+  const dummy = new THREE.Object3D();
+  let count = 0;
+  for (let y = 0; y < 12; y++) {
+    for (let x = 0; x < 16; x++) {
+      dummy.position.set(-8.5, 0.4 + y * 0.32, -2 + x * 0.32);
+      dummy.updateMatrix();
+      wall.setMatrixAt(count++, dummy.matrix);
+    }
   }
+  group.add(wall);
+  for (let i = 0; i < (counts.mdla || 4); i++) {
+    group.add(box(1.6, 6.5, 1.4, materials.silicon, -7.2, 3.2, -3 + i * 2));
+  }
+  const packets = streak(materials, 12);
+  packets.forEach((bead) => group.add(bead));
   const label = callout("INT8 MAC");
-  label.position.set(0, 2.2, n / 2 + 0.4);
+  label.position.set(0, 6.4, 2);
   group.add(label);
+  group.traverse((obj) => {
+    obj.castShadow = false;
+    obj.receiveShadow = false;
+  });
   return {
     group,
-    note: `${counts.mdla} MDLA and ${counts.mvpu} MVPU are cited. Column height and the sweeping glow are a live INT8 matmul in this page. It does not run on NPU 990. The SRAM block is a drawing. CIM cell geometry is unpublished.`,
+    eye: EYE.npu,
+    note: `${counts.mdla} MDLA and ${counts.mvpu} MVPU are cited. You are inside the MAC field. Column height and the sweeping glow are a live INT8 matmul in this page. It does not run on NPU 990. The SRAM wall is a drawing.`,
     update() {
       const sweep = (performance.now() * 0.0012) % n;
       cells.forEach((cell, i) => {
         const col = i % n;
         const near = 1 - Math.min(1, Math.abs(col - sweep) / 2.2);
-        cell.material.emissiveIntensity = 0.12 + cell.userData.mag * (0.35 + near * 1.1);
+        cell.material.emissiveIntensity = 0.15 + cell.userData.mag * (0.4 + near * 1.3);
+      });
+      const t = performance.now() * 0.001;
+      packets.forEach((bead, i) => {
+        const u = (t * 0.2 + i / packets.length) % 1;
+        bead.position.set(-4 + u * 9, 2.4 + Math.sin(u * 6) * 0.4, -1 + (i % 5) * 0.5);
       });
     },
   };

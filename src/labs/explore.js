@@ -9,6 +9,9 @@ import { makeMaterials, mountView } from "../graphics/view.js";
  */
 export async function mountExplore(cap, engine, levels) {
   const stage = el("div", { class: "stage" });
+  if (new URLSearchParams(location.search).get("shot") === "4k") {
+    stage.style.cssText = "position:fixed;inset:0;width:100vw;height:100vh;max-width:none;z-index:20;border-radius:0";
+  }
   const canvas = el("canvas", { "aria-label": `${engine} explorable stack` });
   stage.append(canvas);
   const rail = el("div", { class: "level-rail" });
@@ -24,6 +27,20 @@ export async function mountExplore(cap, engine, levels) {
   let current = null;
   let flying = false;
   const data = { points: null };
+  if (view) view.scene.fog = new view.THREE.Fog(0x4a4038, 5, 32);
+
+  function place(built) {
+    if (built.eye) {
+      view.release();
+      const target = new view.THREE.Vector3(...built.eye.target);
+      built.group.localToWorld(target);
+      view.orbit.set(built.eye.radius, target);
+      view.orbit.pose(built.eye.theta, built.eye.phi);
+      return;
+    }
+    view.scene.fog = null;
+    view.frame(built.group, 0.9);
+  }
 
   function show(level) {
     for (const button of rail.querySelectorAll("button")) {
@@ -44,7 +61,7 @@ export async function mountExplore(cap, engine, levels) {
     view.root.add(built.group);
     current = built;
     if (!previous) {
-      view.frame(built.group, 0.9);
+      place(built);
       return;
     }
     flying = true;
@@ -60,7 +77,7 @@ export async function mountExplore(cap, engine, levels) {
       }
       view.root.remove(previous.group);
       flying = false;
-      view.frame(built.group, 0.9);
+      place(built);
     };
     requestAnimationFrame(step);
   }

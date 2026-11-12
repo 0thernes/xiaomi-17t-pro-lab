@@ -15,6 +15,9 @@ export async function mount(main, { cap }) {
   const die = parseDieMm(specs);
   const pkg = parsePackageMm(specs);
   const stage = el("div", { class: "stage" });
+  if (new URLSearchParams(location.search).get("shot") === "4k") {
+    stage.style.cssText = "position:fixed;inset:0;width:100vw;height:100vh;max-width:none;z-index:20;border-radius:0";
+  }
   const canvas = el("canvas", {
     "aria-label": "Exploded model of the Xiaomi 17T Pro. Outer size is cited. Internals are a reconstruction.",
   });
@@ -49,6 +52,7 @@ export async function mount(main, { cap }) {
     if (pose === "front") view.orbit.pose(0.28, 1.12);
     else if (pose === "back" || pose === "explode" || cap.reducedMotion) view.orbit.pose(Math.PI + 0.22, 1.05);
     else view.orbit.pose(0.28, 1.12);
+    view.scene.fog = null;
   } catch (error) {
     stage.append(note(`WebGL unavailable (${error.message}). The numbers below still come from specs.json.`));
   }
