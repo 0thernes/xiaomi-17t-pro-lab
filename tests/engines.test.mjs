@@ -51,7 +51,7 @@ describe("version", () => {
   it("matches package.json and VERSION", () => {
     const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"));
     const file = readFileSync(new URL("../VERSION", import.meta.url), "utf8").trim();
-    assert.equal(VERSION, "0.1.0");
+    assert.equal(VERSION, "0.2.0");
     assert.equal(pkg.version, VERSION);
     assert.equal(file, VERSION);
   });
@@ -73,11 +73,17 @@ describe("specs integrity", () => {
     assert.ok(text.includes("512KB"));
     assert.equal(specs.soc.l3_mb.value, 16);
     assert.equal(specs.soc.slc_mb.value, 10);
-    assert.equal(specs.soc.l1_cache_bytes.status, "unknown");
-    assert.equal(specs.soc.l1_cache_bytes.value, null);
-    assert.equal(specs.soc.gpu_clock_mhz.status, "unknown");
-    assert.equal(specs.soc.npu_tops.status, "unknown");
+    assert.equal(specs.soc.l1i_kb_c1_ultra.value, 64);
+    assert.equal(specs.soc.l1d_kb_c1_ultra.value, 128);
+    assert.equal(specs.soc.l1i_kb_c1_pro.status, "unconfirmed");
+    assert.equal(specs.soc.gpu_clock_mhz.status, "unconfirmed");
+    assert.equal(specs.soc.gpu_clock_mhz.value, 1716);
+    assert.equal(specs.soc.npu_tops.status, "unconfirmed");
+    assert.equal(specs.soc.npu_tops.value, 100);
+    assert.equal(specs.soc.die_size_mm2.value, 140.57);
     assert.equal(specs.soc.transistor_architecture.value, "FinFET");
+    assert.equal(specs.device.ufs_lane_count_device.value, null);
+    assert.equal(specs.device.pmic.value, null);
   });
 });
 
@@ -256,7 +262,7 @@ describe("a64, chase, stream, device math", () => {
 });
 
 describe("comparison model", () => {
-  it("computes Steel Nomad stability from cited scores and leaves iPhone GB6 unknown", () => {
+  it("computes Steel Nomad stability and keeps iPhone Geekbench on a different lab", () => {
     const model = buildComparison();
     const snl = model.snlStability.xiaomi.ratio;
     assert.ok(Math.abs(snl - 1871 / 2476) < 1e-12);
@@ -264,6 +270,10 @@ describe("comparison model", () => {
     assert.equal(gb6.iphone.text, "UNKNOWN");
     assert.equal(gb6.xiaomi.numeric, 2903);
     assert.equal(gb6.samsung.numeric, 3753);
+    const cross = model.rows.find((r) => r.id === "gb6_single_cross");
+    assert.equal(cross.crossLab, true);
+    assert.equal(cross.iphone.numeric, 4725);
+    assert.equal(cross.ratioVsIphone, null);
     assert.equal(model.scoreboard.geekbench6_cpu_phonearena.value, "galaxy_s26_ultra");
     assert.ok(Math.abs(model.ppi.xiaomiComputed.ppi - 447) < 0.2);
     assert.equal(model.ppi.samsungCited, null);

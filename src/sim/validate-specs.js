@@ -78,4 +78,7 @@ function checkLeaf(node, path, errors) {
       errors.push(`${path} is unconfirmed with a value but no source`);
     }
   }
+  if ("confidence" in node && (typeof node.confidence !== "string" || node.confidence.length === 0)) {
+    errors.push(`${path} confidence must be a non-empty string when present`);
+  }
 }

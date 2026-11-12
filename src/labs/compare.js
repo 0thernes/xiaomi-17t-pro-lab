@@ -56,7 +56,7 @@ export async function mount(main) {
   main.replaceChildren(
     el("h1", {}, ["Wins and losses"]),
     el("p", { class: "lede" }, [
-      `${model.phones.xiaomi.text} against ${model.phones.iphone.text} and ${model.phones.samsung.text}, as of ${model.asOf.value}. Geekbench 6 is never mixed with Geekbench 7. The iPhone has no same-lab Geekbench 6 number in this dossier, so that cell is UNKNOWN.`,
+      `${model.phones.xiaomi.text} against ${model.phones.iphone.text} and ${model.phones.samsung.text}, as of ${model.asOf.value}. Geekbench 6 is never mixed with Geekbench 7. The iPhone Geekbench 6.7 figures are Notebookcheck, a different lab from the PhoneArena row, and they are not divided into the Xiaomi score.`,
     ]),
     panel("Scoreboard", [board, note(model.methodology.value)]),
     panel("Numbers the page divides", [

@@ -1,6 +1,6 @@
 # Data provenance
 
-`data/specs.json` is the only source of hardware numbers in the UI. Every leaf has `value`, `unit`, `source`, and `status` of `confirmed`, `unconfirmed`, or `unknown`.
+`data/specs.json` is the only source of hardware numbers in the UI. Every leaf has `value`, `unit`, `source`, and `status` of `confirmed`, `unconfirmed`, or `unknown`. The 2026-11-12 pass also stored `confidence` on the leaves it touched. Views read the leaf. A confidence string does not promote an unconfirmed value.
 
 Rules enforced by `src/sim/validate-specs.js` and `npm test`:
 

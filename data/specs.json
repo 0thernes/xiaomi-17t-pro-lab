@@ -49,7 +49,58 @@
       "GSMA-17T": "https://www.gsmarena.com/xiaomi_17t_pro-14651.php",
       "GSMA-17T-REVIEW": "https://www.gsmarena.com/xiaomi_17t_pro-review-2965p4.php",
       "ENGADGET-S26U": "https://www.engadget.com/mobile/smartphones/samsung-galaxy-s26-ultra-review-the-stealth-upgrade-140000629.html",
-      "H2H": "see /workspace/xiaomi-lab/head-to-head.md"
+      "H2H": "see /workspace/xiaomi-lab/head-to-head.md",
+      "ARM_C1U_TRM": "https://support.arm.com/documentation/108014/0101/Technical-overview/Core-components",
+      "ARM_C1P_TRM": "https://support.arm.com/documentation/109416/0101/Technical-overview/Core-components",
+      "ARM_C1PRO_TRM": "https://support.arm.com/documentation/107771/0103/Technical-overview/Core-components",
+      "ARM_SME2_TRM": "https://support.arm.com/documentation/107831/0103/The-C1-SME2--unit/C1-SME2--unit-features",
+      "ARM_C1U_FEAT": "https://support.arm.com/documentation/108014/0101/The-C1-Ultra--core/C1-Ultra--core-features",
+      "ARM_C1U_SOG": "https://developer.arm.com/documentation/111079/3-0",
+      "ARM_C1_CMP": "https://documentation-service.arm.com/static/68c0db0ecccf2a5517017bfe",
+      "JIA_ARM": "https://jia.je/hardware/2025/09/10/arm-core-development/",
+      "CB_LUMEX": "https://www.computerbase.de/news/prozessoren/arm-lumex-css-platform-neue-c1-kerne-fuehren-sme2-fuer-ai-direkt-auf-der-cpu-ein.94179/",
+      "KURNAL_PDF": "https://kurnal-insights.com/uploads/Report/D9500%20V1.pdf",
+      "KURNAL_PAGE": "https://kurnal-insights.com/dieshot/mediatek-dimensity-9500-mt6993/",
+      "NBC_DIE": "https://www.notebookcheck.net/MediaTek-Dimensity-9500-die-shot-showcases-noticeably-larger-chip-and-incremental-upgrades-to-CPU-and-NPU.1128763.0.html",
+      "TI_D9500": "https://www.techinsights.com/blog/dimensity-9500-debuts-arm-c1-cores-and-dual-npu",
+      "TI_PKG": "https://www.techinsights.com/blog/mediatek-dimensity-9500-advanced-packaging-quick-look",
+      "TI_FLOOR": "https://www.techinsights.com/blog/mediatek-dimensity-9500-digital-floorplan-analysis",
+      "ZOL_D9500": "https://mobile.zol.com.cn/1051/10516661.html",
+      "COUNTERPOINT": "https://counterpointresearch.com/en/insights/mediatek-dimensity-9500-powering-powering-next-gen-smartphones",
+      "NANOREVIEW": "https://nanoreview.net/en/soc/mediatek-dimensity-9500",
+      "GOOGLE_LITERT_BLOG": "https://developers.googleblog.com/mediatek-npu-and-litert-powering-the-next-generation-of-on-device-ai/",
+      "GENIO_MDLA": "https://genio-community.mediatek.com/t/mediatek-aot-compilation-via-public-api-produces-unoptimized-bytecode-missing-19-mdla-flags-vs-googles-official-litertlm/1907",
+      "GH_A16W8": "https://github.com/google-ai-edge/ai-edge-quantizer/issues/449",
+      "XIAOMI_ERP": "https://spare-parts.mi.com/cdn/shop/files/P12U_Xiaomi_17T_Pro_ERP_c1d3851e-b6a1-4622-b262-c160cb7fba23.pdf?v=18270098609428527401",
+      "XIAOMI_TW": "https://www.mi.com/tw/product/xiaomi-17t-pro/specs/",
+      "XIAOMI_CN": "https://www.mi.com/prod/xiaomi-17t-pro/specs",
+      "XIAOMI_GL": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "ITHOME_TCL": "https://www.ithome.com/0/961/658.htm",
+      "ITHOME_CNSKU": "https://www.ithome.com/0/961/562.htm",
+      "ITHOME_SI": "https://www.ithome.com/0/960/256.htm",
+      "ITHOME_REVIEW": "https://www.ithome.com/0/961/522.htm",
+      "HUAWEICENTRAL": "https://www.huaweicentral.com/xiaomi-17t-series-debuts-in-china-for-first-time/",
+      "NBC_17T": "https://www.notebookcheck.net/A-flagship-that-makes-you-forget-its-price-Xiaomi-17T-Pro-Review.1352144.0.html",
+      "MTK_PHONE": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500",
+      "WIKICHIP_N3": "https://fuse.wikichip.org/news/7375/tsmc-n3-and-challenges-ahead/",
+      "TSMC_SMART": "https://www.tsmc.com/english/dedicatedFoundry/technology/platform_smartphone_tech_advancedTech",
+      "REUTERS_HNA": "https://www.reuters.com/technology/tsmc-says-asml-high-na-euv-machine-not-necessary-a16-node-2024-05-14/",
+      "ASML_EUV": "https://www.asml.com/en/products/euv-lithography-systems",
+      "ALANHC_BOOT": "https://alanhc.github.io/til/docs/qualcomm-vs-mediatek-android-boot-flow",
+      "APPLE_SHOP": "https://www.apple.com/shop/buy-iphone/iphone-18-pro",
+      "APPLE_NR": "https://www.apple.com/newsroom/2026/09/apple-debuts-iphone-18-pro-and-iphone-18-pro-max/",
+      "MACRUMORS_RAM": "https://www.macrumors.com/2026/09/10/iphone-18-pro-max-battery-capacities-ram/",
+      "PA_TEARDOWN": "https://www.phonearena.com/news/iphone-18-pro-max-teardown-confirms-its-battery-and-exposes-a-fragile-flaw_id183530",
+      "TI_A20": "https://www.techinsights.com/iphone-18-pro-max-idm-analysis",
+      "NBC_A20_GB": "https://www.notebookcheck.net/Apple-iPhone-18-Pro-Max-gaming-performance-exceeds-official-40-sustained-performance-claim.1415112.0.html",
+      "TI_SD8EG5": "https://www.techinsights.com/blog/qualcomm-snapdragon-8-elite-gen-5-advanced-packaging-quick-look",
+      "QCOM_BRIEF": "https://www.qualcomm.com/content/dam/qcomm-martech/dm-assets/documents/Snapdragon-8-Elite-Gen-5-product-brief.pdf",
+      "SAMSUNG_NR": "https://news.samsung.com/global/samsung-unveils-galaxy-s26-series-the-most-intuitive-galaxy-ai-phone-yet",
+      "PA_S26_PRICE": "https://www.phonearena.com/news/samsung-galaxy-s26-plus-ultra-price-hike-full-official-numbers_id178507",
+      "PA_S26_HIKE": "https://www.phonearena.com/news/samsung-galaxy-s26-plus-ultra-us-prices-officially-increased_id183747",
+      "SAMSUNG_US_BUY": "https://www.samsung.com/us/smartphones/galaxy-s26-ultra/buy/",
+      "TECHRADAR_17T": "https://www.techradar.com/phones/xiaomi-phones/xiaomi-17t-pro-review",
+      "PHOTOWORKOUT": "https://www.photoworkout.com/xiaomi-17t-leica/"
     },
     "companion_files": [
       "specs-dossier.md",
@@ -57,7 +108,8 @@
       "cpu-gpu-npu-deep.md",
       "taxonomy.json",
       "predecessor-notes.md"
-    ]
+    ],
+    "unknowns_pass_2026_11_12": "Second research pass resolving UNKNOWN/UNCONFIRMED fields; see unknowns-resolved.md. Added keys: confidence, resolved_on, searched_2026_11_12."
   },
   "device": {
     "name": {
@@ -94,9 +146,11 @@
     "model_number": {
       "value": "2602EPTC0G",
       "unit": null,
-      "source": "https://www.gsmarena.com/xiaomi_17t_pro-14651.php",
-      "status": "unconfirmed",
-      "notes": "GSMArena only; not on Xiaomi official spec page."
+      "source": "https://www.mi.com/tw/product/xiaomi-17t-pro/specs/",
+      "status": "confirmed",
+      "notes": "Printed on Xiaomi Taiwan official spec page (產品型號：2602EPTC0G, NCC ID CCAF265G0140T0). Also GSMArena.",
+      "confidence": "high",
+      "resolved_on": "2026-11-12"
     },
     "height_mm": {
       "value": 162.2,
@@ -134,14 +188,17 @@
       "unit": null,
       "source": "https://www.gsmarena.com/xiaomi_17t_pro-14651.php",
       "status": "unconfirmed",
-      "notes": "Reputable outlet (GSMArena review also). Not stated on Xiaomi official spec sheet. Treated as outlet-confirmed in the dossier narrative; status unconfirmed officially."
+      "notes": "Reputable outlet (GSMArena review also). Not stated on Xiaomi official spec sheet. Treated as outlet-confirmed in the dossier narrative; status unconfirmed officially. | 2026-11-12: Xiaomi lists Gorilla Glass 7i only under Display (front). IT之家 hands-on describes the back as AG matte glass; only GSMArena names GG7i for the back. Still single-source for the rear glass grade.",
+      "searched_2026_11_12": "Xiaomi Global/TW/CN spec pages, IT之家 review (ithome.com/0/961/522.htm), Notebookcheck review, GSMArena"
     },
     "frame": {
-      "value": "Aluminum alloy",
+      "value": "Aluminum alloy (sand-blasted matte)",
       "unit": null,
-      "source": "https://www.gsmarena.com/xiaomi_17t_pro-14651.php",
-      "status": "unconfirmed",
-      "notes": "GSMArena / review; not on official Xiaomi spec sheet."
+      "source": "https://www.ithome.com/0/961/522.htm",
+      "status": "confirmed",
+      "notes": "Two independent hands-on sources: IT之家 review (铝合金材质, 雾面喷砂) and GSMArena (aluminum frame). Not on the Xiaomi spec sheet.",
+      "confidence": "medium-high",
+      "resolved_on": "2026-11-12"
     },
     "ingress_protection": {
       "value": "IP68",
@@ -157,17 +214,22 @@
       "status": "confirmed"
     },
     "cooling_materials": {
-      "value": null,
+      "value": "Vapor chamber (VC heat sink) + graphite sheets + graphite-copper foil (front camera) + thermal grease applied to frame; marketed as Xiaomi 3D IceLoop",
       "unit": null,
-      "source": null,
-      "status": "unknown"
+      "source": "https://spare-parts.mi.com/cdn/shop/files/P12U_Xiaomi_17T_Pro_ERP_c1d3851e-b6a1-4622-b262-c160cb7fba23.pdf?v=18270098609428527401",
+      "status": "confirmed",
+      "notes": "Xiaomi official repair manual (ERP, 53 pp): 'Lift the graphite sheet', 'Check that the VC heat sink is not wrinkled or deformed', 'apply thermal grease to the frame', 'Apply graphite copper foil to the front camera'. VC area: see cooling_vc_area_mm2.",
+      "confidence": "high",
+      "resolved_on": "2026-11-12"
     },
     "fingerprint": {
-      "value": "In-screen fingerprint sensor",
+      "value": "In-screen optical fingerprint sensor",
       "unit": null,
-      "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "source": "https://www.mi.com/prod/xiaomi-17t-pro/specs",
       "status": "confirmed",
-      "notes": "Optical vs ultrasonic not stated officially; GSMArena says optical."
+      "notes": "Xiaomi China official page meta lists 光学指纹 (optical fingerprint); Notebookcheck and GSMArena also say optical. Resolves conflict #13.",
+      "confidence": "high",
+      "resolved_on": "2026-11-12"
     },
     "display_type": {
       "value": "AMOLED, flat, flexible, on-cell full lamination",
@@ -293,15 +355,20 @@
     "pwm_hz": {
       "value": 3840,
       "unit": "Hz",
-      "source": "https://www.gsmarena.com/xiaomi_17t_pro-14651.php",
-      "status": "unconfirmed",
-      "notes": "GSMArena only."
+      "source": "https://www.notebookcheck.net/A-flagship-that-makes-you-forget-its-price-Xiaomi-17T-Pro-Review.1352144.0.html",
+      "status": "confirmed",
+      "notes": "Two independent measurements: GSMArena lists 3840 Hz PWM; Notebookcheck measured a 3,846 Hz component plus a 120 Hz base frequency at minimum brightness (15.5% amplitude) despite Xiaomi calling it DC dimming. Model/app should show both 120 Hz and ~3.84 kHz.",
+      "confidence": "high",
+      "resolved_on": "2026-11-12"
     },
     "panel_supplier": {
-      "value": null,
+      "value": "TCL CSOT (TCL 华星)",
       "unit": null,
-      "source": null,
-      "status": "unknown"
+      "source": "https://www.ithome.com/0/961/658.htm",
+      "status": "confirmed",
+      "notes": "TCL CSOT publicly announced it supplies the Xiaomi 17T series displays (17T Pro: 6.83-in 144 Hz 2772x1280, 3500 nits). Xiaomi CN meta also states 新型红色发光主材 (new red emitter host material). Huawei Central calls the panel LTPS OLED. Exact OLED emitter stack (e.g. M-series code) not published.",
+      "confidence": "high",
+      "resolved_on": "2026-11-12"
     },
     "ram_gb_official_skus": {
       "value": 12,
@@ -333,7 +400,9 @@
       "value": null,
       "unit": "lanes",
       "source": null,
-      "status": "unknown"
+      "status": "unknown",
+      "notes": "2026-11-12: Not stated by Xiaomi (Global/TW/CN), Notebookcheck, GSMArena, IT之家. Measured: Notebookcheck AndroBench seq read 3021.5 MB/s, seq write 2770 MB/s, 4K rand read 414 MB/s (512 GB unit) — below a 2-lane HS-G5 ceiling (~4.2 GB/s), so the measurement cannot discriminate 2- vs 4-lane. SoC supports 4-lane (MediaTek). Only a teardown/UFS device-descriptor dump would settle it.",
+      "searched_2026_11_12": "Xiaomi spec pages, NBC review AndroBench table, GSMArena, IT之家, web search for \"17T Pro\" 4-lane/2-lane"
     },
     "microsd": {
       "value": false,
@@ -342,17 +411,21 @@
       "status": "confirmed"
     },
     "ram_sku_16gb": {
-      "value": "512GB+16GB listed by GSMArena",
+      "value": "16GB+512GB exists in China (国行) only; global SKUs are 12GB only",
       "unit": null,
-      "source": "https://www.gsmarena.com/xiaomi_17t_pro-14651.php",
-      "status": "unconfirmed",
-      "notes": "Not on official Global/UK specs."
+      "source": "https://www.ithome.com/0/961/562.htm",
+      "status": "confirmed",
+      "notes": "IT之家: 国行 Pro adds 16GB+512GB; IT之家 review unit was 16GB+512GB; Huawei Central lists CN pricing 16+512 = ¥5099. Xiaomi Global/TW list 12GB SKUs only. Resolves conflict #7 (market-dependent, not an error).",
+      "confidence": "high",
+      "resolved_on": "2026-11-12"
     },
     "dram_vendor": {
       "value": null,
       "unit": null,
       "source": null,
-      "status": "unknown"
+      "status": "unknown",
+      "notes": "2026-11-12: No 17T Pro teardown/X-ray found (iFixit, TechInsights, Kurnal, PBK, JerryRig searched). Xiaomi repair manual does not name components. TechInsights found Samsung LPDDR5X stacked on MT6993Z in Vivo X300 Pro / OPPO Find X9 Pro only — not transferable.",
+      "searched_2026_11_12": "TechInsights, Kurnal, iFixit, Xiaomi ERP manual, web search \"17T Pro LPDDR5X Samsung/Micron/SK hynix\""
     },
     "battery_typical_mah": {
       "value": 7000,
@@ -424,7 +497,8 @@
       "unit": "W",
       "source": "https://www.mi.com/uk/support/faq/details/KA-704973/",
       "status": "unconfirmed",
-      "notes": "FAQ only; not on official spec sheet."
+      "notes": "FAQ only; not on official spec sheet. | 2026-11-12: Official spec sheets (Global, TW) list only 22.5 W WIRED reverse; GSMArena lists 22.5 W reverse wired only; Notebookcheck mentions no reverse wireless. 5 W reverse wireless rests solely on the UK FAQ (which also contains other errors). Treat as doubtful.",
+      "searched_2026_11_12": "Xiaomi Global/TW specs, UK FAQ, GSMArena, Notebookcheck"
     },
     "full_charge_time_min": {
       "value": 48,
@@ -447,22 +521,30 @@
       "notes": "Cable spec, not necessarily phone SuperSpeed."
     },
     "phone_usb_data": {
-      "value": "USB Type-C 2.0, OTG (GSMArena); official page says USB-C charging port only",
+      "value": "USB 2.0 (USB Type-C, 480 Mb/s class), OTG, no DisplayPort video out",
       "unit": null,
-      "source": "https://www.gsmarena.com/xiaomi_17t_pro-14651.php",
-      "status": "unconfirmed"
+      "source": "https://www.notebookcheck.net/A-flagship-that-makes-you-forget-its-price-Xiaomi-17T-Pro-Review.1352144.0.html",
+      "status": "confirmed",
+      "notes": "Notebookcheck measured 23.16 MB/s copying to a Samsung T7 (USB 3.2 Gen 2) SSD and states USB 2.0 without video output; GSMArena: USB Type-C 2.0, OTG.",
+      "confidence": "high",
+      "resolved_on": "2026-11-12"
     },
     "pmic": {
       "value": null,
       "unit": null,
       "source": null,
-      "status": "unknown"
+      "status": "unknown",
+      "notes": "2026-11-12: No 17T Pro board-level teardown found. MediaTek MT6363/MT6373 SPMI PMICs are documented in upstream Linux for recent Dimensity platforms, but no source ties a specific PMIC to this phone.",
+      "searched_2026_11_12": "TechInsights, Kurnal, Linux dt-bindings (MT6363/MT6373), Xiaomi ERP, web search"
     },
     "battery_si_c_ratio": {
-      "value": null,
-      "unit": null,
-      "source": null,
-      "status": "unknown"
+      "value": 16,
+      "unit": "% silicon content (anode)",
+      "source": "https://www.ithome.com/0/960/256.htm",
+      "status": "confirmed",
+      "notes": "Xiaomi official poster (via IT之家): 7000 mAh 小米金沙江电池, highest Xiaomi silicon content to date 16%, ≥80% capacity after 1600 cycles. Basis (wt% of anode active material vs whole anode) not specified. Dual-cell confirmed in repair manual. Cathode chemistry still unpublished.",
+      "confidence": "high",
+      "resolved_on": "2026-11-12"
     },
     "camera_main": {
       "value": "50MP Light Fusion 950, 2.4μm 4-in-1, f/1.67, OIS, 23mm",
@@ -530,6 +612,24 @@
       "source": "https://www.notebookcheck.net/Xiaomi-launches-new-flagship-smartphone-with-Leica-tuned-cameras-and-Dimensity-9500-chipset.1308049.0.html",
       "status": "confirmed",
       "notes": "Notebookcheck citing Xiaomi pre-release material, 2026-05-28."
+    },
+    "cooling_vc_area_mm2": {
+      "value": 5500,
+      "unit": "mm^2",
+      "source": "https://www.huaweicentral.com/xiaomi-17t-series-debuts-in-china-for-first-time/",
+      "status": "unconfirmed",
+      "notes": "China launch coverage (Huawei Central, citing Xiaomi launch imagery): 5500 mm² VC. Not on Xiaomi Global/TW spec text. A secondary claim of 4637 mm² (repair-parts blog) is unverified and conflicts.",
+      "confidence": "medium",
+      "resolved_on": "2026-11-12"
+    },
+    "battery_cycle_rating": {
+      "value": "≥80% after 1600 cycles (Xiaomi CN claim); EU label: 1000 cycles",
+      "unit": null,
+      "source": "https://www.ithome.com/0/960/256.htm",
+      "status": "confirmed",
+      "notes": "Xiaomi CN poster via IT之家 (1600 cycles). EU energy label summary on GSMArena: Class A, 70:55h endurance, 1000 cycles, free-fall class B, repairability class C.",
+      "confidence": "medium-high",
+      "resolved_on": "2026-11-12"
     }
   },
   "soc": {
@@ -565,24 +665,31 @@
       "notes": "TSMC 3nm family is FinFET. GAA/nanosheet is official on TSMC N2, not N3P."
     },
     "transistor_count": {
-      "value": null,
+      "value": 30000000000,
       "unit": "transistors",
-      "source": null,
-      "status": "unknown",
-      "notes": "Secondary outlets have used ~30 billion; not on MediaTek official pages."
+      "source": "https://www.techinsights.com/blog/dimensity-9500-debuts-arm-c1-cores-and-dual-npu",
+      "status": "confirmed",
+      "notes": "TechInsights: \"packing 30 billion transistors\"; MediaTek launch briefing via ZOL: 300亿+ (30B+). Kurnal die analysis lists 30B? and his own cell-library estimate of ~27.3B. Not on MediaTek public spec pages.",
+      "confidence": "medium-high",
+      "resolved_on": "2026-11-12"
     },
     "die_size_mm2": {
-      "value": null,
+      "value": 140.57,
       "unit": "mm^2",
-      "source": null,
-      "status": "unknown"
+      "source": "https://kurnal-insights.com/uploads/Report/D9500%20V1.pdf",
+      "status": "confirmed",
+      "notes": "Kurnal decap measurement: 10.88 mm x 12.92 mm = 140.57 mm², die thickness 200 µm, die mark BHJ11471B (22 FEB 2025), 458 gross die per 300 mm wafer. Notebookcheck quotes ~140.79 mm² from the same die shot. TechInsights die code BHJ11471B matches.",
+      "confidence": "high",
+      "resolved_on": "2026-11-12"
     },
     "package_this_phone": {
-      "value": null,
+      "value": "PoP: MT6993Z SoC package (HB MUFPOP, 16.40 x 14.00 mm, 0.455 mm thick, 0.35 mm ball pitch) with LPDDR5X stacked on top — SoC-level design; the 17T Pro unit itself has not been torn down",
       "unit": null,
-      "source": null,
-      "status": "unknown",
-      "notes": "TechInsights describes PoP (MT6993Z + Samsung LPDDR5X) on Vivo X300 Pro / OPPO Find X9 Pro, not this Xiaomi."
+      "source": "https://kurnal-insights.com/uploads/Report/D9500%20V1.pdf",
+      "status": "unconfirmed",
+      "notes": "Kurnal (package analysis) and TechInsights (PoP with Samsung LPDDR5X in Vivo X300 Pro/OPPO Find X9 Pro). Dimensity 9500 ships as a PoP part, so PoP in the 17T Pro is highly likely, but DRAM vendor/stack in this phone is unverified.",
+      "confidence": "medium-high",
+      "resolved_on": "2026-11-12"
     },
     "cpu_cluster": {
       "value": "1x C1-Ultra 4.21GHz 2MB L2 + 3x C1-Premium 3.5GHz 1MB L2 + 4x C1-Pro 2.7GHz 512KB L2",
@@ -609,11 +716,13 @@
       "status": "confirmed"
     },
     "l1_cache_bytes": {
-      "value": null,
+      "value": "C1-Ultra: 64 KB L1I + 128 KB L1D; C1-Premium: 64 KB L1I + 64 KB L1D; C1-Pro: 64 KB L1I + 64 KB L1D (C1-Pro size configurable 32/64 KB — 64 KB in D9500 is unconfirmed)",
       "unit": "KB",
-      "source": null,
-      "status": "unknown",
-      "notes": "MediaTek only says 100% bigger L1 vs previous gen. Absolute sizes unpublished in sources used here."
+      "source": "https://support.arm.com/documentation/108014/0101/Technical-overview/Core-components",
+      "status": "confirmed",
+      "notes": "C1-Ultra/C1-Premium L1 sizes are fixed in Arm TRMs (4-way, 64 B lines). C1-Pro is 32 or 64 KB per Arm TRM; aggregators list 64/64 for D9500. MediaTek \"100% bigger L1\" matches C1-Ultra L1D 64→128 KB vs Cortex-X925. NOTE: Arm's C1 comparison PDF says C1-Premium 64/128 KB, contradicting the C1-Premium TRM (64 KB L1D) — TRM preferred. Per-core fields added below.",
+      "confidence": "high (Ultra/Premium), medium (C1-Pro)",
+      "resolved_on": "2026-11-12"
     },
     "gpu_name": {
       "value": "Arm Mali-G1 Ultra MC12",
@@ -667,11 +776,13 @@
       "status": "confirmed"
     },
     "gpu_clock_mhz": {
-      "value": null,
+      "value": 1716,
       "unit": "MHz",
-      "source": null,
-      "status": "unknown",
-      "notes": "Aggregator repeats of 1716 MHz are unconfirmed. Notebookcheck leaves clocks as unknown."
+      "source": "https://nanoreview.net/en/soc/mediatek-dimensity-9500",
+      "status": "unconfirmed",
+      "notes": "Consistent across aggregators (NanoReview, 91mobiles, c-gpu, spesification) and Kurnal die report (\"Mali G1-Ultra MP12 @1.7GHz\"). Not on MediaTek/Arm pages; no kernel DT/devfreq dump found. Derived peak FP32 = 12 cores x 256 ops/clk x 1.716 GHz = 5.27 TFLOPS (FMA counted as 2); FP16 = 10.54 TFLOPS.",
+      "confidence": "medium",
+      "resolved_on": "2026-11-12"
     },
     "npu_name": {
       "value": "MediaTek NPU 990 + Super Efficient CIM NPU",
@@ -680,18 +791,22 @@
       "status": "confirmed"
     },
     "npu_tops": {
-      "value": null,
+      "value": 100,
       "unit": "TOPS",
-      "source": null,
-      "status": "unknown",
-      "notes": "Not on MediaTek official pages. Secondary outlets repeat 100 TOPS (unconfirmed)."
+      "source": "https://www.techinsights.com/blog/dimensity-9500-debuts-arm-c1-cores-and-dual-npu",
+      "status": "unconfirmed",
+      "notes": "TechInsights: \"AI capabilities scale to 100 TOPS\"; Counterpoint (from MediaTek briefing): up to 100 TOPS. Precision (INT8 vs FP8/INT4) and whether CIM NPU/SME2 are included are NOT stated. Not on MediaTek public pages.",
+      "confidence": "medium",
+      "resolved_on": "2026-11-12"
     },
     "npu_llm_tokens_per_s": {
-      "value": null,
-      "unit": "token/s",
-      "source": null,
-      "status": "unknown",
-      "notes": "Official claims are relative only: 100% faster 3B-parameter LLM output; over 2x token generation vs previous gen."
+      "value": 28,
+      "unit": "token/s (decode)",
+      "source": "https://developers.googleblog.com/mediatek-npu-and-litert-powering-the-next-generation-of-on-device-ai/",
+      "status": "confirmed",
+      "notes": "Google Developers Blog (with MediaTek), Dec 2025: Gemma 3n E2B on Dimensity 9500 NPU (Vivo X300 Pro) >1600 tokens/s prefill and 28 tokens/s decode at 4K context. Developer report on MT6993: Qwen3-0.6B a16w8 ~19 ms/token (~53 tok/s) with Google's official .litertlm (genio-community). Model-specific; not a universal number.",
+      "confidence": "high",
+      "resolved_on": "2026-11-12"
     },
     "npu_bitnet": {
       "value": "BitNet 1.58-bit",
@@ -719,11 +834,13 @@
       "status": "confirmed"
     },
     "mmwave": {
-      "value": null,
+      "value": "No — integrated modem is Sub-6 (FR1) only; 17T Pro band list has no n257/n258/n260/n261",
       "unit": null,
-      "source": null,
-      "status": "unknown",
-      "notes": "FR2/mmWave not listed on official spec table."
+      "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500",
+      "status": "confirmed",
+      "notes": "MediaTek spec table lists Sub-6/FR1, 5CC-CA, 7.4 Gbps; Xiaomi Global/TW band lists contain FR1 bands only. MediaTek M90 (FR1+FR2) is a separate modem, not in D9500.",
+      "confidence": "high",
+      "resolved_on": "2026-11-12"
     },
     "memory_max_mbps": {
       "value": 10667,
@@ -733,17 +850,22 @@
       "notes": "LPDDR5X SoC maximum."
     },
     "memory_channel_width_bits": {
-      "value": null,
+      "value": 64,
       "unit": "bit",
-      "source": null,
-      "status": "unknown"
+      "source": "https://nanoreview.net/en/soc/mediatek-dimensity-9500",
+      "status": "unconfirmed",
+      "notes": "4 x 16-bit LPDDR5X channels per aggregators (NanoReview/PhoneBench/spesification). JEDEC LPDDR5X channels are x16; MediaTek does not publish the controller width.",
+      "confidence": "medium",
+      "resolved_on": "2026-11-12"
     },
     "memory_theoretical_bandwidth_GBps": {
-      "value": null,
+      "value": 76.8,
       "unit": "GB/s",
-      "source": null,
-      "status": "unknown",
-      "notes": "A 64-bit (4x16) assumption yields 85.336 GB/s at 10667 Mbps and 76.8 GB/s at the phone's 9600 Mbps; unconfirmed."
+      "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "status": "unconfirmed",
+      "notes": "Derived for the 17T Pro: 9600 MT/s x 64 bit / 8 = 76.8 GB/s (SoC max at 10667 MT/s = 85.3 GB/s). Inherits the unconfirmed 64-bit width.",
+      "confidence": "medium",
+      "resolved_on": "2026-11-12"
     },
     "ufs_soc": {
       "value": "UFS 4.1 4-lane",
@@ -764,6 +886,303 @@
       "source": "https://americas.kioxia.com/en-us/business/memory/ufs/other.html",
       "status": "confirmed",
       "notes": "KIOXIA: theoretical 23.2 Gbps/lane or 46.4 Gbps/device (2-lane)."
+    },
+    "l1i_kb_c1_ultra": {
+      "value": 64,
+      "unit": "KB",
+      "source": "https://support.arm.com/documentation/108014/0101/Technical-overview/Core-components",
+      "status": "confirmed",
+      "notes": "Arm TRM: 4-way set-associative, 64-byte lines.",
+      "confidence": "high",
+      "resolved_on": "2026-11-12"
+    },
+    "l1d_kb_c1_ultra": {
+      "value": 128,
+      "unit": "KB",
+      "source": "https://support.arm.com/documentation/108014/0101/Technical-overview/Core-components",
+      "status": "confirmed",
+      "notes": "Arm TRM: 4-way set-associative, 64-byte lines.",
+      "confidence": "high",
+      "resolved_on": "2026-11-12"
+    },
+    "l1i_kb_c1_premium": {
+      "value": 64,
+      "unit": "KB",
+      "source": "https://support.arm.com/documentation/109416/0101/Technical-overview/Core-components",
+      "status": "confirmed",
+      "notes": "Arm TRM: 4-way set-associative, 64-byte lines.",
+      "confidence": "high",
+      "resolved_on": "2026-11-12"
+    },
+    "l1d_kb_c1_premium": {
+      "value": 64,
+      "unit": "KB",
+      "source": "https://support.arm.com/documentation/109416/0101/Technical-overview/Core-components",
+      "status": "confirmed",
+      "notes": "Arm TRM: 4-way set-associative, 64-byte lines.",
+      "confidence": "high",
+      "resolved_on": "2026-11-12"
+    },
+    "l1i_kb_c1_pro": {
+      "value": 64,
+      "unit": "KB",
+      "source": "https://support.arm.com/documentation/107771/0103/Technical-overview/Core-components",
+      "status": "unconfirmed",
+      "notes": "Arm C1-Pro TRM allows 32 or 64 KB (4-way, 64 B lines); 64 KB in D9500 per aggregators (NanoReview/HMC) and consistent with D9400 A720 config; not stated by MediaTek.",
+      "confidence": "medium",
+      "resolved_on": "2026-11-12"
+    },
+    "l1d_kb_c1_pro": {
+      "value": 64,
+      "unit": "KB",
+      "source": "https://support.arm.com/documentation/107771/0103/Technical-overview/Core-components",
+      "status": "unconfirmed",
+      "notes": "Arm C1-Pro TRM allows 32 or 64 KB (4-way, 64 B lines); 64 KB in D9500 per aggregators (NanoReview/HMC) and consistent with D9400 A720 config; not stated by MediaTek.",
+      "confidence": "medium",
+      "resolved_on": "2026-11-12"
+    },
+    "c1_ultra_frontend_width": {
+      "value": "10 MOPs/cycle decode/dispatch, up to 20 µOPs/cycle dispatch; 23 issue pipelines (3 branch, 6 int single-cycle, 2 int multi-cycle, 6 FP/ASIMD 128-bit, 2 load/store, 2 load, 2 store-data)",
+      "unit": null,
+      "source": "https://developer.arm.com/documentation/111079/3-0",
+      "status": "confirmed",
+      "notes": "Arm C1-Ultra Software Optimization Guide (quoted by jia.je and the LLVM C1-Ultra scheduling model PR #182251). Arm Lumex briefing: stays \"10-wide\", out-of-order window +25%, up to ~2K instructions in flight, L1I fetch bandwidth +33%. Numeric ROB entry count and pipeline depth are NOT published; LLVM's 320-entry ROB value is explicitly copied from Neoverse V3, do not use.",
+      "confidence": "high",
+      "resolved_on": "2026-11-12"
+    },
+    "c1_premium_frontend_width": {
+      "value": "10 MOPs/cycle dispatch, up to 20 µOPs/cycle; 19 issue pipelines (only 2 FP/ASIMD vs 6 on Ultra)",
+      "unit": null,
+      "source": "https://jia.je/hardware/2025/09/10/arm-core-development/",
+      "status": "confirmed",
+      "notes": "From Arm C1-Premium Software Optimization Guide as compiled by jia.je.",
+      "confidence": "medium-high",
+      "resolved_on": "2026-11-12"
+    },
+    "c1_pro_frontend_width": {
+      "value": "5 MOPs/cycle dispatch, up to 10 µOPs/cycle; 13 issue pipelines; 2x 0-cycle BTB and 16x 1-cycle BTB capacity vs A725",
+      "unit": null,
+      "source": "https://jia.je/hardware/2025/09/10/arm-core-development/",
+      "status": "confirmed",
+      "notes": "From Arm C1-Pro SOG/TRM and Arm Lumex C1-Pro blog as compiled by jia.je.",
+      "confidence": "medium-high",
+      "resolved_on": "2026-11-12"
+    },
+    "c1_ultra_inflight_instructions": {
+      "value": 2000,
+      "unit": "instructions (approx.)",
+      "source": "https://www.computerbase.de/news/prozessoren/arm-lumex-css-platform-neue-c1-kerne-fuehren-sme2-fuer-ai-direkt-auf-der-cpu-ein.94179/",
+      "status": "confirmed",
+      "notes": "Arm Lumex briefing (ComputerBase): \"bis zu ~2K Instruktionen in flight\", OoO window +25% vs X925. Approximate, not a ROB entry count.",
+      "confidence": "medium-high",
+      "resolved_on": "2026-11-12"
+    },
+    "sve_vector_length_bits": {
+      "value": 128,
+      "unit": "bits",
+      "source": "https://support.arm.com/documentation/108014/0101/The-C1-Ultra--core/C1-Ultra--core-features",
+      "status": "confirmed",
+      "notes": "Arm C1-Ultra TRM: SVE with 128-bit vector length + SVE2 (same 128-bit on C1-Premium/C1-Pro).",
+      "confidence": "high",
+      "resolved_on": "2026-11-12"
+    },
+    "sme2_streaming_vector_length_bits": {
+      "value": 512,
+      "unit": "bits",
+      "source": "https://support.arm.com/documentation/107831/0103/The-C1-SME2--unit/C1-SME2--unit-features",
+      "status": "confirmed",
+      "notes": "Arm C1-SME2 unit TRM: SME/SME2 and Streaming SVE with 512-bit vector length; shared unit in the DSU cluster. Kurnal identifies a 2.91 mm² block with 640 KiB cache in the D9500 CPU cluster as probably the SME2 unit (tentative).",
+      "confidence": "high",
+      "resolved_on": "2026-11-12"
+    },
+    "c1_ultra_tlb": {
+      "value": "L1 ITLB 128 entries, L1 DTLB 96 entries, L2 TLB 2048 entries 8-way",
+      "unit": null,
+      "source": "https://jia.je/hardware/2025/09/10/arm-core-development/",
+      "status": "confirmed",
+      "notes": "From Arm C1-Ultra TRM as compiled by jia.je.",
+      "confidence": "high",
+      "resolved_on": "2026-11-12"
+    },
+    "gpu_peak_fp32_tflops_derived": {
+      "value": 5.27,
+      "unit": "TFLOPS",
+      "source": "https://nanoreview.net/en/soc/mediatek-dimensity-9500",
+      "status": "unconfirmed",
+      "notes": "Computed: 12 x 256 x 1.716e9. Inherits the unconfirmed clock.",
+      "confidence": "medium",
+      "resolved_on": "2026-11-12"
+    },
+    "gpu_l2_mb": {
+      "value": 2,
+      "unit": "MiB",
+      "source": "https://kurnal-insights.com/uploads/Report/D9500%20V1.pdf",
+      "status": "confirmed",
+      "notes": "Kurnal die analysis: \"Have 2MiByte L2 Cache\". (Arm Lumex reference platform used 4 MB with 14 cores.)",
+      "confidence": "medium-high",
+      "resolved_on": "2026-11-12"
+    },
+    "npu_prefill_tokens_per_s": {
+      "value": 1600,
+      "unit": "token/s (prefill, Gemma 3n E2B, 4K ctx)",
+      "source": "https://developers.googleblog.com/mediatek-npu-and-litert-powering-the-next-generation-of-on-device-ai/",
+      "status": "confirmed",
+      "notes": "\">1600 tokens/sec for prefill\" — lower bound.",
+      "confidence": "high",
+      "resolved_on": "2026-11-12"
+    },
+    "npu_structure": {
+      "value": "NPU 990: 4x MDLA (MediaTek Deep Learning Accelerator) + 2x MVPU (vision/vector processing unit); 4 MiB NPU L2; ~1 MiB per-MDLA cache; NeuroPilot compiler targets --num-mdla 4 --l1-size-kb 7168 for MT6993",
+      "unit": null,
+      "source": "https://kurnal-insights.com/uploads/Report/D9500%20V1.pdf",
+      "status": "confirmed",
+      "notes": "Kurnal die analysis (NPU990 12.595 mm² vs APU890 10.414 mm²; MDLA core 1.811 mm²; MVPU core 0.62 mm²; MVPU cache 512 KiB). Compiler flags from Google's official Qwen3-0.6B.mediatek.mt6993.litertlm (genio-community thread). Internal MAC-array dimensions still unpublished.",
+      "confidence": "medium-high",
+      "resolved_on": "2026-11-12"
+    },
+    "npu_precisions_documented": {
+      "value": "a16w8 (FP16 activations + INT8 weights) used by Google's official MT6993 LLM bundles; BitNet 1.58-bit supported (MediaTek); INT and FP compute both \"doubled\" vs D9400 (MediaTek)",
+      "unit": null,
+      "source": "https://github.com/google-ai-edge/ai-edge-quantizer/issues/449",
+      "status": "confirmed",
+      "notes": "990-specific INT4/FP8 throughput table still not published.",
+      "confidence": "medium-high",
+      "resolved_on": "2026-11-12"
+    },
+    "part_number": {
+      "value": "MT6993 (package marking MT6993Z)",
+      "unit": null,
+      "source": "https://kurnal-insights.com/uploads/Report/D9500%20V1.pdf",
+      "status": "confirmed",
+      "notes": "Kurnal package photo (MEDIATEK ARM MT6993Z, date code 2521 = 2025 wk21), TechInsights (MT6993Z), Google LiteRT SDK target SocModel.MT6993 for Dimensity 9500. Google LiteRT doc page listing \"MT6990\" appears to be an error. Resolves conflict #15.",
+      "confidence": "high",
+      "resolved_on": "2026-11-12"
+    },
+    "die_block_cpu_cluster_mm2": {
+      "value": 28.75,
+      "unit": "mm^2",
+      "source": "https://kurnal-insights.com/uploads/Report/D9500%20V1.pdf",
+      "status": "confirmed",
+      "notes": "Kurnal: CPU cluster 28.75 mm² (a 25.84 mm² variant excluding some area also shown; 18.38% of die)",
+      "confidence": "medium-high",
+      "resolved_on": "2026-11-12"
+    },
+    "die_block_c1_ultra_core_mm2": {
+      "value": 3.259,
+      "unit": "mm^2",
+      "source": "https://kurnal-insights.com/uploads/Report/D9500%20V1.pdf",
+      "status": "confirmed",
+      "notes": "Kurnal; incl. 2 MiB L2. Est. ~555M transistors.",
+      "confidence": "medium-high",
+      "resolved_on": "2026-11-12"
+    },
+    "die_block_c1_premium_core_mm2": {
+      "value": 1.91,
+      "unit": "mm^2",
+      "source": "https://kurnal-insights.com/uploads/Report/D9500%20V1.pdf",
+      "status": "confirmed",
+      "notes": "Kurnal; incl. 1 MiB L2.",
+      "confidence": "medium-high",
+      "resolved_on": "2026-11-12"
+    },
+    "die_block_c1_pro_core_mm2": {
+      "value": 1.131,
+      "unit": "mm^2",
+      "source": "https://kurnal-insights.com/uploads/Report/D9500%20V1.pdf",
+      "status": "confirmed",
+      "notes": "Kurnal; incl. 512 KiB L2.",
+      "confidence": "medium-high",
+      "resolved_on": "2026-11-12"
+    },
+    "die_block_gpu_mm2": {
+      "value": 24.232,
+      "unit": "mm^2",
+      "source": "https://kurnal-insights.com/uploads/Report/D9500%20V1.pdf",
+      "status": "confirmed",
+      "notes": "Kurnal: Mali-G1 Ultra MP12, 17.24% of die.",
+      "confidence": "medium-high",
+      "resolved_on": "2026-11-12"
+    },
+    "die_block_gpu_shader_core_mm2": {
+      "value": 1.55,
+      "unit": "mm^2",
+      "source": "https://kurnal-insights.com/uploads/Report/D9500%20V1.pdf",
+      "status": "confirmed",
+      "notes": "Kurnal: ~282M transistors per core (estimate).",
+      "confidence": "medium-high",
+      "resolved_on": "2026-11-12"
+    },
+    "die_block_npu990_mm2": {
+      "value": 12.595,
+      "unit": "mm^2",
+      "source": "https://kurnal-insights.com/uploads/Report/D9500%20V1.pdf",
+      "status": "confirmed",
+      "notes": "Kurnal.",
+      "confidence": "medium-high",
+      "resolved_on": "2026-11-12"
+    },
+    "die_block_mdla_core_mm2": {
+      "value": 1.811,
+      "unit": "mm^2",
+      "source": "https://kurnal-insights.com/uploads/Report/D9500%20V1.pdf",
+      "status": "confirmed",
+      "notes": "Kurnal.",
+      "confidence": "medium-high",
+      "resolved_on": "2026-11-12"
+    },
+    "die_block_mvpu_core_mm2": {
+      "value": 0.62,
+      "unit": "mm^2",
+      "source": "https://kurnal-insights.com/uploads/Report/D9500%20V1.pdf",
+      "status": "confirmed",
+      "notes": "Kurnal.",
+      "confidence": "medium-high",
+      "resolved_on": "2026-11-12"
+    },
+    "die_block_sme2_block_mm2_tentative": {
+      "value": 2.91,
+      "unit": "mm^2",
+      "source": "https://kurnal-insights.com/uploads/Report/D9500%20V1.pdf",
+      "status": "unconfirmed",
+      "notes": "Kurnal: \"4 Core = 2.91 mm², 640 KiB cache, maybe SME?\" — tentative identification.",
+      "confidence": "low",
+      "resolved_on": "2026-11-12"
+    },
+    "process_n3e_cpp_nm": {
+      "value": 48,
+      "unit": "nm",
+      "source": "https://fuse.wikichip.org/news/7375/tsmc-n3-and-challenges-ahead/",
+      "status": "confirmed",
+      "notes": "N3E contacted poly pitch 48 nm (WikiChip, IEDM 2022 data); N3P is an optical shrink of N3E with compatible design rules (TSMC). Kurnal: D9500 uses N3 \"2-1\" ultra-HD library (cell height 143 nm, 48 nm gate pitch) on non-CPU logic and \"2-2\" HD library (169 nm, 48/54 nm) on CPU/NPU/GPU/IO.",
+      "confidence": "medium-high",
+      "resolved_on": "2026-11-12"
+    },
+    "process_n3e_min_metal_pitch_nm": {
+      "value": 23,
+      "unit": "nm",
+      "source": "https://fuse.wikichip.org/news/7375/tsmc-n3-and-challenges-ahead/",
+      "status": "confirmed",
+      "notes": "N3E minimum metal pitch 23 nm (WikiChip). N3P-specific BEOL metals (Cu vs Ru/Co liners) remain unpublished.",
+      "confidence": "medium",
+      "resolved_on": "2026-11-12"
+    },
+    "euv_numerical_aperture": {
+      "value": 0.33,
+      "unit": "NA",
+      "source": "https://www.reuters.com/technology/tsmc-says-asml-high-na-euv-machine-not-necessary-a16-node-2024-05-14/",
+      "status": "confirmed",
+      "notes": "TSMC says High-NA EUV is not needed even for A16 (Reuters 2024-05-14); 3 nm-class nodes use 0.33 NA NXE scanners. High-NA (0.55) is NOT used on N3P.",
+      "confidence": "high",
+      "resolved_on": "2026-11-12"
+    },
+    "boot_chain_generic_mediatek": {
+      "value": "BootROM (mask ROM) → Preloader (DRAM/PMIC init) → TF-A BL31 (EL3 secure monitor) + TEE (BL32) + GenieZone (EL2 hypervisor) → LK (BL33: fastboot/AVB) → Linux kernel",
+      "unit": null,
+      "source": "https://alanhc.github.io/til/docs/qualcomm-vs-mediatek-android-boot-flow",
+      "status": "unconfirmed",
+      "notes": "Generic, publicly documented MediaTek Android boot flow; Xiaomi 17T Pro device-specific chain, memory map and firmware clocks are not published.",
+      "confidence": "medium",
+      "resolved_on": "2026-11-12"
     }
   },
   "browser": {
@@ -786,7 +1205,8 @@
       "unit": null,
       "source": "https://github.com/gpuweb/gpuweb/wiki/Implementation-Status",
       "status": "unknown",
-      "notes": "Class-level ARM support is documented; this exact GPU is unconfirmed."
+      "notes": "Class-level ARM support is documented; this exact GPU is unconfirmed. | 2026-11-12: No per-GPU WebGPU confirmation found for Mali-G1 Ultra; gpuweb status and Chrome docs describe Android support at vendor/OS level only. The app's live WebGPU probe on the device is the only authoritative test.",
+      "searched_2026_11_12": "gpuweb Implementation-Status wiki, Chrome WebGPU release notes, web search"
     },
     "sharedarraybuffer": {
       "value": "Requires cross-origin isolation (COOP/COEP or equivalent)",
@@ -849,7 +1269,8 @@
       "id": 7,
       "classification": "conflict",
       "topic": "16 GB RAM SKU",
-      "summary": "Official Global/UK SKUs are 12 GB only; GSMArena lists 512 GB + 16 GB."
+      "summary": "Official Global/UK SKUs are 12 GB only; GSMArena lists 512 GB + 16 GB.",
+      "resolution": "Resolved 2026-11-12: 16GB+512GB is a China-only SKU (IT之家); global is 12GB only."
     },
     {
       "id": 8,
@@ -885,7 +1306,8 @@
       "id": 13,
       "classification": "conflict",
       "topic": "Fingerprint sensing principle",
-      "summary": "Official in-screen only; GSMArena optical; some outlets have said ultrasonic."
+      "summary": "Official in-screen only; GSMArena optical; some outlets have said ultrasonic.",
+      "resolution": "Resolved 2026-11-12: optical (Xiaomi China official 光学指纹; Notebookcheck; GSMArena)."
     },
     {
       "id": 14,
@@ -897,31 +1319,57 @@
       "id": 15,
       "classification": "conflict",
       "topic": "Dimensity 9500 part number",
-      "summary": "Google LiteRT lists Dimensity 9500 as MT6990; TechInsights packaging note uses MT6993Z. Not settled on a MediaTek official table in this research."
+      "summary": "Google LiteRT lists Dimensity 9500 as MT6990; TechInsights packaging note uses MT6993Z. Not settled on a MediaTek official table in this research.",
+      "resolution": "Resolved 2026-11-12: MT6993 / package MT6993Z (Kurnal package photo, TechInsights, Google LiteRT SDK target MT6993). LiteRT doc page \"MT6990\" is likely an error."
+    },
+    {
+      "id": 16,
+      "classification": "conflict",
+      "topic": "C1-Premium L1D size",
+      "summary": "Arm C1 comparison PDF lists C1-Premium L1 as 64KB/128KB; the C1-Premium TRM says 64KB 4-way L1D. TRM preferred (64KB)."
+    },
+    {
+      "id": 17,
+      "classification": "conflict",
+      "topic": "Vapor chamber area",
+      "summary": "5500 mm² (China launch coverage) vs 4637 mm² (unverified repair-parts blog). Neither on Xiaomi spec text."
+    },
+    {
+      "id": 18,
+      "classification": "issue",
+      "topic": "PWM vs DC dimming",
+      "summary": "Xiaomi markets DC dimming; Notebookcheck measured 120 Hz base + 3,846 Hz component at minimum brightness; GSMArena 3840 Hz PWM."
+    },
+    {
+      "id": 19,
+      "classification": "conflict",
+      "topic": "Transistor count",
+      "summary": "TechInsights/MediaTek briefing ~30B vs Kurnal cell-library estimate ~27.3B."
+    },
+    {
+      "id": 20,
+      "classification": "issue",
+      "topic": "LLVM C1-Ultra ROB=320",
+      "summary": "LLVM scheduling model states ROB 320 is copied from Neoverse V3 — not a C1-Ultra figure; do not cite."
     }
   ],
   "unknowns": [
-    "Absolute L1 I/D sizes per core",
-    "C1-Ultra/Premium decode width, ROB size, pipeline depth (numeric)",
-    "GPU clock and therefore peak TFLOPS",
-    "NPU TOPS by precision and absolute LLM tokens/s",
-    "MAC array organization of NPU 990",
-    "NPU 990-specific INT4/INT8/FP8/FP16 table (family MDLA docs exist; 990-specific table not found official)",
-    "Transistor count and official die size",
-    "Xiaomi 17T Pro package type, InFO vs PoP, DRAM vendor",
-    "Memory channel width and official theoretical bandwidth",
-    "Whether this phone's UFS is 4-lane",
+    "C1-Ultra/Premium numeric ROB entries and pipeline depth (Arm publishes only '10-wide', '~2K in flight')",
+    "Official GPU clock (1716 MHz is aggregator/die-analyst only)",
+    "NPU TOPS precision basis; NPU 990 MAC-array dimensions; 990-specific INT4/FP8 throughput",
+    "Xiaomi 17T Pro DRAM vendor / PoP stack in this specific phone",
+    "Memory controller width (64-bit is aggregator-only)",
+    "Whether the 17T Pro's UFS 4.1 device is 2- or 4-lane",
     "PMIC identity",
-    "Battery Si/C anode fraction and cathode chemistry",
-    "Display panel supplier, OLED emitter chemistry, official PWM",
-    "mmWave/FR2",
+    "Battery cathode chemistry",
+    "OLED emitter material code (TCL CSOT supplies the panel)",
     "Complete official launch-country list",
-    "Official 16 GB RAM SKU",
-    "Fingerprint optical vs ultrasonic",
-    "Phone USB SuperSpeed generation",
+    "Rear glass grade (GG7i on back is GSMArena-only)",
+    "Reverse wireless charging (FAQ-only 5 W)",
     "Device-specific boot chain, physical memory map, GPU firmware clocks",
-    "N3P CPP/M0/M1 pitches, high-k/metal-gate stack, Cu/Co/Ru interconnect metals",
-    "Whether High-NA EUV (NA 0.55) is used on N3P (ASML says NXE NA 0.33 is used for 3 nm nodes; High-NA is aimed at 2 nm-class)"
+    "N3P BEOL metal stack (Cu/Co/Ru) and high-k/metal-gate composition",
+    "WebGPU support confirmation for Mali-G1 Ultra specifically",
+    "iPhone 18 Pro Max 3DMark Wild Life Extreme in PhoneArena's same table"
   ],
   "competitors": {
     "compared_as_of": {
@@ -971,11 +1419,13 @@
         "notes": "12 GB + 256 GB official Europe launch price from Xiaomi pre-release material cited by Notebookcheck."
       },
       "price_us_msrp": {
-        "value": null,
-        "unit": "USD",
-        "source": null,
-        "status": "unknown",
-        "notes": "No official U.S. Xiaomi MSRP found in this research."
+        "value": "N/A — Xiaomi does not officially sell the 17T Pro in the US; grey-import listings ~$620–$777",
+        "unit": null,
+        "source": "https://www.techradar.com/phones/xiaomi-phones/xiaomi-17t-pro-review",
+        "status": "confirmed",
+        "notes": "No official US MSRP exists (TechRadar review, PhotoWorkout). Amazon US import listings 2026-11: ~$709.50 (12/256) and ~$775 (12/512) per Notebookcheck price widget; no US warranty.",
+        "confidence": "medium-high",
+        "resolved_on": "2026-11-12"
       },
       "height_mm": {
         "value": 162.2,
@@ -1227,11 +1677,13 @@
         "notes": "Apple wording. Foundry not named in the cited Newsroom/spec pages."
       },
       "foundry": {
-        "value": null,
+        "value": "TSMC N2 (2 nm, gate-all-around)",
         "unit": null,
-        "source": "https://www.apple.com/newsroom/2026/09/apple-debuts-iphone-18-pro-and-iphone-18-pro-max/",
-        "status": "unknown",
-        "notes": "Apple did not name the foundry in the cited official pages."
+        "source": "https://www.techinsights.com/iphone-18-pro-max-idm-analysis",
+        "status": "confirmed",
+        "notes": "Apple says \"latest 2-nanometer process\"; TechInsights preliminary teardown identifies A20 Pro on TSMC N2 with GAA.",
+        "confidence": "high",
+        "resolved_on": "2026-11-12"
       },
       "cpu": {
         "value": "6-core (2 performance + 4 efficiency)",
@@ -1268,21 +1720,29 @@
       "price_us_512gb": {
         "value": 1499,
         "unit": "USD",
-        "source": "https://www.apple.com/newsroom/2026/09/apple-debuts-iphone-18-pro-and-iphone-18-pro-max/",
-        "status": "unconfirmed",
-        "notes": "Shop/Newsroom tier snippets; treat as unconfirmed if not re-verified on the live Apple shop page."
+        "source": "https://www.apple.com/shop/buy-iphone/iphone-18-pro",
+        "status": "confirmed",
+        "notes": "Re-verified on live apple.com/shop (familyType iphone18promax) on 2026-11-12; 256 GB = $1,299.",
+        "confidence": "high",
+        "resolved_on": "2026-11-12"
       },
       "price_us_1tb": {
         "value": 1899,
         "unit": "USD",
-        "source": "https://www.apple.com/newsroom/2026/09/apple-debuts-iphone-18-pro-and-iphone-18-pro-max/",
-        "status": "unconfirmed"
+        "source": "https://www.apple.com/shop/buy-iphone/iphone-18-pro",
+        "status": "confirmed",
+        "notes": "Re-verified on live apple.com/shop (familyType iphone18promax) on 2026-11-12; 256 GB = $1,299.",
+        "confidence": "high",
+        "resolved_on": "2026-11-12"
       },
       "price_us_2tb": {
         "value": 2499,
         "unit": "USD",
-        "source": "https://www.apple.com/newsroom/2026/09/apple-debuts-iphone-18-pro-and-iphone-18-pro-max/",
-        "status": "unconfirmed"
+        "source": "https://www.apple.com/shop/buy-iphone/iphone-18-pro",
+        "status": "confirmed",
+        "notes": "Re-verified on live apple.com/shop (familyType iphone18promax) on 2026-11-12; 256 GB = $1,299.",
+        "confidence": "high",
+        "resolved_on": "2026-11-12"
       },
       "height_mm": {
         "value": 163.4,
@@ -1377,11 +1837,13 @@
         "status": "confirmed"
       },
       "ram_gb": {
-        "value": null,
+        "value": 12,
         "unit": "GB",
-        "source": "https://www.apple.com/iphone-18-pro/specs/",
-        "status": "unknown",
-        "notes": "Apple does not list RAM on the cited official spec page."
+        "source": "https://www.macrumors.com/2026/09/10/iphone-18-pro-max-battery-capacities-ram/",
+        "status": "confirmed",
+        "notes": "Apple does not advertise RAM; MacRumors confirmed 12 GB from Xcode 27 device data.",
+        "confidence": "high",
+        "resolved_on": "2026-11-12"
       },
       "storage": {
         "value": "256/512/1024/2048 GB",
@@ -1409,11 +1871,13 @@
         "status": "confirmed"
       },
       "battery_typical_mah": {
-        "value": null,
+        "value": 5391,
         "unit": "mAh",
-        "source": "https://www.apple.com/iphone-18-pro/specs/",
-        "status": "unknown",
-        "notes": "Apple does not publish mAh on the cited spec page."
+        "source": "https://www.macrumors.com/2026/09/10/iphone-18-pro-max-battery-capacities-ram/",
+        "status": "confirmed",
+        "notes": "Apple EU energy label (SIM-tray models). eSIM-only models (incl. US) are larger: 5,567 mAh per teardown (PhoneArena).",
+        "confidence": "high",
+        "resolved_on": "2026-11-12"
       },
       "battery_typical_use_h": {
         "value": 30,
@@ -1484,17 +1948,22 @@
         "status": "confirmed"
       },
       "geekbench6_single": {
-        "value": null,
+        "value": 4725,
         "unit": "score",
-        "source": "https://www.phonearena.com/news/I-tested-the-iPhone-18-Pro-Maxs-A20-Pro-performance-against-the-Galaxy-S26-Ultra_id183453",
-        "status": "unknown",
-        "notes": "No same-lab GB6 isolated here. Do not use mixed v7/v6 PhoneArena aggregate tables or pcspecs.io as GB6."
+        "source": "https://www.notebookcheck.net/Apple-iPhone-18-Pro-Max-gaming-performance-exceeds-official-40-sustained-performance-claim.1415112.0.html",
+        "status": "confirmed",
+        "notes": "Notebookcheck, Geekbench 6.7. Different lab/version than the Xiaomi GB6 row — label as cross-lab.",
+        "confidence": "medium-high",
+        "resolved_on": "2026-11-12"
       },
       "geekbench6_multi": {
-        "value": null,
+        "value": 12575,
         "unit": "score",
-        "source": "https://www.phonearena.com/news/I-tested-the-iPhone-18-Pro-Maxs-A20-Pro-performance-against-the-Galaxy-S26-Ultra_id183453",
-        "status": "unknown"
+        "source": "https://www.notebookcheck.net/Apple-iPhone-18-Pro-Max-gaming-performance-exceeds-official-40-sustained-performance-claim.1415112.0.html",
+        "status": "confirmed",
+        "notes": "Notebookcheck, Geekbench 6.7. Cross-lab caveat as above.",
+        "confidence": "medium-high",
+        "resolved_on": "2026-11-12"
       },
       "3dmark_snl_high_phonearena": {
         "value": 3850,
@@ -1514,7 +1983,8 @@
         "unit": "score",
         "source": "https://www.phonearena.com/reviews/xiaomi-17t-pro-review_id7943",
         "status": "unknown",
-        "notes": "Not in the 17T review same-table set used for Xiaomi vs Ultra."
+        "notes": "Not in the 17T review same-table set used for Xiaomi vs Ultra. | 2026-11-12: Not found in PhoneArena's 17T Pro review table; using another lab would break same-table comparability.",
+        "searched_2026_11_12": "PhoneArena 17T review, PhoneArena A20 vs S26U article"
       }
     },
     "galaxy_s26_ultra": {
@@ -1546,11 +2016,13 @@
         "notes": "Review measurement/identification, not a Qualcomm public GPU-clock citation."
       },
       "process": {
-        "value": null,
+        "value": "TSMC N3P (3 nm)",
         "unit": null,
-        "source": "https://www.qualcomm.com/snapdragon/news/just-announced--the-samsung-galaxy-s26-series--powered-by-snapdr.md",
-        "status": "unknown",
-        "notes": "Do not invent a foundry/node for the Galaxy SKU without a Qualcomm official citation."
+        "source": "https://www.techinsights.com/blog/qualcomm-snapdragon-8-elite-gen-5-advanced-packaging-quick-look",
+        "status": "unconfirmed",
+        "notes": "Qualcomm product brief: 3 nm. TechInsights identified TSMC N3P on the standard SM8850-AC (in Xiaomi 17 Pro Max). The \"for Galaxy\" bin was not separately analyzed in sources found.",
+        "confidence": "medium-high",
+        "resolved_on": "2026-11-12"
       },
       "os": {
         "value": "Android 16, One UI 8.5",
@@ -1566,11 +2038,13 @@
         "notes": "European list price as stated in Notebookcheck's review context."
       },
       "price_us_official_msrp": {
-        "value": null,
+        "value": 1299.99,
         "unit": "USD",
-        "source": null,
-        "status": "unknown",
-        "notes": "Official Samsung U.S. MSRP not independently fetched in this compilation. NBC street prices as of 2026-11-12: about $1048 (256 GB) / $1282 (512 GB) — street, not MSRP."
+        "source": "https://news.samsung.com/global/samsung-unveils-galaxy-s26-series-the-most-intuitive-galaxy-ai-phone-yet",
+        "status": "confirmed",
+        "notes": "US launch MSRP 256 GB (Feb 25 2026). Samsung raised US prices in Oct 2026: live samsung.com/us on 2026-11-12 shows msrpPrice 1399.99 (256 GB), 1599.99 (512 GB), 1999.99 (1 TB).",
+        "confidence": "high",
+        "resolved_on": "2026-11-12"
       },
       "price_us_street_256_nbc": {
         "value": 1048,
@@ -1791,6 +2265,15 @@
         "unit": null,
         "source": "https://news.samsung.com/global/samsung-unveils-galaxy-s26-series-the-most-intuitive-galaxy-ai-phone-yet",
         "status": "confirmed"
+      },
+      "price_us_current_msrp_256": {
+        "value": 1399.99,
+        "unit": "USD",
+        "source": "https://www.samsung.com/us/smartphones/galaxy-s26-ultra/buy/",
+        "status": "confirmed",
+        "notes": "Live samsung.com/us msrpPrice after Oct-2026 increase (PhoneArena report).",
+        "confidence": "high",
+        "resolved_on": "2026-11-12"
       }
     },
     "scoreboard": {

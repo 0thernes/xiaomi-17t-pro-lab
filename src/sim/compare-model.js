@@ -72,21 +72,41 @@ export function buildComparison() {
     ),
     row(
       "gb6_single",
-      "Geekbench 6 single (PhoneArena)",
+      "Geekbench 6 single (PhoneArena table)",
       "score",
       X.geekbench6_single_phonearena,
-      I.geekbench6_single,
+      phoneArenaGap("No PhoneArena Geekbench 6 single for the iPhone in this dossier."),
       S.geekbench6_single_phonearena,
       "geekbench6_cpu_phonearena",
     ),
     row(
       "gb6_multi",
-      "Geekbench 6 multi (PhoneArena)",
+      "Geekbench 6 multi (PhoneArena table)",
       "score",
       X.geekbench6_multi_phonearena,
-      I.geekbench6_multi,
+      phoneArenaGap("No PhoneArena Geekbench 6 multi for the iPhone in this dossier."),
       S.geekbench6_multi_phonearena,
       "geekbench6_cpu_phonearena",
+    ),
+    row(
+      "gb6_single_cross",
+      "Geekbench 6.7 single (Notebookcheck, different lab)",
+      "score",
+      phoneArenaGap("Not this lab. The Xiaomi PhoneArena score stays on the row above."),
+      I.geekbench6_single,
+      phoneArenaGap("Not this lab."),
+      null,
+      { crossLab: true },
+    ),
+    row(
+      "gb6_multi_cross",
+      "Geekbench 6.7 multi (Notebookcheck, different lab)",
+      "score",
+      phoneArenaGap("Not this lab."),
+      I.geekbench6_multi,
+      phoneArenaGap("Not this lab."),
+      null,
+      { crossLab: true },
     ),
     row(
       "snl_high",
@@ -150,10 +170,15 @@ export function buildComparison() {
   };
 }
 
-function row(id, label, unit, xEntry, iEntry, sEntry, scoreboardKey) {
+function phoneArenaGap(notes) {
+  return { value: null, unit: "score", source: "", status: "unknown", notes };
+}
+
+function row(id, label, unit, xEntry, iEntry, sEntry, scoreboardKey, options = {}) {
   const xiaomi = readCell(xEntry);
   const iphone = readCell(iEntry);
   const samsung = readCell(sEntry);
+  const crossLab = Boolean(options.crossLab);
   return {
     id,
     label,
@@ -161,9 +186,10 @@ function row(id, label, unit, xEntry, iEntry, sEntry, scoreboardKey) {
     xiaomi,
     iphone,
     samsung,
-    ratioVsIphone: ratio(xiaomi.numeric, iphone.numeric),
-    ratioVsSamsung: ratio(xiaomi.numeric, samsung.numeric),
+    ratioVsIphone: crossLab ? null : ratio(xiaomi.numeric, iphone.numeric),
+    ratioVsSamsung: crossLab ? null : ratio(xiaomi.numeric, samsung.numeric),
     scoreboardKey,
+    crossLab,
   };
 }
 
