@@ -1,4 +1,5 @@
 import { el, note, panel } from "../dom.js";
+import { referenceCards } from "../ref-card.js";
 import { provCited } from "../provenance.js";
 import { siliconNearestNeighbor } from "../sim/device-math.js";
 import { getSpecs } from "../specs.js";
@@ -70,6 +71,7 @@ export async function mount(main, { cap }) {
                 : "Outer millimeters are the Xiaomi spec. The exploded stack names the repair-manual layers.",
         ),
         id === "finfet" ? provCited(specs.soc.process_n3e_cpp_nm) : null,
+        id === "die" ? referenceCards(["kurnal-die", "kurnal-pdf", "techinsights"]) : null,
       ]),
     );
   }

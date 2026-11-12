@@ -4,6 +4,7 @@ import { provCited, provComputed, provMeasured } from "../provenance.js";
 import { computedPpi, pixelRate, ultraToProPowerRatio } from "../sim/device-math.js";
 import { getSpecs, openItems, parseDieMm, parsePackageMm } from "../specs.js";
 import { applyMetalPlate, buildPhone, makeMaterials, mountView } from "../graphics/view.js";
+import { referenceCards } from "../ref-card.js";
 
 export async function mount(main, { cap }) {
   const specs = getSpecs();
@@ -48,6 +49,14 @@ export async function mount(main, { cap }) {
     value: "0",
     "aria-label": "Explode the phone",
   });
+  const refs = referenceCards(["xiaomi-product", "xiaomi-repair"]);
+  refs.hidden = true;
+  const toggle = el("button", { type: "button", "aria-pressed": "false" }, ["Real vs model"]);
+  toggle.addEventListener("click", () => {
+    const open = refs.hidden;
+    refs.hidden = !open;
+    toggle.setAttribute("aria-pressed", open ? "true" : "false");
+  });
   explode.addEventListener("input", () => {
     if (!view) return;
     view.clear();
@@ -74,7 +83,8 @@ export async function mount(main, { cap }) {
       "Flagship launch lab for the Xiaomi 17T Pro and Dimensity 9500. The body size is cited. The teardown follows the repair manual’s named stack. Die areas are Kurnal’s, arranged here as a reconstruction. Reference photographs are not included.",
     ]),
     stage,
-    el("label", { class: "slider" }, ["Pull the stack apart", explode]),
+    el("div", { class: "hero-tools" }, [el("label", { class: "slider" }, ["Pull the stack apart", explode]), toggle]),
+    refs,
     el("div", { class: "grid cols-2" }, [
       panel("This browser", [
         kv(

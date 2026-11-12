@@ -7,6 +7,7 @@ import { createPipeline } from "../src/sim/pipeline.js";
 import { rasterizeTiles } from "../src/sim/tiler.js";
 import { chooseTier } from "../src/quality.js";
 import { floorplan, npuCounts, openItems, parseDieMm, parsePackageMm } from "../src/specs.js";
+import { REFERENCES } from "../src/references.js";
 import { buildWeights, greedyTokens } from "../src/workloads/gpt-neo.js";
 import { parseSafetensors } from "../src/workloads/safetensors.js";
 import { GPT2Tokenizer } from "../src/workloads/tokenizer.js";
@@ -29,6 +30,14 @@ describe("corrected geometry", () => {
     assert.equal(npuCounts().mvpu, 2);
     assert.equal(openItems().length, 9);
     assert.ok(openItems().every((item) => item.reason && item.reason.length > 8));
+  });
+
+  it("does not ship copyrighted reference photographs", () => {
+    for (const item of REFERENCES) {
+      assert.equal(item.shipped, null, item.id);
+      assert.ok(item.url.startsWith("https://"));
+      assert.ok(item.license.length > 8);
+    }
   });
 });
 
