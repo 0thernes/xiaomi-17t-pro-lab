@@ -12,6 +12,12 @@ const routes = [
   ["#/litho", "litho"],
   ["#/transistor", "transistor"],
   ["#/compare", "compare"],
+  ["#/work", "work"],
+  ["#/work/llm", "work-llm"],
+  ["#/work/life", "work-life"],
+  ["#/work/sci", "work-sci"],
+  ["#/work/browser", "work-browser"],
+  ["#/specs", "specs"],
 ];
 
 test("every route at a phone viewport", async ({ page }) => {
@@ -41,8 +47,15 @@ test("every route at a phone viewport", async ({ page }) => {
     if (name === "npu") {
       await expect(page.locator("#main")).toContainText("do not run on the MediaTek NPU");
     }
+    const dock = page.locator("nav.nav a").first();
+    const box = await dock.boundingBox();
+    expect(box.height).toBeGreaterThanOrEqual(44);
+    expect(box.width).toBeGreaterThanOrEqual(44);
     if (process.env.SHOOT) {
-      await page.screenshot({ path: `docs/screenshots/${name}.png`, fullPage: true });
+      await page.screenshot({ path: `docs/screenshots/phone/${name}.png` });
+      await page.setViewportSize({ width: 1440, height: 900 });
+      await page.screenshot({ path: `docs/screenshots/desktop/${name}.png` });
+      await page.setViewportSize({ width: 412, height: 915 });
     }
   }
   expect(errors).toEqual([]);

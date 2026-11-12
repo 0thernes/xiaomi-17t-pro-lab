@@ -1,11 +1,11 @@
 # Xiaomi 17T Pro Lab
 
 [![CI](https://github.com/0thernes/xiaomi-17t-pro-lab/actions/workflows/ci.yml/badge.svg)](https://github.com/0thernes/xiaomi-17t-pro-lab/actions/workflows/ci.yml)
-[![version](https://img.shields.io/badge/version-0.1.0-8ec8d8)](CHANGELOG.md)
+[![version](https://img.shields.io/badge/version-0.2.0-ff7a1a)](CHANGELOG.md)
 [![license](https://img.shields.io/badge/license-MIT-e2c56a)](LICENSE)
 [![pages](https://img.shields.io/badge/demo-GitHub%20Pages-e08a4f)](https://0thernes.github.io/xiaomi-17t-pro-lab/)
 
-Phone-first lab for the **Xiaomi 17T Pro** and the **MediaTek Dimensity 9500** (TSMC **N3P FinFET**, not GAA). Every view computes something in the browser. Every hardware number is **MEASURED** on this device, **CITED** from a source, or **COMPUTED** from a formula written next to it. Unpublished figures stay **UNKNOWN**.
+Phone-first lab for the **Xiaomi 17T Pro** and the **MediaTek Dimensity 9500** (TSMC **N3P FinFET**, not GAA). v0.2 rebuilds the shell and the models around the same solvers. Every hardware number is a leaf in `data/specs.json`: **CITED**, **UNCONFIRMED**, or **UNKNOWN**. Live numbers are **MEASURED** or **COMPUTED**.
 
 Live demo: <https://0thernes.github.io/xiaomi-17t-pro-lab/>
 
@@ -13,36 +13,36 @@ Owner: Alex Donahue (GitHub [0thernes](https://github.com/0thernes)).
 
 ## What you can do
 
-| Route      | What is live                                                                                                              |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------- |
-| Phone      | three.js body at the cited 162.2 × 77.5 × 8.25 mm size, PPI and pixel-rate arithmetic, quality tier from a fill probe     |
-| Zoom       | `taxonomy.json` stacks (device tree, 15 CPU levels, 16 GPU, 14 NPU) and a formula for the level you are on                |
-| CPU        | Pointer-chase latency sweep, STREAM triad, WASM SIMD, documented A64 words                                                |
-| GPU        | WebGPU matmul, WebGL2 fallback, checked against CPU math. Official GFLOPS stays symbolic because the GPU clock is unknown |
-| NPU        | INT8 and 1.58-bit matmul in JS/WASM. Labeled as **not** the NPU 990                                                       |
-| Litho      | Rayleigh CD and a 1D Abbe aerial image (EUV 13.5 nm, NA 0.33 vs 0.55)                                                     |
-| Transistor | Finite-difference infinite well, Kronig–Penney scan, double-gate scale length                                             |
-| Compare    | Cited wins and losses versus iPhone 18 Pro Max and Galaxy S26 Ultra, plus ratios computed from those numbers              |
+| Route  | What is live                                                                                           |
+| ------ | ------------------------------------------------------------------------------------------------------ |
+| Phone  | Exploded body at the cited size. Internals follow the repair manual and are a reconstruction           |
+| Zoom   | Phone, die, FinFET pitch, lattice. One subject at a time                                               |
+| CPU    | Pointer-chase ns/load, Arm L1 leaves, a five-stage pipeline, 15 taxonomy levels                        |
+| GPU    | WebGPU or WebGL2 matmul checked against the CPU, plus a JS tile rasterizer. 1716 MHz stays unconfirmed |
+| NPU    | INT8 matmul in JS. 100 TOPS stays unconfirmed. The page says it is not the NPU 990                     |
+| Work   | Instanced stress scene, TinyStories-8M, Glitchling, RK4 / Dormand–Prince, a local browser shell        |
+| Litho  | Rayleigh CD and a live 1D Abbe aerial image                                                            |
+| Atom   | Finite-difference well, Kronig–Penney, double-gate scale length                                        |
+| Versus | PhoneArena table, plus iPhone Geekbench 6.7 marked as Notebookcheck                                    |
+| Specs  | The nine open leaves, with the reason each is open, and conflicts 16–20                                |
 
 ## Screenshots
 
 Phone viewport (Pixel 7). The hero below is the low tier this environment measured (software WebGL). A faster GPU selects medium, high, or ultra and turns on the studio environment and bloom.
 
-![Phone hub](docs/screenshots/phone.png)
+![Phone hub](docs/screenshots/phone/phone.png)
 
-![CPU chase](docs/screenshots/cpu.png)
+![Phone hub, desktop](docs/screenshots/desktop/phone.png)
 
-![GPU matmul](docs/screenshots/gpu.png)
+![CPU chase](docs/screenshots/phone/cpu.png)
 
-![NPU concepts](docs/screenshots/npu.png)
+![GPU matmul](docs/screenshots/phone/gpu.png)
 
-![Lithography](docs/screenshots/litho.png)
+![NPU](docs/screenshots/phone/npu.png)
 
-![Transistor](docs/screenshots/transistor.png)
+![Zoom](docs/screenshots/phone/zoom.png)
 
-![Head to head](docs/screenshots/compare.png)
-
-![Zoom stack](docs/screenshots/zoom.png)
+![Specs](docs/screenshots/phone/specs.png)
 
 ## Run locally
 

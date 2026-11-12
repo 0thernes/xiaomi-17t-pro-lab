@@ -19,6 +19,24 @@ The postprocessing and environment helpers under `vendor/three/examples/jsm/` ar
 
 The file is the official minified build so a phone does not parse the multi-megabyte unminified source. It is not authored code of this lab. Modifications to p5 itself would need to follow the LGPL; this repo does not modify it.
 
+## Unbounded, Source Sans 3, IBM Plex Mono
+
+- Path: `vendor/fonts/unbounded-*.woff2`, `source-sans-3-*.woff2`, `ibm-plex-mono-latin-400-normal.woff2`
+- License: SIL Open Font License 1.1 (`UNBOUNDED-OFL.txt`, `SOURCE-SANS-3-OFL.txt`, `IBM-PLEX-MONO-OFL.txt`)
+- Distributed via Fontsource
+
+## Poly Haven, Metal Plate
+
+- Path: `assets/textures/cc0/metal_plate/`
+- Author: Rob Tuytel (`authors: {"Rob Tuytel": "All"}` on the Poly Haven info API)
+- License: CC0
+- Credits file: `assets/textures/cc0/CREDITS.md`
+
+## TinyStories-8M and Glitchling
+
+- `vendor/tinystories/NOTICE.md`
+- `vendor/glitchling/NOTICE.md`
+
 ## Literata and Outfit
 
 - Path: `vendor/fonts/`

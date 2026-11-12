@@ -1,5 +1,7 @@
 # Architecture
 
+v0.2 keeps the zero-build layout and adds one WebGL subject per route (`src/graphics/view.js`). Hardware numbers come from `src/specs.js`, which reads `data/specs.json`. Workloads live in `src/labs/work.js` and `src/workloads/`. See ADR 006 and ADR 007.
+
 Zero-build. `index.html` loads `src/main.js` as a module. An import map points `three` at `vendor/three/build/three.module.js`. p5 is injected as a classic script the first time a plot needs it.
 
 ```

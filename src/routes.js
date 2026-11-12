@@ -4,9 +4,11 @@ export const ROUTES = [
   { id: "cpu", hash: "#/cpu", label: "CPU" },
   { id: "gpu", hash: "#/gpu", label: "GPU" },
   { id: "npu", hash: "#/npu", label: "NPU" },
+  { id: "work", hash: "#/work", label: "Work" },
   { id: "litho", hash: "#/litho", label: "Litho" },
-  { id: "transistor", hash: "#/transistor", label: "Transistor" },
-  { id: "compare", hash: "#/compare", label: "Compare" },
+  { id: "transistor", hash: "#/transistor", label: "Atom" },
+  { id: "compare", hash: "#/compare", label: "Versus" },
+  { id: "specs", hash: "#/specs", label: "Specs" },
 ];
 
 const IDS = new Set(ROUTES.map((route) => route.id));

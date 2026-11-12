@@ -14,13 +14,14 @@ export function mountShell(audio) {
   });
   const helpButton = el("button", { type: "button", id: "help" }, ["Help"]);
   const dialog = el("dialog", {}, [
-    el("h2", {}, ["How to move through the lab"]),
-    el("p", { class: "note" }, [
-      "Tab reaches every control. Arrow along the zoom list when it is focused. M toggles sound. Sound stays off until you turn it on. Esc closes this note.",
+    el("h2", {}, ["How to move"]),
+    el("p", {}, [
+      "The bottom bar is the thumb zone. On a wide screen it becomes a side rail. Drag the model to orbit, scroll to dolly. Sound stays off until you tap it.",
     ]),
-    el("p", { class: "note" }, [
-      "MEASURED is a number taken on this device, in this browser. CITED is a published figure with a link. COMPUTED is arithmetic from a formula written next to the badge. UNKNOWN means the sources do not publish it.",
+    el("p", {}, [
+      "MEASURED is this browser. CITED is a sourced leaf in specs.json. COMPUTED shows its formula. UNCONFIRMED is published but not an official vendor figure. UNKNOWN is still open.",
     ]),
+    el("p", {}, [audio.credits]),
     el("button", { type: "button", class: "primary", onClick: () => dialog.close() }, ["Close"]),
   ]);
   helpButton.addEventListener("click", () => dialog.showModal());
@@ -34,8 +35,8 @@ export function mountShell(audio) {
   app.replaceChildren(
     el("header", { class: "top" }, [
       el("a", { class: "brand", href: "#/" }, [
-        el("strong", {}, ["17T Pro Lab"]),
-        el("span", {}, [`v${VERSION} · Alex Donahue`]),
+        el("span", { class: "brand-mark" }, ["17T"]),
+        el("span", { class: "brand-text" }, [el("strong", {}, ["Pro Lab"]), el("small", {}, [`v${VERSION}`])]),
       ]),
       el("div", { class: "top-spacer" }),
       helpButton,
@@ -48,12 +49,13 @@ export function mountShell(audio) {
         el("span", { class: "badge badge-measured" }, ["MEASURED"]),
         el("span", { class: "badge badge-cited" }, ["CITED"]),
         el("span", { class: "badge badge-computed" }, ["COMPUTED"]),
+        el("span", { class: "badge badge-unconfirmed" }, ["UNCONFIRMED"]),
         el("span", { class: "badge badge-unknown" }, ["UNKNOWN"]),
       ]),
       el("p", {}, [
         iso.isolated
-          ? "This page is cross-origin isolated, so explicit timers can use Chrome’s tighter class."
-          : "Timers are not cross-origin isolated. The CPU lab repeats work and reports the uncertainty. A service worker can tighten them on GitHub Pages.",
+          ? "Timers are cross-origin isolated."
+          : "Timers are not cross-origin isolated. The CPU lab reports that uncertainty.",
       ]),
     ]),
     dialog,

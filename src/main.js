@@ -17,6 +17,8 @@ const loaders = {
   litho: () => import("./labs/litho.js"),
   transistor: () => import("./labs/transistor.js"),
   compare: () => import("./labs/compare.js"),
+  work: () => import("./labs/work.js"),
+  specs: () => import("./labs/specs-view.js"),
 };
 
 let dispose = () => {};
@@ -56,7 +58,7 @@ async function show() {
     const heading = main.querySelector("h1");
     if (heading) {
       heading.tabIndex = -1;
-      heading.focus({ preventScroll: true });
+      heading.focus({ preventScroll: true, focusVisible: false });
     }
     lastId = route.id;
   }

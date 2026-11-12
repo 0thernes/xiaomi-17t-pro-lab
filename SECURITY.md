@@ -1,6 +1,6 @@
 # Security
 
-This is a static site. It has no accounts, no server-side secret, and no database.
+Version 0.2.0. This is a static site. It has no accounts, no server-side secret, and no database. The TinyStories weights under `vendor/tinystories/` are a public model checkpoint, not a credential.
 
 ## Reporting
 
