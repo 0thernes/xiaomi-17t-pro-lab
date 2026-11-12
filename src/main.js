@@ -52,10 +52,11 @@ async function show() {
   }
   main.dataset.ready = "true";
   if (route.id !== lastId) {
+    window.scrollTo(0, 0);
     const heading = main.querySelector("h1");
     if (heading) {
       heading.tabIndex = -1;
-      heading.focus({ preventScroll: false });
+      heading.focus({ preventScroll: true });
     }
     lastId = route.id;
   }

@@ -7,7 +7,7 @@
 
 Phone-first lab for the **Xiaomi 17T Pro** and the **MediaTek Dimensity 9500** (TSMC **N3P FinFET**, not GAA). Every view computes something in the browser. Every hardware number is **MEASURED** on this device, **CITED** from a source, or **COMPUTED** from a formula written next to it. Unpublished figures stay **UNKNOWN**.
 
-Live demo (placeholder until Pages is enabled on the public repo): <https://0thernes.github.io/xiaomi-17t-pro-lab/>
+Live demo: <https://0thernes.github.io/xiaomi-17t-pro-lab/>
 
 Owner: Alex Donahue (GitHub [0thernes](https://github.com/0thernes)).
 

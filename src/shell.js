@@ -5,6 +5,7 @@ import { isolationStatus } from "./isolation.js";
 
 export function mountShell(audio) {
   const app = document.getElementById("app");
+  app.classList.add("app");
   const sound = el("button", { type: "button", id: "sound", "aria-pressed": "false" }, ["Sound off"]);
   sound.addEventListener("click", async () => {
     const muted = await audio.toggle();

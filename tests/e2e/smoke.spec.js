@@ -64,3 +64,13 @@ test("subpath hosting still reaches the CPU lab", async ({ page }) => {
   await expect(page.locator("#main[data-ready='true'] h1")).toContainText("CPU");
   expect(errors).toEqual([]);
 });
+
+test("desktop layout places nav sidebar beside main without overlap", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto("/#/");
+  await expect(page.locator("#main[data-ready='true'] h1")).toBeVisible();
+  const navBox = await page.locator("nav.nav").boundingBox();
+  const mainBox = await page.locator("#main").boundingBox();
+  expect(navBox.width).toBeLessThanOrEqual(240);
+  expect(mainBox.x).toBeGreaterThanOrEqual(navBox.x + navBox.width - 1);
+});

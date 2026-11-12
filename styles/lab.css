@@ -228,6 +228,10 @@ button[aria-pressed="true"] {
   padding: 18px var(--pad) 48px;
   width: min(1180px, 100%);
   margin: 0 auto;
+  scroll-margin-top: calc(var(--header) + 16px);
+}
+h1 {
+  scroll-margin-top: calc(var(--header) + 16px);
 }
 .lede {
   color: var(--muted);
@@ -483,22 +487,25 @@ code,
 @media (min-width: 960px) {
   .app {
     display: grid;
-    grid-template-columns: 220px 1fr;
+    grid-template-columns: 220px minmax(0, 1fr);
     grid-template-rows: auto 1fr auto;
   }
   .top {
     grid-column: 1 / -1;
   }
   .nav {
+    grid-column: 1;
     grid-row: 2;
     flex-direction: column;
     align-items: stretch;
     border-bottom: 0;
     border-right: 1px solid var(--line);
     position: sticky;
-    top: 64px;
+    top: var(--header);
     align-self: start;
-    max-height: calc(100vh - 64px);
+    min-height: calc(100vh - var(--header));
+    max-height: calc(100vh - var(--header));
+    overflow-y: auto;
   }
   .nav a {
     justify-content: flex-start;
@@ -507,6 +514,7 @@ code,
   #main {
     grid-column: 2;
     grid-row: 2;
+    min-width: 0;
     width: min(1280px, 100%);
   }
   .footer {

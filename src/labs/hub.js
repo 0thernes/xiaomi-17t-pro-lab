@@ -34,9 +34,18 @@ export async function mount(main, { cap }) {
   try {
     hero = mountHero(canvas, cap);
     const colors = el("div", { class: "color-row" });
+    const swatches = [];
     for (const name of device.colors_official.value) {
-      const button = el("button", { type: "button", class: "swatch" }, [name]);
-      button.addEventListener("click", () => hero.setFinish(name));
+      const button = el(
+        "button",
+        { type: "button", class: "swatch", "aria-pressed": name === "Black" ? "true" : "false" },
+        [name],
+      );
+      button.addEventListener("click", () => {
+        hero.setFinish(name);
+        for (const s of swatches) s.setAttribute("aria-pressed", s === button ? "true" : "false");
+      });
+      swatches.push(button);
       colors.append(button);
     }
     caption.append(colors);
