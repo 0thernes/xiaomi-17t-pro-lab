@@ -1,0 +1,3262 @@
+{
+  "meta": {
+    "title": "Xiaomi 17T Pro Lab — hardware taxonomy and CPU/GPU/NPU zoom stacks",
+    "compiled": "2026-11-12",
+    "timezone": "America/Los_Angeles",
+    "companions": ["cpu-gpu-npu-deep.md", "deep-dive.md", "specs.json", "specs-dossier.md", "head-to-head.md"],
+    "facet_keys_device": [
+      "structure",
+      "function",
+      "materials",
+      "dimensions",
+      "physics",
+      "data_signal_paths",
+      "trade_offs",
+      "failure_modes",
+      "manufacturing"
+    ],
+    "facet_keys_engines": [
+      "structure",
+      "dataflow",
+      "timing_latency",
+      "throughput",
+      "power_energy",
+      "materials",
+      "physics",
+      "isa_software_interface",
+      "design_trade_offs"
+    ],
+    "depth_policy": "Ten zoom levels are a floor, not a cap. Depth follows real citable structure. Do not pad. Do not truncate where citations exist. TSMC N3P is FinFET, never GAA (GAA/nanosheet is TSMC N2 contrast only).",
+    "status_values": ["confirmed", "unconfirmed", "unknown"],
+    "shared_nodes_policy": "Lower physics/lithography/FinFET nodes live in 'shared' and are referenced by refs[] to avoid copy-paste filler."
+  },
+  "shared": {
+    "n3p_finfet": {
+      "id": "n3p_finfet",
+      "name": "Standard cell / TSMC N3P FinFET transistor",
+      "scale": "transistor",
+      "facets": {
+        "structure": {
+          "text": "TSMC N3P enhanced 3 nm FinFET. Not GAA, not nanosheet. TSMC N2 is the public GAA contrast only.",
+          "status": "confirmed",
+          "source": "https://www.tsmc.com/english/dedicatedFoundry/technology/logic/l_3nm"
+        },
+        "materials": {
+          "text": "HKMG / Cu-Co-Ru stack for this tapeout unpublished.",
+          "status": "unknown"
+        },
+        "dimensions": {
+          "text": "Do not copy N3 CPP 45 nm or N3E M0 23 nm onto N3P. N3P pitches unknown here.",
+          "status": "unknown"
+        },
+        "physics": {
+          "text": "FinFET electrostatics (fin height, fin count) unpublished for this product.",
+          "status": "unknown"
+        },
+        "manufacturing": {
+          "text": "EUV 13.5 nm, Low-NA 0.33 typical of TSMC 3 nm-class public discussion. High-NA 0.55 is not claimed for N3P.",
+          "status": "confirmed",
+          "note": "Generic foundry context, not a MediaTek process recipe."
+        },
+        "trade_offs": {
+          "text": "FinFET still used at N3P; foundry moves to GAA at N2 for further scaling — public TSMC story, not a Xiaomi claim.",
+          "status": "confirmed",
+          "source": "https://www.tsmc.com/english/dedicatedFoundry/technology/logic/l_3nm"
+        },
+        "failure_modes": {
+          "text": "BTI, HCI, variability — textbook, not a 9500 reliability report.",
+          "status": "unknown"
+        }
+      },
+      "refs": ["lithography_euv", "si_quantum"]
+    },
+    "lithography_euv": {
+      "id": "lithography_euv",
+      "name": "Materials / lithography (EUV, Rayleigh)",
+      "scale": "materials",
+      "facets": {
+        "structure": {
+          "text": "Scanner optics and multipatterning around a 3 nm-class FinFET process.",
+          "status": "confirmed",
+          "source": "https://www.tsmc.com/english/dedicatedFoundry/technology/logic/l_3nm",
+          "note": "Generic; not a TSMC OPC deck for this SKU."
+        },
+        "physics": {
+          "text": "Rayleigh CD = k1 * lambda / NA with lambda=13.5 nm. Low-NA NA=0.33; High-NA EXE NA=0.55 is contrast only.",
+          "status": "confirmed",
+          "source": "generic ASML public EUV lambda=13.5 nm / NA 0.33 vs High-NA 0.55; see deep-dive.md"
+        },
+        "dimensions": {
+          "text": "lambda=13.5 nm EUV. N3P minimum pitches not published in sources used.",
+          "status": "unknown"
+        },
+        "manufacturing": {
+          "text": "Multipatterning vs High-NA trade-off is industry context, not a claimed N3P High-NA process.",
+          "status": "confirmed"
+        },
+        "materials": {
+          "text": "Photoresist / hardmask stacks unpublished for this tapeout.",
+          "status": "unknown"
+        }
+      }
+    },
+    "si_quantum": {
+      "id": "si_quantum",
+      "name": "Quantum / electron transport (generic Si)",
+      "scale": "quantum",
+      "facets": {
+        "structure": {
+          "text": "Crystalline silicon channel; NIST/CODATA lattice parameter a=5.431020511(89)e-10 m (22.5 C, vacuum).",
+          "status": "confirmed",
+          "source": "NIST/CODATA Si lattice a=5.431020511(89)e-10 m at 22.5 C vacuum; see deep-dive.md",
+          "note": "Textbook/NIST, not a MediaTek TEM."
+        },
+        "physics": {
+          "text": "Band transport, ballistic mean free path, direct tunneling through gate dielectrics — generic device physics.",
+          "status": "confirmed",
+          "source": "NIST/CODATA Si lattice a=5.431020511(89)e-10 m at 22.5 C vacuum; see deep-dive.md"
+        },
+        "materials": {
+          "text": "Si channel; high-k / work-function metals unpublished for this product.",
+          "status": "unknown"
+        },
+        "trade_offs": {
+          "text": "Explains why FinFET gate control still works at N3P and why GAA appears at N2 — foundry contrast only.",
+          "status": "confirmed"
+        }
+      }
+    },
+    "cmos_energy": {
+      "id": "cmos_energy",
+      "name": "Generic CMOS energy model",
+      "scale": "circuit",
+      "facets": {
+        "physics": {
+          "text": "E_dyn ~ alpha*C*V^2 per toggle; P_dyn ~ alpha*C*V^2*f; P_leak ~ I_leak*V. alpha, C, V, I_leak remain symbolic.",
+          "status": "confirmed",
+          "note": "Textbook CMOS, not a MediaTek lab number."
+        },
+        "power_energy": {
+          "text": "No official pJ/op or Vmin for C1 / Mali-G1 Ultra / NPU 990 in sources used.",
+          "status": "unknown"
+        }
+      }
+    }
+  },
+  "device_taxonomy": {
+    "id": "device",
+    "name": "Xiaomi 17T Pro",
+    "scale": "device",
+    "facets": {
+      "structure": {
+        "text": "Flagship phone: chassis, display, cameras, board, Dimensity 9500, battery, antennas.",
+        "status": "confirmed",
+        "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/"
+      },
+      "function": {
+        "text": "Android 16 / HyperOS 3 handheld computer and camera.",
+        "status": "confirmed",
+        "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/"
+      },
+      "materials": {
+        "text": "Gorilla Glass 7i front; rear cover / frame materials — see specs; Si-C Li-polymer battery.",
+        "status": "confirmed",
+        "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/"
+      },
+      "dimensions": {
+        "text": "162.2 x 77.5 x 8.25 mm, 219 g.",
+        "status": "confirmed",
+        "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/"
+      },
+      "physics": {
+        "text": "See child branches (thermal, display optics, lithography).",
+        "status": "confirmed"
+      },
+      "data_signal_paths": {
+        "text": "Cameras/ISP, RF/modem, storage, DRAM, display, charging.",
+        "status": "confirmed"
+      },
+      "trade_offs": {
+        "text": "Value / 7000 mAh / 100 W / 144 Hz vs trailing GB6 and peak GPU vs S26 Ultra and iPhone 18 Pro Max — see head-to-head.md.",
+        "status": "confirmed"
+      },
+      "failure_modes": {
+        "text": "IP68 official 1.5 m / 30 min; thermal throttle (see SNL stress); FAQ vs spec conflicts listed in specs.json.",
+        "status": "confirmed"
+      },
+      "manufacturing": {
+        "text": "Launch 28 May 2026 Vienna; SKU assembly details unknown.",
+        "status": "unknown"
+      }
+    },
+    "specs": [
+      {
+        "key": "name",
+        "value": "Xiaomi 17T Pro",
+        "unit": null,
+        "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+        "status": "confirmed"
+      },
+      {
+        "key": "weight_g",
+        "value": 219,
+        "unit": "g",
+        "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+        "status": "confirmed"
+      },
+      {
+        "key": "thickness_mm",
+        "value": 8.25,
+        "unit": "mm",
+        "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+        "status": "confirmed"
+      }
+    ],
+    "children": [
+      {
+        "id": "soc",
+        "name": "Dimensity 9500 SoC",
+        "scale": "package_die",
+        "facets": {
+          "structure": {
+            "text": "TSMC N3P FinFET SoC: C1 CPU cluster, Mali-G1 Ultra MC12, NPU 990 + CIM, Imagiq 1190, Rel-17 modem, LPDDR5X/UFS PHYs.",
+            "status": "confirmed",
+            "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500"
+          },
+          "function": {
+            "text": "Compute, graphics, on-device AI, imaging, cellular.",
+            "status": "confirmed",
+            "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500"
+          },
+          "materials": {
+            "text": "N3P FinFET silicon; package type (InFO/PoP) unknown on this phone. PoP only confirmed on other D9500 teardowns.",
+            "status": "unknown",
+            "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500"
+          },
+          "dimensions": {
+            "text": "Die size / transistor count unpublished. Aggregator ~30B transistors unconfirmed.",
+            "status": "unknown"
+          },
+          "physics": {
+            "text": "See lithography / FinFET / CMOS energy shared nodes.",
+            "status": "confirmed"
+          },
+          "data_signal_paths": {
+            "text": "CPU, GPU, NPU share 10 MB SLC then LPDDR5X 9600 (device) / 10667 (SoC max).",
+            "status": "confirmed"
+          },
+          "trade_offs": {
+            "text": "N3P FinFET vs Apple 'latest 2-nanometer' wording on A20 Pro — marketing node names, not a transistor-for-transistor proof.",
+            "status": "confirmed"
+          },
+          "failure_modes": {
+            "text": "Thermal/DVFS; no official errata sheet cited.",
+            "status": "confirmed"
+          },
+          "manufacturing": {
+            "text": "Announced 22 Sep 2025; TSMC N3P.",
+            "status": "confirmed",
+            "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500"
+          }
+        },
+        "specs": [
+          {
+            "key": "process",
+            "value": "TSMC N3P FinFET",
+            "unit": null,
+            "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500",
+            "status": "confirmed"
+          },
+          {
+            "key": "l3_mb",
+            "value": 16,
+            "unit": "MB",
+            "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500",
+            "status": "confirmed"
+          },
+          {
+            "key": "slc_mb",
+            "value": 10,
+            "unit": "MB",
+            "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500",
+            "status": "confirmed"
+          }
+        ],
+        "children": [
+          {
+            "id": "soc_cpu",
+            "name": "SoC CPU (C1 cluster)",
+            "scale": "cluster",
+            "facets": {
+              "structure": {
+                "text": "1+3+4 C1-Ultra/Premium/Pro.",
+                "status": "confirmed",
+                "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500"
+              },
+              "function": {
+                "text": "General-purpose A64 compute + SME2.",
+                "status": "confirmed"
+              },
+              "data_signal_paths": {
+                "text": "See cpu zoom_stack.",
+                "status": "confirmed"
+              },
+              "materials": {
+                "text": "N3P FinFET.",
+                "status": "confirmed",
+                "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500"
+              },
+              "dimensions": {
+                "text": "See official L2/L3/SLC; L1 KB unknown.",
+                "status": "unknown"
+              },
+              "physics": {
+                "text": "See cpu stack / shared.",
+                "status": "confirmed"
+              },
+              "trade_offs": {
+                "text": "See cpu stack.",
+                "status": "confirmed"
+              },
+              "failure_modes": {
+                "text": "See cpu stack.",
+                "status": "confirmed"
+              },
+              "manufacturing": {
+                "text": "Arm C1 IP on TSMC N3P.",
+                "status": "confirmed",
+                "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500"
+              }
+            },
+            "notes": "Full zoom stack lives at taxonomy.cpu (15 levels). Do not duplicate here."
+          },
+          {
+            "id": "soc_gpu",
+            "name": "SoC GPU (Mali-G1 Ultra MC12)",
+            "scale": "shader_complex",
+            "facets": {
+              "structure": {
+                "text": "MC12, CSF, DVS/TBDR, RTUv2.",
+                "status": "confirmed",
+                "source": "https://www.arm.com/products/silicon-ip-multimedia/gpu/mali-g1-ultra"
+              },
+              "function": {
+                "text": "Graphics, compute, optional GPU-neural queue (not the NPU 990).",
+                "status": "confirmed"
+              },
+              "data_signal_paths": {
+                "text": "See gpu zoom_stack.",
+                "status": "confirmed"
+              },
+              "materials": {
+                "text": "N3P.",
+                "status": "confirmed"
+              },
+              "dimensions": {
+                "text": "12 cores; clock unknown.",
+                "status": "unknown"
+              },
+              "physics": {
+                "text": "See gpu stack.",
+                "status": "confirmed"
+              },
+              "trade_offs": {
+                "text": "Peak vs IceLoop sustained.",
+                "status": "confirmed"
+              },
+              "failure_modes": {
+                "text": "Throttle under stress benches.",
+                "status": "confirmed"
+              },
+              "manufacturing": {
+                "text": "Arm 5th Gen GPU IP.",
+                "status": "confirmed"
+              }
+            },
+            "notes": "Full zoom stack lives at taxonomy.gpu (16 levels)."
+          },
+          {
+            "id": "soc_npu",
+            "name": "SoC NPU (990 + CIM eNPU)",
+            "scale": "engine_topology",
+            "facets": {
+              "structure": {
+                "text": "Dual engine, BitNet 1.58-bit, 128K context.",
+                "status": "confirmed",
+                "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500"
+              },
+              "function": {
+                "text": "On-device generative and always-on AI.",
+                "status": "confirmed"
+              },
+              "data_signal_paths": {
+                "text": "See npu zoom_stack.",
+                "status": "confirmed"
+              },
+              "materials": {
+                "text": "N3P; CIM cell unknown.",
+                "status": "unknown"
+              },
+              "dimensions": {
+                "text": "TOPS / array size unknown.",
+                "status": "unknown"
+              },
+              "physics": {
+                "text": "See npu CIM / quantum levels.",
+                "status": "confirmed"
+              },
+              "trade_offs": {
+                "text": "Relative 2x tokens only.",
+                "status": "confirmed"
+              },
+              "failure_modes": {
+                "text": "Unsupported ops; FAQ Hexagon error.",
+                "status": "confirmed"
+              },
+              "manufacturing": {
+                "text": "MediaTek 9th-gen NPU.",
+                "status": "confirmed"
+              }
+            },
+            "notes": "Full zoom stack lives at taxonomy.npu (14 levels)."
+          },
+          {
+            "id": "soc_isp",
+            "name": "Imagiq 1190 ISP",
+            "scale": "block",
+            "facets": {
+              "structure": {
+                "text": "MediaTek Imagiq 1190. Internal pipeline stages unpublished.",
+                "status": "confirmed",
+                "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500",
+                "note": "Name official; microarchitecture unknown."
+              },
+              "function": {
+                "text": "Camera pipeline: 17T Pro official 8K30 / 4K120; SoC table lists higher caps not all exposed on this phone.",
+                "status": "confirmed"
+              },
+              "data_signal_paths": {
+                "text": "Sensors to ISP to DRAM/SLC to display/encode; optional NPU.",
+                "status": "confirmed"
+              },
+              "materials": {
+                "text": "N3P.",
+                "status": "confirmed"
+              },
+              "dimensions": {
+                "text": "Unknown die area.",
+                "status": "unknown"
+              },
+              "physics": {
+                "text": "n/a at this depth.",
+                "status": "unknown"
+              },
+              "trade_offs": {
+                "text": "SoC 8K60 capture listed vs phone 8K30 official.",
+                "status": "confirmed"
+              },
+              "failure_modes": {
+                "text": "Unknown.",
+                "status": "unknown"
+              },
+              "manufacturing": {
+                "text": "On-die.",
+                "status": "confirmed"
+              }
+            },
+            "specs": [
+              {
+                "key": "isp",
+                "value": "Imagiq 1190",
+                "unit": null,
+                "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500",
+                "status": "confirmed"
+              },
+              {
+                "key": "soc_max_sensor",
+                "value": 320,
+                "unit": "MP",
+                "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500",
+                "status": "confirmed",
+                "notes": "SoC cap, not a 17T Pro camera."
+              }
+            ]
+          },
+          {
+            "id": "soc_modem",
+            "name": "5G modem (Rel-17 FR1)",
+            "scale": "block",
+            "facets": {
+              "structure": {
+                "text": "Integrated Rel-17 5G FR1, official 5CC 7.4 Gbps downlink. mmWave not listed on this phone.",
+                "status": "confirmed",
+                "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500"
+              },
+              "function": {
+                "text": "Cellular data/voice.",
+                "status": "confirmed"
+              },
+              "data_signal_paths": {
+                "text": "Modem to RF transceivers / antennas (see rf branch).",
+                "status": "confirmed"
+              },
+              "materials": {
+                "text": "On-die + off-die RF.",
+                "status": "confirmed"
+              },
+              "dimensions": {
+                "text": "Unknown.",
+                "status": "unknown"
+              },
+              "physics": {
+                "text": "Shannon/channel physics generic; not measured here.",
+                "status": "confirmed"
+              },
+              "trade_offs": {
+                "text": "Sub-6 only on official Xiaomi list vs iPhone 18 Pro Max official mmWave in the U.S.",
+                "status": "confirmed"
+              },
+              "failure_modes": {
+                "text": "Band/carrier limits; official band list on Xiaomi spec page.",
+                "status": "confirmed"
+              },
+              "manufacturing": {
+                "text": "On-die modem.",
+                "status": "confirmed"
+              }
+            },
+            "specs": [
+              {
+                "key": "peak_dl",
+                "value": 7.4,
+                "unit": "Gbps",
+                "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500",
+                "status": "confirmed",
+                "notes": "SoC FR1 5CC theoretical."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "memory",
+        "name": "LPDDR5X DRAM",
+        "scale": "package",
+        "facets": {
+          "structure": {
+            "text": "Official device SKUs: 12 GB LPDDR5X 9600. SoC cap 10667 Mbps. Channel count / width unpublished.",
+            "status": "confirmed",
+            "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/"
+          },
+          "function": {
+            "text": "Off-die main memory for CPU/GPU/NPU/ISP.",
+            "status": "confirmed"
+          },
+          "materials": {
+            "text": "JEDEC LPDDR5X package; vendor/rank unknown.",
+            "status": "unknown"
+          },
+          "dimensions": {
+            "text": "12 GB official only (GSMArena 16 GB is a documented conflict).",
+            "status": "confirmed",
+            "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/"
+          },
+          "physics": {
+            "text": "JEDEC signaling; theoretical GB/s not confirmed without channel geometry.",
+            "status": "unknown"
+          },
+          "data_signal_paths": {
+            "text": "SoC memory PHY to DRAM. Packaging PoP unknown on this phone.",
+            "status": "confirmed"
+          },
+          "trade_offs": {
+            "text": "9600 device bin vs 10667 SoC max — a bin, not a conflict.",
+            "status": "confirmed"
+          },
+          "failure_modes": {
+            "text": "Unknown retention/refresh details.",
+            "status": "unknown"
+          },
+          "manufacturing": {
+            "text": "JEDEC LPDDR5X.",
+            "status": "confirmed"
+          }
+        },
+        "specs": [
+          {
+            "key": "capacity_gb",
+            "value": 12,
+            "unit": "GB",
+            "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+            "status": "confirmed"
+          },
+          {
+            "key": "data_rate_mbps",
+            "value": 9600,
+            "unit": "Mbps",
+            "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+            "status": "confirmed"
+          },
+          {
+            "key": "soc_max_mbps",
+            "value": 10667,
+            "unit": "Mbps",
+            "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500",
+            "status": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "storage",
+        "name": "UFS 4.1 flash",
+        "scale": "package",
+        "facets": {
+          "structure": {
+            "text": "Official UFS 4.1, SKUs 256/512/1024 GB, no microSD. SoC supports 4-lane UFS 4.1; device lane count unknown.",
+            "status": "confirmed",
+            "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+            "note": "Device lane count unknown."
+          },
+          "function": {
+            "text": "Persistent storage.",
+            "status": "confirmed"
+          },
+          "materials": {
+            "text": "NAND vendor unknown on this phone.",
+            "status": "unknown"
+          },
+          "dimensions": {
+            "text": "Capacities official.",
+            "status": "confirmed",
+            "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/"
+          },
+          "physics": {
+            "text": "JEDEC UFS; KIOXIA cites 23.2 Gbps/lane class. 4-lane ~11.6 GB/s raw is derived, not a JEDEC-published 4-lane peak, and may not apply if the phone is not 4-lane.",
+            "status": "unknown"
+          },
+          "data_signal_paths": {
+            "text": "UFS host (SoC) to device.",
+            "status": "confirmed"
+          },
+          "trade_offs": {
+            "text": "UFS 4.1 official vs Notebookcheck UFS 4.0 on a tested S26 Ultra — different products.",
+            "status": "confirmed"
+          },
+          "failure_modes": {
+            "text": "Unknown TBW.",
+            "status": "unknown"
+          },
+          "manufacturing": {
+            "text": "UFS 4.1 (JEDEC).",
+            "status": "confirmed",
+            "source": "https://www.jedec.org/news/pressreleases/jedec%C2%AE-announces-updates-universal-flash-storage-ufs-and-memory-interface"
+          }
+        }
+      },
+      {
+        "id": "display",
+        "name": "6.83 in on-cell AMOLED",
+        "scale": "panel",
+        "facets": {
+          "structure": {
+            "text": "Flat flexible on-cell AMOLED, 2772x1280, 447 ppi, up to 144 Hz (30 AOD / 60 / 120 / 144), 12-bit 68B colors, 100% DCI-P3 on the spec page.",
+            "status": "confirmed",
+            "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/"
+          },
+          "function": {
+            "text": "Image output, touch, in-screen fingerprint (official wording; optical vs ultrasonic is conflict 13).",
+            "status": "confirmed",
+            "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/"
+          },
+          "materials": {
+            "text": "Gorilla Glass 7i front; OLED stack unpublished.",
+            "status": "confirmed",
+            "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/"
+          },
+          "dimensions": {
+            "text": "6.83 in; typ/HBM/UHBM 600/2000/3500 nits (UHBM at APL 25%), min 1 nit, contrast 5e6:1.",
+            "status": "confirmed",
+            "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/"
+          },
+          "physics": {
+            "text": "OLED emission, DC dimming official; PWM Hz unknown.",
+            "status": "unknown"
+          },
+          "data_signal_paths": {
+            "text": "Composer/GPU to panel; touch 480 Hz / 3500 Game Turbo official.",
+            "status": "confirmed"
+          },
+          "trade_offs": {
+            "text": "Spec 12-bit vs FAQ 8-bit (error 1); spec 100% DCI-P3 vs FAQ 94% (conflict 2). Official 3500 nits vs GSMArena measured 1069 — mixed methods.",
+            "status": "confirmed"
+          },
+          "failure_modes": {
+            "text": "Burn-in generic; not measured here.",
+            "status": "confirmed"
+          },
+          "manufacturing": {
+            "text": "Panel supplier unknown.",
+            "status": "unknown"
+          }
+        },
+        "specs": [
+          {
+            "key": "resolution",
+            "value": "2772x1280",
+            "unit": "px",
+            "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+            "status": "confirmed"
+          },
+          {
+            "key": "refresh_max_hz",
+            "value": 144,
+            "unit": "Hz",
+            "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+            "status": "confirmed"
+          },
+          {
+            "key": "peak_nits_official",
+            "value": 3500,
+            "unit": "nits",
+            "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+            "status": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "battery_pmic",
+        "name": "Battery / charging / PMIC",
+        "scale": "module",
+        "facets": {
+          "structure": {
+            "text": "7000 mAh typ / 6830 rated, Si-C Li-polymer dual-cell, ATL+LIWINON, 4.58 V. 100 W HyperCharge/PPS, 50 W wireless, 22.5 W wired reverse. No in-box adapter. PMIC identity unknown.",
+            "status": "confirmed",
+            "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+            "note": "PMIC unknown."
+          },
+          "function": {
+            "text": "Energy storage and power conversion.",
+            "status": "confirmed"
+          },
+          "materials": {
+            "text": "Official Si-C wording; electrochemistry beyond that unpublished.",
+            "status": "confirmed",
+            "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/"
+          },
+          "dimensions": {
+            "text": "Capacity official; physical cell dimensions unknown.",
+            "status": "unknown"
+          },
+          "physics": {
+            "text": "No invented charge-curve chemistry. Official lab ~48 min full.",
+            "status": "confirmed",
+            "source": "https://www.mi.com/uk/support/faq/details/KA-704973/"
+          },
+          "data_signal_paths": {
+            "text": "USB-C PD/PPS, wireless coil, reverse wired 22.5 W. FAQ 5 W reverse wireless vs spec wired-only is conflict 6.",
+            "status": "confirmed"
+          },
+          "trade_offs": {
+            "text": "Capacity and 100 W lead this trio on paper; vendor hours are not a common protocol (head-to-head).",
+            "status": "confirmed"
+          },
+          "failure_modes": {
+            "text": "PD3.0 vs FAQ PD2.0 only is conflict 5.",
+            "status": "confirmed"
+          },
+          "manufacturing": {
+            "text": "ATL + LIWINON official.",
+            "status": "confirmed",
+            "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/"
+          }
+        },
+        "specs": [
+          {
+            "key": "typical_mah",
+            "value": 7000,
+            "unit": "mAh",
+            "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+            "status": "confirmed"
+          },
+          {
+            "key": "wired_w",
+            "value": 100,
+            "unit": "W",
+            "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+            "status": "confirmed"
+          },
+          {
+            "key": "wireless_w",
+            "value": 50,
+            "unit": "W",
+            "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+            "status": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "cameras",
+        "name": "Camera modules",
+        "scale": "modules",
+        "facets": {
+          "structure": {
+            "text": "50 MP Light Fusion 950 f/1.67 OIS 23 mm; 50 MP 115 mm f/3.0 5x periscope; 12 MP UW f/2.2 15 mm 120 deg; 32 MP front f/2.2.",
+            "status": "confirmed",
+            "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/"
+          },
+          "function": {
+            "text": "Still/video capture; official 8K30, 4K120.",
+            "status": "confirmed",
+            "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/"
+          },
+          "materials": {
+            "text": "Sensor vendors beyond Light Fusion 950 name unknown.",
+            "status": "unknown"
+          },
+          "dimensions": {
+            "text": "f/1.67 vs some listings f/1.7 is issue 10.",
+            "status": "confirmed",
+            "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/"
+          },
+          "physics": {
+            "text": "Optics / OIS; no lab MTF cited.",
+            "status": "confirmed"
+          },
+          "data_signal_paths": {
+            "text": "Sensors to Imagiq 1190 to encode/DRAM.",
+            "status": "confirmed"
+          },
+          "trade_offs": {
+            "text": "12 MP UW loses the spec-sheet UW contest to Apple 48 MP and Samsung 50 MP. 32 MP front wins MP vs 18/12. Hardware only, not a photo-quality rank.",
+            "status": "confirmed"
+          },
+          "failure_modes": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "manufacturing": {
+            "text": "Module assembly unknown.",
+            "status": "unknown"
+          }
+        }
+      },
+      {
+        "id": "rf_antennas",
+        "name": "RF / antennas",
+        "scale": "rf",
+        "facets": {
+          "structure": {
+            "text": "Wi-Fi 7 2x2, Bluetooth 6.0, NFC official. Cellular band list on Xiaomi spec page. Antenna count/placement unknown without a teardown of this exact phone.",
+            "status": "confirmed",
+            "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+            "note": "Radios official; antenna geometry unknown."
+          },
+          "function": {
+            "text": "WLAN, WPAN, cellular, NFC, GNSS as listed on the official page.",
+            "status": "confirmed"
+          },
+          "materials": {
+            "text": "Unknown antenna materials / mmWave (not listed).",
+            "status": "unknown"
+          },
+          "dimensions": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "physics": {
+            "text": "Antenna efficiency unpublished.",
+            "status": "unknown"
+          },
+          "data_signal_paths": {
+            "text": "Modem / connectivity combo to antennas. Do not invent a part number.",
+            "status": "confirmed"
+          },
+          "trade_offs": {
+            "text": "No official mmWave vs iPhone C2 mmWave in the U.S.",
+            "status": "confirmed"
+          },
+          "failure_modes": {
+            "text": "Coexistence / hand-blocking unpublished.",
+            "status": "confirmed"
+          },
+          "manufacturing": {
+            "text": "Unknown.",
+            "status": "unknown"
+          }
+        }
+      },
+      {
+        "id": "board_pcb",
+        "name": "Board / PCB",
+        "scale": "board",
+        "facets": {
+          "structure": {
+            "text": "Main logic board, interconnects, shields. No official exploded PCB for this SKU was used; teardown block list in deep-dive.md is a planning list, not a counted Xiaomi teardown.",
+            "status": "unknown"
+          },
+          "function": {
+            "text": "Connect SoC, DRAM, UFS, PMIC, RF, connectors.",
+            "status": "confirmed"
+          },
+          "materials": {
+            "text": "PCB stackup / layer count unknown.",
+            "status": "unknown"
+          },
+          "dimensions": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "physics": {
+            "text": "PDN impedance unpublished.",
+            "status": "unknown"
+          },
+          "data_signal_paths": {
+            "text": "See deep-dive teardown block list — do not invent traces.",
+            "status": "confirmed"
+          },
+          "trade_offs": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "failure_modes": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "manufacturing": {
+            "text": "Unknown. Do not paste other D9500 (Vivo/Oppo) teardowns as this phone.",
+            "status": "unknown"
+          }
+        }
+      },
+      {
+        "id": "chassis_thermal",
+        "name": "Chassis / thermal (3D IceLoop)",
+        "scale": "chassis",
+        "facets": {
+          "structure": {
+            "text": "Official 3D IceLoop cooling; 162.2x77.5x8.25 mm, 219 g; IP68 1.5 m / 30 min; GG7i front.",
+            "status": "confirmed",
+            "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/"
+          },
+          "function": {
+            "text": "Mechanical protection, heat spreading, seals.",
+            "status": "confirmed"
+          },
+          "materials": {
+            "text": "IceLoop materials not fully official; frame/rear — see specs-dossier. Thickness 8.25 vs 8.3 is issue 9.",
+            "status": "unknown"
+          },
+          "dimensions": {
+            "text": "Official outer dimensions.",
+            "status": "confirmed",
+            "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/"
+          },
+          "physics": {
+            "text": "Spreading / convection; no official Rth. Independent evidence: PhoneArena SNL Low vs S26 Ultra.",
+            "status": "confirmed"
+          },
+          "data_signal_paths": {
+            "text": "Thermistors (count unknown) to DVFS.",
+            "status": "confirmed"
+          },
+          "trade_offs": {
+            "text": "Thicker/heavier than S26 Ultra (7.9 mm, 214 g); lighter/thinner than 18 Pro Max (8.75 mm, 249 g). Apple IP68 6 m wins depth.",
+            "status": "confirmed"
+          },
+          "failure_modes": {
+            "text": "Ingress per official 1.5 m lab; thermal throttle under peak GPU.",
+            "status": "confirmed"
+          },
+          "manufacturing": {
+            "text": "Unknown assembly sequence.",
+            "status": "unknown"
+          }
+        }
+      }
+    ]
+  },
+  "cpu": {
+    "id": "cpu",
+    "name": "Dimensity 9500 CPU (Arm C1 cluster)",
+    "depth_policy": "Ten levels are a floor, not a cap. This stack has 15 levels plus SME2 and cache/MMU as real structure. No padded filler. N3P is FinFET, not GAA.",
+    "zoom_stack": [
+      {
+        "id": "cpu_l1_software",
+        "name": "Software / API (ART, NDK, libc)",
+        "scale": "software",
+        "facets": {
+          "structure": {
+            "text": "App process: Java/Kotlin (ART) and/or NDK; libc, pthreads. SME2/SVE2 from native ACLE, not from Java or the browser.",
+            "status": "confirmed"
+          },
+          "dataflow": {
+            "text": "Bytecode or ELF to interpreter / JIT / AOT to user-mode A64.",
+            "status": "confirmed"
+          },
+          "timing_latency": {
+            "text": "Frame and request times (ms), not cycle-accurate.",
+            "status": "confirmed"
+          },
+          "throughput": {
+            "text": "Threads scheduled across the 1+3+4 cluster; JS worker placement is not exposed to the page.",
+            "status": "confirmed"
+          },
+          "power_energy": {
+            "text": "Android power HAL / thermal APIs are coarse.",
+            "status": "confirmed"
+          },
+          "materials": {
+            "text": "None at this layer.",
+            "status": "unknown"
+          },
+          "physics": {
+            "text": "None at this layer.",
+            "status": "unknown"
+          },
+          "isa_software_interface": {
+            "text": "No raw MSR / PMMIR_EL1 access from the browser (EL1+).",
+            "status": "confirmed"
+          },
+          "design_trade_offs": {
+            "text": "Portability vs SME2: a Web app will almost never hit SME2.",
+            "status": "confirmed"
+          }
+        }
+      },
+      {
+        "id": "cpu_l2_os",
+        "name": "Driver / runtime / OS (HyperOS 3, Android 16)",
+        "scale": "driver_runtime",
+        "facets": {
+          "structure": {
+            "text": "HyperOS 3 (Android 16) kernel, cpufreq/cpuidle, thermal, binder. Exact GKI / Xiaomi tree unknown.",
+            "status": "confirmed",
+            "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+            "note": "OS official; kernel version unknown."
+          },
+          "dataflow": {
+            "text": "Syscalls, binder, dmabuf, cgroup CPU sets.",
+            "status": "confirmed"
+          },
+          "timing_latency": {
+            "text": "DVFS dwell times unpublished.",
+            "status": "unknown"
+          },
+          "throughput": {
+            "text": "Energy Aware Scheduling places work on C1-Pro first, then Premium/Ultra, subject to unpublished Xiaomi tunables.",
+            "status": "unconfirmed"
+          },
+          "power_energy": {
+            "text": "Thermal/policy dominate sustained benches as much as peak GHz (see head-to-head SNL Low).",
+            "status": "confirmed"
+          },
+          "isa_software_interface": {
+            "text": "Kernel at EL1; firmware EL3 image unknown.",
+            "status": "unknown"
+          },
+          "design_trade_offs": {
+            "text": "Responsiveness vs sustained GPU/CPU caps.",
+            "status": "confirmed"
+          },
+          "materials": {
+            "text": "n/a",
+            "status": "unknown"
+          },
+          "physics": {
+            "text": "n/a",
+            "status": "unknown"
+          }
+        },
+        "specs": [
+          {
+            "key": "os",
+            "value": "HyperOS 3 / Android 16",
+            "unit": null,
+            "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+            "status": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "cpu_l3_isa",
+        "name": "ISA / exception model (Armv9.3-A, SVE2, SME2)",
+        "scale": "isa",
+        "facets": {
+          "structure": {
+            "text": "A64 32-bit encodings; SVE2 VL=128-bit (C1-Pro SOG); SME2 present. ZA geometry unknown.",
+            "status": "confirmed",
+            "source": "https://developer.arm.com/documentation/109879"
+          },
+          "dataflow": {
+            "text": "Fetch to decode MOP to optional split to 2 uOPs to issue (SOG).",
+            "status": "confirmed"
+          },
+          "timing_latency": {
+            "text": "Architected memory order; DMB/DSB/ISB. Cycle costs unknown.",
+            "status": "unknown"
+          },
+          "throughput": {
+            "text": "SVE 128-bit is narrower than some server VLs; SME2 recovers matrix throughput.",
+            "status": "confirmed"
+          },
+          "isa_software_interface": {
+            "text": "EL0-EL3 required by SOG. Documented encodings: NOP D503201F, RET D65F03C0, SVC#0 D4000001, ADD X0,X1,X2 8B020020.",
+            "status": "confirmed"
+          },
+          "design_trade_offs": {
+            "text": "128-bit SVE vs SME2 vs offload to NPU 990.",
+            "status": "confirmed"
+          },
+          "materials": {
+            "text": "n/a",
+            "status": "unknown"
+          },
+          "physics": {
+            "text": "n/a",
+            "status": "unknown"
+          },
+          "power_energy": {
+            "text": "ISA itself has no official pJ/inst.",
+            "status": "unknown"
+          }
+        },
+        "specs": [
+          {
+            "key": "isa",
+            "value": "Armv9.3-A + SVE2 + SME2",
+            "unit": null,
+            "source": "https://www.arm.com/products/silicon-ip-cpu/c1-ultra",
+            "status": "confirmed"
+          },
+          {
+            "key": "sve_vl",
+            "value": 128,
+            "unit": "bit",
+            "source": "https://developer.arm.com/documentation/109879",
+            "status": "confirmed"
+          },
+          {
+            "key": "pa_bits",
+            "value": 40,
+            "unit": "bit",
+            "source": "https://developer.arm.com/documentation/109879",
+            "status": "confirmed"
+          },
+          {
+            "key": "va_bits",
+            "value": 48,
+            "unit": "bit",
+            "source": "https://developer.arm.com/documentation/109879",
+            "status": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "cpu_l4_dsu",
+        "name": "Cluster / C1-DSU / L3 / SLC",
+        "scale": "cluster",
+        "facets": {
+          "structure": {
+            "text": "One DSU-hosted 8-core cluster, 16 MB L3, 10 MB SLC also serving GPU/NPU/ISP. Slice count unknown.",
+            "status": "confirmed",
+            "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500",
+            "note": "Capacities official; slice geometry unknown."
+          },
+          "dataflow": {
+            "text": "Intra-cluster coherence via DSU; SLC last on-die stop before LPDDR5X.",
+            "status": "confirmed"
+          },
+          "timing_latency": {
+            "text": "L3/SLC hit latency unknown.",
+            "status": "unknown"
+          },
+          "throughput": {
+            "text": "Capacities official; bandwidth unpublished.",
+            "status": "unknown"
+          },
+          "power_energy": {
+            "text": "Shared L3/SLC leakage unpublished.",
+            "status": "unknown"
+          },
+          "design_trade_offs": {
+            "text": "10 MB SLC helps GPU/NPU working sets at die-area cost; area unpublished.",
+            "status": "unknown"
+          },
+          "materials": {
+            "text": "On-die SRAM, N3P.",
+            "status": "confirmed",
+            "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500"
+          },
+          "physics": {
+            "text": "See cmos_energy.",
+            "status": "confirmed"
+          },
+          "isa_software_interface": {
+            "text": "Cache geometry is not fully discoverable from a web page.",
+            "status": "confirmed"
+          }
+        },
+        "specs": [
+          {
+            "key": "l3",
+            "value": 16,
+            "unit": "MB",
+            "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500",
+            "status": "confirmed"
+          },
+          {
+            "key": "slc",
+            "value": 10,
+            "unit": "MB",
+            "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500",
+            "status": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "cpu_l5_cores",
+        "name": "Core types (C1-Ultra / Premium / Pro)",
+        "scale": "core_types",
+        "facets": {
+          "structure": {
+            "text": "Three different Arm C1 products, not one uarch with clock bins. 1x Ultra + 3x Premium + 4x Pro.",
+            "status": "confirmed",
+            "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500"
+          },
+          "dataflow": {
+            "text": "DynamIQ task migration across core types.",
+            "status": "confirmed"
+          },
+          "timing_latency": {
+            "text": "Official caps 4.21 / 3.5 / 2.7 GHz; 17T Pro DVFS table unknown.",
+            "status": "confirmed",
+            "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500",
+            "note": "Caps official; DVFS table unknown."
+          },
+          "throughput": {
+            "text": "No official SPECrate-style split.",
+            "status": "unknown"
+          },
+          "power_energy": {
+            "text": "Efficiency cores exist to cut energy at light load; no official pJ/op.",
+            "status": "unknown"
+          },
+          "design_trade_offs": {
+            "text": "One prime at 4.21 GHz vs other vendors' peak clocks is not a single-thread proof (different ISAs).",
+            "status": "confirmed"
+          },
+          "materials": {
+            "text": "Same N3P die.",
+            "status": "confirmed",
+            "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500"
+          },
+          "physics": {
+            "text": "See cmos_energy.",
+            "status": "confirmed"
+          },
+          "isa_software_interface": {
+            "text": "Same Armv9.3-A across the cluster; SME2 required if a high-performance core is present (SOG).",
+            "status": "confirmed",
+            "source": "https://developer.arm.com/documentation/109879"
+          }
+        },
+        "specs": [
+          {
+            "key": "c1_ultra",
+            "value": "1x up to 4.21 GHz, 2 MB L2",
+            "unit": null,
+            "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500",
+            "status": "confirmed"
+          },
+          {
+            "key": "c1_premium",
+            "value": "3x up to 3.5 GHz, 1 MB L2",
+            "unit": null,
+            "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500",
+            "status": "confirmed"
+          },
+          {
+            "key": "c1_pro",
+            "value": "4x up to 2.7 GHz, 512 KB L2",
+            "unit": null,
+            "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500",
+            "status": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "cpu_l6_uarch",
+        "name": "Core microarchitecture (published SOG / telemetry only)",
+        "scale": "microarchitecture",
+        "facets": {
+          "structure": {
+            "text": "C1-Pro SOG (109879_0102_05_en, 2025-09-10): 13 issue pipelines, 1 uOP/cycle/pipeline, MOP may split into 2 uOPs. C1-Premium diagram: Branch, ALU x3, FADD x2, FMUL x2, IMAC, AGU, FDIV, SME2. Do not copy Premium FUs onto Ultra as fact. Do not use C2-Ultra SOG numbers.",
+            "status": "confirmed",
+            "source": "https://developer.arm.com/documentation/109879"
+          },
+          "dataflow": {
+            "text": "In-order vs out-of-order window sizes unknown. Do not invent ROB entries.",
+            "status": "unknown"
+          },
+          "timing_latency": {
+            "text": "Pipeline depth unknown. Unverified 10-wide / 23-pipe blog claims are not used.",
+            "status": "unknown"
+          },
+          "throughput": {
+            "text": "Bounded in wording by the 13-pipe SOG figure; frontend width is N-slot, not a public integer.",
+            "status": "confirmed",
+            "source": "https://developer.arm.com/documentation/109879"
+          },
+          "power_energy": {
+            "text": "No official pJ/op.",
+            "status": "unknown"
+          },
+          "isa_software_interface": {
+            "text": "Performance counters / PMMIR at EL1+, not in the browser.",
+            "status": "confirmed"
+          },
+          "design_trade_offs": {
+            "text": "Document known structure; leave ROB/depth to a native perf-counter helper.",
+            "status": "confirmed"
+          },
+          "materials": {
+            "text": "N3P standard cells.",
+            "status": "confirmed"
+          },
+          "physics": {
+            "text": "See cmos_energy.",
+            "status": "confirmed"
+          }
+        }
+      },
+      {
+        "id": "cpu_l7_frontend",
+        "name": "Frontend (predict / N-slot decode / rename)",
+        "scale": "pipeline_frontend",
+        "facets": {
+          "structure": {
+            "text": "Decode is N-slot; numeric width via PMMIR_EL1.SLOTS — unpublished as a constant here. Predictor geometry unknown.",
+            "status": "unknown",
+            "source": "https://developer.arm.com/documentation/109879",
+            "note": "N-slot mechanism confirmed; integer width unknown."
+          },
+          "dataflow": {
+            "text": "L1-I (absolute size unknown) to decode.",
+            "status": "confirmed"
+          },
+          "timing_latency": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "throughput": {
+            "text": "Unknown slots/cycle as a public number.",
+            "status": "unknown"
+          },
+          "isa_software_interface": {
+            "text": "A native privileged helper could read PMMIR_EL1.SLOTS; the Lab must not guess 10.",
+            "status": "confirmed"
+          },
+          "design_trade_offs": {
+            "text": "Frontend width vs power/area — not quantified by Arm in the sources used.",
+            "status": "confirmed"
+          },
+          "power_energy": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "materials": {
+            "text": "n/a",
+            "status": "unknown"
+          },
+          "physics": {
+            "text": "n/a",
+            "status": "unknown"
+          }
+        },
+        "specs": [
+          {
+            "key": "l1_absolute_kb",
+            "value": null,
+            "unit": "KB",
+            "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500",
+            "status": "unknown",
+            "notes": "MediaTek only states 100% bigger L1 vs previous gen."
+          }
+        ]
+      },
+      {
+        "id": "cpu_l8_fu",
+        "name": "Execution pipelines / functional units",
+        "scale": "functional_units",
+        "facets": {
+          "structure": {
+            "text": "Premium telemetry list as above; Ultra/Pro complete official FU graphic not independently fetched — do not assume identity.",
+            "status": "confirmed",
+            "source": "https://www.arm.com/products/silicon-ip-cpu/c1-ultra"
+          },
+          "dataflow": {
+            "text": "Integer vs FP vs SME2 issue paths only partly specified.",
+            "status": "confirmed"
+          },
+          "throughput": {
+            "text": "Partly specified by pipeline count; issue width numeric unknown.",
+            "status": "unknown"
+          },
+          "timing_latency": {
+            "text": "FDIV latency unknown.",
+            "status": "unknown"
+          },
+          "power_energy": {
+            "text": "FDIV and SME2 are heavy units; no official pJ/op.",
+            "status": "unknown"
+          },
+          "physics": {
+            "text": "P_dyn ~ alpha*C*V^2*f (symbolic).",
+            "status": "confirmed",
+            "note": "Textbook."
+          },
+          "isa_software_interface": {
+            "text": "A64 / SVE2 / SME2 ops map onto these FUs.",
+            "status": "confirmed"
+          },
+          "design_trade_offs": {
+            "text": "ALU count vs SME2 area.",
+            "status": "confirmed"
+          },
+          "materials": {
+            "text": "N3P.",
+            "status": "confirmed"
+          }
+        }
+      },
+      {
+        "id": "cpu_l9_sme2",
+        "name": "C1-SME2 unit (sub-branch)",
+        "scale": "sme2",
+        "facets": {
+          "structure": {
+            "text": "Streaming SME2 datapath required in this cluster (SOG). ZA tile geometry, SME VL, outer-product pipe count unknown for the 9500 tapeout.",
+            "status": "confirmed",
+            "source": "https://developer.arm.com/documentation/109879",
+            "note": "Presence required; geometry unknown."
+          },
+          "dataflow": {
+            "text": "Matrix outer products and vector ops via SME2; memory through ZA and ordinary LS.",
+            "status": "confirmed"
+          },
+          "throughput": {
+            "text": "No official tokens/s or GEMM TFLOPS for this SoC.",
+            "status": "unknown"
+          },
+          "timing_latency": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "isa_software_interface": {
+            "text": "SME2 ACLE; Android/browser typically will not emit this from JS.",
+            "status": "confirmed"
+          },
+          "design_trade_offs": {
+            "text": "SME2 (CPU path) vs NPU 990 / CIM for LLM decode — no official tokens/s for either used here.",
+            "status": "confirmed"
+          },
+          "power_energy": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "materials": {
+            "text": "N3P.",
+            "status": "confirmed"
+          },
+          "physics": {
+            "text": "See cmos_energy.",
+            "status": "confirmed"
+          }
+        }
+      },
+      {
+        "id": "cpu_l10_cache",
+        "name": "Cache / memory-side CPU path",
+        "scale": "cache_memory",
+        "facets": {
+          "structure": {
+            "text": "L1-I/D (KB unknown) to private L2 (2 MB / 1 MB / 512 KB official) to L3 16 MB to SLC 10 MB to LPDDR5X. Device DRAM official 9600 Mbps; SoC cap 10667 Mbps (a bin, not a conflict).",
+            "status": "confirmed",
+            "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500"
+          },
+          "dataflow": {
+            "text": "Loads/stores and prefetchers (prefetcher details unknown).",
+            "status": "unknown"
+          },
+          "timing_latency": {
+            "text": "Hit/miss cycles unknown. C1-Pro SOG section 3.14 not successfully extracted here.",
+            "status": "unknown"
+          },
+          "throughput": {
+            "text": "Theoretical DRAM bandwidth not confirmed (channel count/width unpublished). Aggregator 4x16 85.3 GB/s stays unconfirmed.",
+            "status": "unknown"
+          },
+          "isa_software_interface": {
+            "text": "Pointer-chase experiment can overlay official capacities only.",
+            "status": "confirmed"
+          },
+          "design_trade_offs": {
+            "text": "Private L2 size vs number of cores.",
+            "status": "confirmed"
+          },
+          "power_energy": {
+            "text": "SRAM leakage unpublished.",
+            "status": "unknown"
+          },
+          "materials": {
+            "text": "On-die SRAM + package LPDDR5X.",
+            "status": "confirmed"
+          },
+          "physics": {
+            "text": "See cmos_energy.",
+            "status": "confirmed"
+          }
+        }
+      },
+      {
+        "id": "cpu_l11_mmu",
+        "name": "MMU / translation / exceptions",
+        "scale": "mmu",
+        "facets": {
+          "structure": {
+            "text": "48-bit VA, 40-bit PA (C1-Pro SOG). Page-table format architected (VMSAv8-64/VMSAv9); Xiaomi granule and TCR unknown.",
+            "status": "confirmed",
+            "source": "https://developer.arm.com/documentation/109879"
+          },
+          "dataflow": {
+            "text": "TLB (geometry unknown) to table walks in L2/L3/DRAM.",
+            "status": "unknown"
+          },
+          "timing_latency": {
+            "text": "Walk cost unknown.",
+            "status": "unknown"
+          },
+          "isa_software_interface": {
+            "text": "SVC #0 encoding D4000001 is the canonical EL0 to EL1 call; the Lab can decode it, not trace it from JS.",
+            "status": "confirmed"
+          },
+          "design_trade_offs": {
+            "text": "40-bit PA caps physical memory well above this phone's official 12 GB.",
+            "status": "confirmed"
+          },
+          "throughput": {
+            "text": "Unknown TLB reach.",
+            "status": "unknown"
+          },
+          "power_energy": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "materials": {
+            "text": "n/a",
+            "status": "unknown"
+          },
+          "physics": {
+            "text": "n/a",
+            "status": "unknown"
+          }
+        }
+      },
+      {
+        "id": "cpu_l12_circuit",
+        "name": "Circuit (SRAM bits, adders, flops)",
+        "scale": "circuit",
+        "facets": {
+          "structure": {
+            "text": "Generic 6T SRAM, adders, scan flops — not a 9500 netlist.",
+            "status": "unconfirmed",
+            "note": "Textbook structure only."
+          },
+          "materials": {
+            "text": "SRAM CMOS on the same N3P die; bit-cell area unknown (do not reuse an older N3 paper's area as N3P).",
+            "status": "unknown"
+          },
+          "physics": {
+            "text": "t_CQ and bitline delay unpublished.",
+            "status": "unknown"
+          },
+          "timing_latency": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "throughput": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "power_energy": {
+            "text": "Official Vmin unknown.",
+            "status": "unknown"
+          },
+          "design_trade_offs": {
+            "text": "16 MB L3 is a large SRAM tax.",
+            "status": "confirmed"
+          },
+          "isa_software_interface": {
+            "text": "Invisible to software except via latency.",
+            "status": "confirmed"
+          },
+          "dataflow": {
+            "text": "Bitlines / sense amps — textbook.",
+            "status": "confirmed"
+          }
+        },
+        "refs": ["cmos_energy", "n3p_finfet"]
+      },
+      {
+        "id": "cpu_l13_finfet",
+        "name": "Standard cell / FinFET transistor (N3P)",
+        "scale": "transistor",
+        "facets": {
+          "structure": {
+            "text": "See shared n3p_finfet. Never label this SoC GAA.",
+            "status": "confirmed",
+            "source": "https://www.tsmc.com/english/dedicatedFoundry/technology/logic/l_3nm"
+          },
+          "dataflow": {
+            "text": "Charge in the fin channel under the gate.",
+            "status": "confirmed"
+          },
+          "materials": {
+            "text": "See n3p_finfet.",
+            "status": "unknown"
+          },
+          "physics": {
+            "text": "See n3p_finfet / lithography_euv / si_quantum.",
+            "status": "confirmed"
+          },
+          "timing_latency": {
+            "text": "FO4 unpublished.",
+            "status": "unknown"
+          },
+          "throughput": {
+            "text": "n/a",
+            "status": "unknown"
+          },
+          "power_energy": {
+            "text": "See cmos_energy.",
+            "status": "unknown"
+          },
+          "isa_software_interface": {
+            "text": "Invisible.",
+            "status": "confirmed"
+          },
+          "design_trade_offs": {
+            "text": "FinFET at N3P vs GAA at N2 — foundry contrast only.",
+            "status": "confirmed"
+          }
+        },
+        "refs": ["n3p_finfet", "lithography_euv", "si_quantum", "cmos_energy"]
+      },
+      {
+        "id": "cpu_l14_litho",
+        "name": "Materials / lithography",
+        "scale": "materials",
+        "facets": {
+          "structure": {
+            "text": "See shared lithography_euv.",
+            "status": "confirmed"
+          },
+          "physics": {
+            "text": "CD = k1*lambda/NA, lambda=13.5 nm, NA=0.33 vs 0.55 contrast.",
+            "status": "confirmed",
+            "source": "generic ASML public EUV lambda=13.5 nm / NA 0.33 vs High-NA 0.55; see deep-dive.md"
+          },
+          "materials": {
+            "text": "Unpublished stack.",
+            "status": "unknown"
+          },
+          "dataflow": {
+            "text": "n/a",
+            "status": "unknown"
+          },
+          "timing_latency": {
+            "text": "n/a",
+            "status": "unknown"
+          },
+          "throughput": {
+            "text": "Scanner throughput not relevant as a phone spec.",
+            "status": "unknown"
+          },
+          "power_energy": {
+            "text": "n/a",
+            "status": "unknown"
+          },
+          "isa_software_interface": {
+            "text": "n/a",
+            "status": "confirmed"
+          },
+          "design_trade_offs": {
+            "text": "Multipatterning vs High-NA. High-NA is not claimed for N3P.",
+            "status": "confirmed"
+          }
+        },
+        "refs": ["lithography_euv"]
+      },
+      {
+        "id": "cpu_l15_quantum",
+        "name": "Quantum / electron transport",
+        "scale": "quantum",
+        "facets": {
+          "structure": {
+            "text": "See shared si_quantum (NIST Si lattice).",
+            "status": "confirmed",
+            "source": "NIST/CODATA Si lattice a=5.431020511(89)e-10 m at 22.5 C vacuum; see deep-dive.md"
+          },
+          "physics": {
+            "text": "Band transport / tunneling — textbook, not a 9500 measurement.",
+            "status": "confirmed",
+            "source": "NIST/CODATA Si lattice a=5.431020511(89)e-10 m at 22.5 C vacuum; see deep-dive.md"
+          },
+          "materials": {
+            "text": "Si.",
+            "status": "confirmed",
+            "source": "NIST/CODATA Si lattice a=5.431020511(89)e-10 m at 22.5 C vacuum; see deep-dive.md"
+          },
+          "dataflow": {
+            "text": "Carriers in the channel.",
+            "status": "confirmed"
+          },
+          "timing_latency": {
+            "text": "Mean free path unpublished for this process.",
+            "status": "unknown"
+          },
+          "throughput": {
+            "text": "n/a",
+            "status": "unknown"
+          },
+          "power_energy": {
+            "text": "Leakage related; unpublished.",
+            "status": "unknown"
+          },
+          "isa_software_interface": {
+            "text": "n/a",
+            "status": "confirmed"
+          },
+          "design_trade_offs": {
+            "text": "Why FinFET remains at N3P.",
+            "status": "confirmed"
+          }
+        },
+        "refs": ["si_quantum"]
+      }
+    ],
+    "experiment": {
+      "id": "cpu_pointer_chase_a64",
+      "title": "Pointer-chase working-set sweep + documented A64 decoder",
+      "medium": "p5.js / WASM, COOP/COEP isolation preferred (Chrome 5 us vs 100 us timers)",
+      "measures": "ns/load over 4 KB to >32 MB working sets; overlay official L2 512 KB / 1 MB / 2 MB, L3 16 MB, SLC 10 MB as 'consistent with,' never as cycle-accurate hit latency. A64 bit-field inspector limited to documented encodings. Optional scalar vs WASM SIMD roofline (software ceiling, not SME2). Computed model P_dyn=alpha*C*V^2*f with f sliders at official 4.21/3.5/2.7 GHz caps; alpha,C,V symbolic.",
+      "cannot_claim": "Decode width, ROB size, pipeline depth, L1 hit cycles, PMMIR_EL1.SLOTS as a hardcoded integer.",
+      "status": "designed",
+      "source": "cpu-gpu-npu-deep.md section 1.4"
+    }
+  },
+  "gpu": {
+    "id": "gpu",
+    "name": "Arm Mali-G1 Ultra MC12",
+    "depth_policy": "Sixteen levels follow real structure (API, CSF, four queues, MC12, DVS/TBDR, warp, FMA, RTUv2, 32 KB caches, scan-out, circuit, FinFET, lithography, quantum, IceLoop thermal). No filler. GPU clock remains UNKNOWN; theoretical GFLOPS stays symbolic.",
+    "zoom_stack": [
+      {
+        "id": "gpu_l1_api",
+        "name": "Application / API (Vulkan 1.4, GLES 3.2, OpenCL 3.0, WebGPU)",
+        "scale": "software",
+        "facets": {
+          "structure": {
+            "text": "Vulkan 1.4, OpenGL ES 3.2, OpenCL 3.0, Android Hardware Buffer; Lab uses WebGPU / WebGL2.",
+            "status": "confirmed",
+            "source": "https://www.khronos.org/conformance/adopters/conformant-products/vulkan"
+          },
+          "dataflow": {
+            "text": "Command buffers / draw calls to driver.",
+            "status": "confirmed"
+          },
+          "isa_software_interface": {
+            "text": "SPIR-V or GLSL ES. WebGPU enabled as a class for ARM GPUs in Chrome 121+ (Android 12+). Mali-G1 Ultra specifically unconfirmed — feature-detect navigator.gpu.",
+            "status": "confirmed",
+            "note": "Class confirmed; this GPU unconfirmed."
+          },
+          "design_trade_offs": {
+            "text": "WebGPU will not expose CSF queues or RTUv2 counters.",
+            "status": "confirmed"
+          },
+          "throughput": {
+            "text": "API overhead vs native Vulkan not measured here.",
+            "status": "unknown"
+          },
+          "timing_latency": {
+            "text": "Submission latency unpublished.",
+            "status": "unknown"
+          },
+          "power_energy": {
+            "text": "n/a at API layer.",
+            "status": "unknown"
+          },
+          "materials": {
+            "text": "n/a",
+            "status": "unknown"
+          },
+          "physics": {
+            "text": "n/a",
+            "status": "unknown"
+          }
+        },
+        "specs": [
+          {
+            "key": "vulkan",
+            "value": "1.4 (Khronos Mali-G1-Ultra, Arm, 2025-12-19, CTS 1.4.1.3)",
+            "unit": null,
+            "source": "https://www.khronos.org/conformance/adopters/conformant-products/vulkan",
+            "status": "confirmed"
+          },
+          {
+            "key": "gles",
+            "value": "3.2",
+            "unit": null,
+            "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500",
+            "status": "confirmed"
+          },
+          {
+            "key": "opencl",
+            "value": "3.0",
+            "unit": null,
+            "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500",
+            "status": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "gpu_l2_driver",
+        "name": "Driver / runtime (Mali DDK)",
+        "scale": "driver_runtime",
+        "facets": {
+          "structure": {
+            "text": "Arm Mali user-mode + kernel driver in the Xiaomi tree. DDK version unknown.",
+            "status": "unknown",
+            "note": "Presence of a Mali driver is implied by the GPU; version unknown."
+          },
+          "dataflow": {
+            "text": "Descriptors, shader compiler, memory heaps.",
+            "status": "confirmed"
+          },
+          "isa_software_interface": {
+            "text": "Vendor compiler internals unpublished.",
+            "status": "unknown"
+          },
+          "timing_latency": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "throughput": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "power_energy": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "materials": {
+            "text": "n/a",
+            "status": "unknown"
+          },
+          "physics": {
+            "text": "n/a",
+            "status": "unknown"
+          },
+          "design_trade_offs": {
+            "text": "Feature set vs driver maturity on a new 5th Gen GPU.",
+            "status": "confirmed"
+          }
+        }
+      },
+      {
+        "id": "gpu_l3_csf",
+        "name": "Command format / CSF",
+        "scale": "command_format",
+        "facets": {
+          "structure": {
+            "text": "Command Stream Frontend; work packed into CSF streams rather than a Midgard-style job chain (Arm public CSF).",
+            "status": "confirmed",
+            "source": "https://arm-software.github.io/libGPUCounters/mali_g1_counter_reference.html"
+          },
+          "dataflow": {
+            "text": "Userspace submits streams; firmware/CSF walks them.",
+            "status": "confirmed"
+          },
+          "timing_latency": {
+            "text": "Submission latency unpublished.",
+            "status": "unknown"
+          },
+          "design_trade_offs": {
+            "text": "CSF was introduced to cut CPU overhead of job management — qualitative Arm story, no microsecond number for this phone.",
+            "status": "confirmed"
+          },
+          "isa_software_interface": {
+            "text": "Not inspectable from WebGPU.",
+            "status": "confirmed"
+          },
+          "throughput": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "power_energy": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "materials": {
+            "text": "n/a",
+            "status": "unknown"
+          },
+          "physics": {
+            "text": "n/a",
+            "status": "unknown"
+          }
+        }
+      },
+      {
+        "id": "gpu_l4_queues",
+        "name": "Queues: Binning, Main, Compute, Neural (sub-branch)",
+        "scale": "queues",
+        "facets": {
+          "structure": {
+            "text": "Four official counter-visible queues (Arm Mali-G1 counter reference).",
+            "status": "confirmed",
+            "source": "https://arm-software.github.io/libGPUCounters/mali_g1_counter_reference.html"
+          },
+          "dataflow": {
+            "text": "Graphics splits binning vs main (DVS); compute and a Neural queue sit beside them. The Neural queue is not the NPU 990 — do not conflate.",
+            "status": "confirmed"
+          },
+          "throughput": {
+            "text": "Occupancy only via native counters.",
+            "status": "unknown"
+          },
+          "design_trade_offs": {
+            "text": "GPU-side neural vs NPU 990 vs CIM; routing policy on 17T Pro unknown.",
+            "status": "unknown"
+          },
+          "isa_software_interface": {
+            "text": "libGPUCounters, not the browser.",
+            "status": "confirmed"
+          },
+          "timing_latency": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "power_energy": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "materials": {
+            "text": "n/a",
+            "status": "unknown"
+          },
+          "physics": {
+            "text": "n/a",
+            "status": "unknown"
+          }
+        }
+      },
+      {
+        "id": "gpu_l5_mc12",
+        "name": "Shader-core complex (Mali-G1 Ultra MC12)",
+        "scale": "shader_complex",
+        "facets": {
+          "structure": {
+            "text": "12 shader cores. On-die arrangement / slice count unknown.",
+            "status": "confirmed",
+            "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500",
+            "note": "Core count official; floorplan unknown."
+          },
+          "throughput": {
+            "text": "12 x 256 FP32 ops/cycle at unknown f. Do not insert aggregator 1716 MHz.",
+            "status": "confirmed",
+            "source": "https://documentation-service.arm.com/static/68c168ab8a337a2bc6645afb",
+            "note": "Ops/cycle official; clock unknown."
+          },
+          "power_energy": {
+            "text": "GPU clock/voltage rail unknown.",
+            "status": "unknown"
+          },
+          "design_trade_offs": {
+            "text": "12 cores vs power/thermal (IceLoop).",
+            "status": "confirmed"
+          },
+          "dataflow": {
+            "text": "Work distributed across MC12; distribution policy unknown.",
+            "status": "unknown"
+          },
+          "timing_latency": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "isa_software_interface": {
+            "text": "Not exposed as a core count in WebGPU beyond adapter limits.",
+            "status": "confirmed"
+          },
+          "materials": {
+            "text": "N3P.",
+            "status": "confirmed",
+            "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500"
+          },
+          "physics": {
+            "text": "See cmos_energy.",
+            "status": "confirmed"
+          }
+        },
+        "specs": [
+          {
+            "key": "shader_cores",
+            "value": 12,
+            "unit": "cores",
+            "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500",
+            "status": "confirmed"
+          },
+          {
+            "key": "fp32_ops_per_core_per_cycle",
+            "value": 256,
+            "unit": "ops",
+            "source": "https://documentation-service.arm.com/static/68c168ab8a337a2bc6645afb",
+            "status": "confirmed",
+            "notes": "FMA counted as 2 ops."
+          },
+          {
+            "key": "fp16_ops_per_core_per_cycle",
+            "value": 512,
+            "unit": "ops",
+            "source": "https://documentation-service.arm.com/static/68c168ab8a337a2bc6645afb",
+            "status": "confirmed"
+          },
+          {
+            "key": "gpu_clock_hz",
+            "value": null,
+            "unit": "Hz",
+            "source": null,
+            "status": "unknown"
+          }
+        ]
+      },
+      {
+        "id": "gpu_l6_tbdr",
+        "name": "Tiler / DVS / TBDR",
+        "scale": "tiler",
+        "facets": {
+          "structure": {
+            "text": "Deferred Vertex Shading, binning pass then main pass (Arm). Tile size unknown for G1 Ultra — do not reuse older Mali 16x16 as fact.",
+            "status": "confirmed",
+            "source": "https://www.arm.com/products/silicon-ip-multimedia/gpu/mali-g1-ultra",
+            "note": "DVS/TBDR confirmed; tile size unknown."
+          },
+          "dataflow": {
+            "text": "Primitives binned to tiles in on-die tile memory, then shaded.",
+            "status": "confirmed"
+          },
+          "design_trade_offs": {
+            "text": "TBDR saves DRAM bandwidth vs immediate-mode; savings on this device unknown.",
+            "status": "unknown"
+          },
+          "throughput": {
+            "text": "Unknown Gprim/s.",
+            "status": "unknown"
+          },
+          "timing_latency": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "isa_software_interface": {
+            "text": "Schematic Lab animation only, not a firmware trace.",
+            "status": "confirmed"
+          },
+          "power_energy": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "materials": {
+            "text": "On-die tile SRAM, size unknown.",
+            "status": "unknown"
+          },
+          "physics": {
+            "text": "See cmos_energy.",
+            "status": "confirmed"
+          }
+        }
+      },
+      {
+        "id": "gpu_l7_warp",
+        "name": "Warp / thread model",
+        "scale": "warp",
+        "facets": {
+          "structure": {
+            "text": "Warp width 16; 2048 threads per core (counter reference).",
+            "status": "confirmed",
+            "source": "https://arm-software.github.io/libGPUCounters/mali_g1_counter_reference.html"
+          },
+          "dataflow": {
+            "text": "16-wide lockstep-style warps (Arm SIMT-like); divergence cost unquantified here.",
+            "status": "confirmed",
+            "source": "https://arm-software.github.io/libGPUCounters/mali_g1_counter_reference.html"
+          },
+          "timing_latency": {
+            "text": "Occupancy vs 2048-thread cap is a teaching model, not a measured 17T figure.",
+            "status": "unknown"
+          },
+          "isa_software_interface": {
+            "text": "SPIR-V subgroup size may or may not equal 16 — verify on device, do not assume.",
+            "status": "unknown"
+          },
+          "throughput": {
+            "text": "16-wide warps times cores; clock unknown.",
+            "status": "unknown"
+          },
+          "power_energy": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "materials": {
+            "text": "n/a",
+            "status": "unknown"
+          },
+          "physics": {
+            "text": "n/a",
+            "status": "unknown"
+          },
+          "design_trade_offs": {
+            "text": "Warp width vs divergence penalty.",
+            "status": "confirmed"
+          }
+        },
+        "specs": [
+          {
+            "key": "warp_width",
+            "value": 16,
+            "unit": "threads",
+            "source": "https://arm-software.github.io/libGPUCounters/mali_g1_counter_reference.html",
+            "status": "confirmed"
+          },
+          {
+            "key": "threads_per_core",
+            "value": 2048,
+            "unit": "threads",
+            "source": "https://arm-software.github.io/libGPUCounters/mali_g1_counter_reference.html",
+            "status": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "gpu_l8_alu",
+        "name": "Arithmetic pipelines (FP32/FP16 FMA)",
+        "scale": "functional_units",
+        "facets": {
+          "structure": {
+            "text": "256 FP32 / 512 FP16 ops per core per cycle, FMA=2 ops (Arm GPU PDF). INT and tensor-on-GPU rates unknown.",
+            "status": "confirmed",
+            "source": "https://documentation-service.arm.com/static/68c168ab8a337a2bc6645afb"
+          },
+          "throughput": {
+            "text": "Theoretical FP32 GFLOPS = 12 x 256 x f_Hz / 1e9, with f left symbolic.",
+            "status": "confirmed",
+            "source": "https://documentation-service.arm.com/static/68c168ab8a337a2bc6645afb"
+          },
+          "physics": {
+            "text": "P=alpha*C*V^2*f, symbolic.",
+            "status": "confirmed"
+          },
+          "design_trade_offs": {
+            "text": "Official FP16 is 2x the FP32 op-count on this ratio — useful Lab roofline toggle.",
+            "status": "confirmed"
+          },
+          "dataflow": {
+            "text": "FMA pipes fed by register file (size unknown).",
+            "status": "unknown"
+          },
+          "timing_latency": {
+            "text": "FMA latency unknown.",
+            "status": "unknown"
+          },
+          "power_energy": {
+            "text": "Unknown pJ/FMA.",
+            "status": "unknown"
+          },
+          "isa_software_interface": {
+            "text": "SPIR-V / WGSL arithmetic.",
+            "status": "confirmed"
+          },
+          "materials": {
+            "text": "N3P.",
+            "status": "confirmed"
+          }
+        }
+      },
+      {
+        "id": "gpu_l9_rtu",
+        "name": "RTUv2 ray-tracing unit (sub-branch)",
+        "scale": "ray_tracing",
+        "facets": {
+          "structure": {
+            "text": "5th Gen RT unit, version 2 (Arm public). Box/triangle intersection throughput unknown — no official MT/s used.",
+            "status": "confirmed",
+            "source": "https://www.arm.com/products/silicon-ip-multimedia/gpu/mali-g1-ultra",
+            "note": "Presence confirmed; rates unknown."
+          },
+          "dataflow": {
+            "text": "Acceleration-structure traversal on GPU, not CPU.",
+            "status": "confirmed"
+          },
+          "isa_software_interface": {
+            "text": "Vulkan RT / SPV ray ops; WebGPU ray tracing on Android unconfirmed — feature-detect.",
+            "status": "unknown"
+          },
+          "design_trade_offs": {
+            "text": "Mobile RT vs raster. PhoneArena SNL / WLE are not a dedicated RT unit bench.",
+            "status": "confirmed"
+          },
+          "throughput": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "timing_latency": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "power_energy": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "materials": {
+            "text": "N3P.",
+            "status": "confirmed"
+          },
+          "physics": {
+            "text": "See cmos_energy.",
+            "status": "confirmed"
+          }
+        }
+      },
+      {
+        "id": "gpu_l10_cache",
+        "name": "Load-store, texture, 32 KB caches",
+        "scale": "cache_memory",
+        "facets": {
+          "structure": {
+            "text": "32 KB load-store and 32 KB texture cache per core (counter docs).",
+            "status": "confirmed",
+            "source": "https://arm-software.github.io/libGPUCounters/mali_g1_counter_reference.html"
+          },
+          "dataflow": {
+            "text": "Shader core to LS/tex to SLC 10 MB to LPDDR5X 9600 (device).",
+            "status": "confirmed"
+          },
+          "timing_latency": {
+            "text": "Cache hit cycles unknown.",
+            "status": "unknown"
+          },
+          "throughput": {
+            "text": "Unknown GB/s.",
+            "status": "unknown"
+          },
+          "isa_software_interface": {
+            "text": "WebGPU streaming copy vs cache-resident FMAs (experiment hook).",
+            "status": "confirmed"
+          },
+          "design_trade_offs": {
+            "text": "32 KB/core vs die area; no official alternative cited.",
+            "status": "confirmed"
+          },
+          "power_energy": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "materials": {
+            "text": "On-die SRAM.",
+            "status": "confirmed"
+          },
+          "physics": {
+            "text": "See cmos_energy.",
+            "status": "confirmed"
+          }
+        },
+        "specs": [
+          {
+            "key": "ls_cache_per_core",
+            "value": 32,
+            "unit": "KB",
+            "source": "https://arm-software.github.io/libGPUCounters/mali_g1_counter_reference.html",
+            "status": "confirmed"
+          },
+          {
+            "key": "tex_cache_per_core",
+            "value": 32,
+            "unit": "KB",
+            "source": "https://arm-software.github.io/libGPUCounters/mali_g1_counter_reference.html",
+            "status": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "gpu_l11_display",
+        "name": "Pixel / blend / display scan-out",
+        "scale": "display_path",
+        "facets": {
+          "structure": {
+            "text": "On-chip tile writeout, then on-cell AMOLED 2772x1280 up to 144 Hz official. Composer versions unknown.",
+            "status": "confirmed",
+            "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+            "note": "Panel official; HWC version unknown."
+          },
+          "throughput": {
+            "text": "2772x1280x144 ~ 0.51 Gpix/s raw, computed from official resolution and refresh — not a vendor fill-rate rating.",
+            "status": "confirmed",
+            "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+            "note": "Derived, labeled as such."
+          },
+          "design_trade_offs": {
+            "text": "144 Hz vs power; typ 600 nits vs UHBM 3500 at APL 25%.",
+            "status": "confirmed"
+          },
+          "dataflow": {
+            "text": "GPU/composer to display interface (link type unknown).",
+            "status": "unknown"
+          },
+          "timing_latency": {
+            "text": "Touch-to-photon unknown. Official touch sample 480 Hz / 3500 Game Turbo.",
+            "status": "unknown"
+          },
+          "power_energy": {
+            "text": "Display often dominates; no official split.",
+            "status": "unknown"
+          },
+          "isa_software_interface": {
+            "text": "SurfaceFlinger / HWC / SurfaceControl.",
+            "status": "confirmed"
+          },
+          "materials": {
+            "text": "Flexible on-cell AMOLED, Gorilla Glass 7i front.",
+            "status": "confirmed",
+            "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/"
+          },
+          "physics": {
+            "text": "OLED emission; not quantified here.",
+            "status": "confirmed"
+          }
+        }
+      },
+      {
+        "id": "gpu_l12_circuit",
+        "name": "Circuit (shader ALUs, tile SRAM)",
+        "scale": "circuit",
+        "facets": {
+          "structure": {
+            "text": "Generic CMOS / SRAM; tile-memory size unknown.",
+            "status": "unknown"
+          },
+          "materials": {
+            "text": "N3P SRAM.",
+            "status": "confirmed"
+          },
+          "physics": {
+            "text": "See cmos_energy.",
+            "status": "confirmed"
+          },
+          "dataflow": {
+            "text": "Textbook datapath.",
+            "status": "confirmed"
+          },
+          "timing_latency": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "throughput": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "power_energy": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "isa_software_interface": {
+            "text": "Invisible.",
+            "status": "confirmed"
+          },
+          "design_trade_offs": {
+            "text": "Tile SRAM vs DRAM traffic.",
+            "status": "confirmed"
+          }
+        },
+        "refs": ["cmos_energy", "n3p_finfet"]
+      },
+      {
+        "id": "gpu_l13_finfet",
+        "name": "Standard cell / FinFET (same N3P die)",
+        "scale": "transistor",
+        "facets": {
+          "structure": {
+            "text": "Same TSMC N3P FinFET die as CPU/NPU. Clock-domain crossing between CPU and GPU unknown.",
+            "status": "confirmed",
+            "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500"
+          },
+          "materials": {
+            "text": "See n3p_finfet.",
+            "status": "unknown"
+          },
+          "physics": {
+            "text": "See n3p_finfet.",
+            "status": "confirmed"
+          },
+          "dataflow": {
+            "text": "Charge in the fin channel.",
+            "status": "confirmed"
+          },
+          "timing_latency": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "throughput": {
+            "text": "n/a",
+            "status": "unknown"
+          },
+          "power_energy": {
+            "text": "See cmos_energy.",
+            "status": "unknown"
+          },
+          "isa_software_interface": {
+            "text": "n/a",
+            "status": "confirmed"
+          },
+          "design_trade_offs": {
+            "text": "Never label GAA.",
+            "status": "confirmed"
+          }
+        },
+        "refs": ["n3p_finfet", "lithography_euv", "si_quantum"]
+      },
+      {
+        "id": "gpu_l14_litho",
+        "name": "Materials / lithography",
+        "scale": "materials",
+        "facets": {
+          "structure": {
+            "text": "See lithography_euv.",
+            "status": "confirmed"
+          },
+          "physics": {
+            "text": "Rayleigh CD=k1*lambda/NA.",
+            "status": "confirmed",
+            "source": "generic ASML public EUV lambda=13.5 nm / NA 0.33 vs High-NA 0.55; see deep-dive.md"
+          },
+          "materials": {
+            "text": "Unpublished.",
+            "status": "unknown"
+          },
+          "dataflow": {
+            "text": "n/a",
+            "status": "unknown"
+          },
+          "timing_latency": {
+            "text": "n/a",
+            "status": "unknown"
+          },
+          "throughput": {
+            "text": "n/a",
+            "status": "unknown"
+          },
+          "power_energy": {
+            "text": "n/a",
+            "status": "unknown"
+          },
+          "isa_software_interface": {
+            "text": "n/a",
+            "status": "confirmed"
+          },
+          "design_trade_offs": {
+            "text": "High-NA not claimed for N3P.",
+            "status": "confirmed"
+          }
+        },
+        "refs": ["lithography_euv"]
+      },
+      {
+        "id": "gpu_l15_quantum",
+        "name": "Quantum / transport",
+        "scale": "quantum",
+        "facets": {
+          "structure": {
+            "text": "Same NIST Si constants; no GPU-specific band-structure claim.",
+            "status": "confirmed",
+            "source": "NIST/CODATA Si lattice a=5.431020511(89)e-10 m at 22.5 C vacuum; see deep-dive.md"
+          },
+          "physics": {
+            "text": "See si_quantum.",
+            "status": "confirmed"
+          },
+          "materials": {
+            "text": "Si.",
+            "status": "confirmed"
+          },
+          "dataflow": {
+            "text": "Carriers.",
+            "status": "confirmed"
+          },
+          "timing_latency": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "throughput": {
+            "text": "n/a",
+            "status": "unknown"
+          },
+          "power_energy": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "isa_software_interface": {
+            "text": "n/a",
+            "status": "confirmed"
+          },
+          "design_trade_offs": {
+            "text": "Foundry contrast only.",
+            "status": "confirmed"
+          }
+        },
+        "refs": ["si_quantum"]
+      },
+      {
+        "id": "gpu_l16_thermal",
+        "name": "Power / DVFS / thermal (system, IceLoop)",
+        "scale": "system_thermal",
+        "facets": {
+          "structure": {
+            "text": "Official Xiaomi 3D IceLoop cooling. GPU thermal cap unknown.",
+            "status": "confirmed",
+            "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+            "note": "Cooling official; GPU cap unknown."
+          },
+          "dataflow": {
+            "text": "Performance to heat to skin temperature to DVFS.",
+            "status": "confirmed"
+          },
+          "throughput": {
+            "text": "PhoneArena Steel Nomad Light Low 1871 on 17T Pro beats S26 Ultra 1498 despite a lower High (2476 vs 2761) — system cooling/policy, not a shader-core win.",
+            "status": "confirmed",
+            "source": "https://www.phonearena.com/reviews/xiaomi-17t-pro-review_id7943"
+          },
+          "power_energy": {
+            "text": "Official GPU W unknown.",
+            "status": "unknown"
+          },
+          "design_trade_offs": {
+            "text": "Peak vs sustained; see head-to-head.md.",
+            "status": "confirmed"
+          },
+          "timing_latency": {
+            "text": "Throttle time unknown beyond the named-lab stress lows.",
+            "status": "unknown"
+          },
+          "isa_software_interface": {
+            "text": "thermal APIs only.",
+            "status": "confirmed"
+          },
+          "materials": {
+            "text": "IceLoop materials — see deep-dive; PoP confirmed only on other D9500 phones, not this teardown.",
+            "status": "unknown"
+          },
+          "physics": {
+            "text": "Conduction/spreading; no official Rth used.",
+            "status": "confirmed"
+          }
+        }
+      }
+    ],
+    "experiment": {
+      "id": "gpu_webgpu_roofline_dvs",
+      "title": "WebGPU roofline (FP32/FP16 FMA vs copy) + schematic DVS animation",
+      "medium": "WebGPU with WebGL2 fallback; p5.js schematic; COOP/COEP if using SAB/tight timers",
+      "measures": "Feature-detect navigator.gpu. Compute FMAs in a storage buffer vs a large streaming copy. Overlay official formula 12x256x f with a user-set f slider clearly marked 'clock not officially published — slider is not a measurement.' Schematic DVS: binning then main, 16-wide warps — teaching model, not a Mali firmware trace.",
+      "cannot_claim": "Mali 32 KB cache hit rate; Vulkan 1.4 from the browser page; JS canvas FPS as a 3DMark result; any 1716 MHz clock.",
+      "status": "designed",
+      "source": "cpu-gpu-npu-deep.md section 2.3"
+    }
+  },
+  "npu": {
+    "id": "npu",
+    "name": "MediaTek NPU 990 + CIM Super Efficient NPU",
+    "depth_policy": "Fourteen levels follow the dual-engine split, BitNet path, SLC/ISP interconnect, and FinFET/lithography/quantum floor. No invented TOPS, MAC-array sizes, or tokens/s. LiteRT MT6990 vs TechInsights MT6993Z is conflict 15 in specs.json — show both, pick neither.",
+    "conflicts_to_surface": [
+      "specs.json conflicts id 15 (MT6990 vs MT6993Z)",
+      "specs.json conflicts id 4 (FAQ Hexagon error)"
+    ],
+    "zoom_stack": [
+      {
+        "id": "npu_l1_api",
+        "name": "Application / framework APIs (NNAPI, LiteRT, NeuroPilot, WebNN)",
+        "scale": "software",
+        "facets": {
+          "structure": {
+            "text": "Apps call NNAPI, LiteRT/TFLite, or NeuroPilot SDK. The browser sees at most WebNN (if enabled) or a WASM fallback.",
+            "status": "confirmed",
+            "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500"
+          },
+          "dataflow": {
+            "text": "Model graph to compile to device buffers.",
+            "status": "confirmed"
+          },
+          "isa_software_interface": {
+            "text": "No public NPU ISA documentation used here.",
+            "status": "unknown"
+          },
+          "design_trade_offs": {
+            "text": "Portability (NNAPI) vs vendor kernels. Web pages almost always miss the 990.",
+            "status": "confirmed"
+          },
+          "throughput": {
+            "text": "Not measurable as NPU 990 TOPS from a web origin.",
+            "status": "unknown"
+          },
+          "timing_latency": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "power_energy": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "materials": {
+            "text": "n/a",
+            "status": "unknown"
+          },
+          "physics": {
+            "text": "n/a",
+            "status": "unknown"
+          }
+        }
+      },
+      {
+        "id": "npu_l2_runtime",
+        "name": "Runtime / driver (NeuroPilot, APU daemon)",
+        "scale": "driver_runtime",
+        "facets": {
+          "structure": {
+            "text": "User-mode NeuroPilot + kernel APU driver. Versions on HyperOS 3 unknown.",
+            "status": "unknown"
+          },
+          "dataflow": {
+            "text": "Job queues to NPU 990 and/or CIM eNPU. Scheduling policy unknown.",
+            "status": "unknown"
+          },
+          "isa_software_interface": {
+            "text": "Vendor runtime, unpublished command ISA.",
+            "status": "unknown"
+          },
+          "timing_latency": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "throughput": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "power_energy": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "materials": {
+            "text": "n/a",
+            "status": "unknown"
+          },
+          "physics": {
+            "text": "n/a",
+            "status": "unknown"
+          },
+          "design_trade_offs": {
+            "text": "Which engine a model lands on is not app-visible in a documented way here.",
+            "status": "confirmed"
+          }
+        }
+      },
+      {
+        "id": "npu_l3_ir",
+        "name": "Model IR / command buffers",
+        "scale": "command_format",
+        "facets": {
+          "structure": {
+            "text": "Compiled command streams and weight blobs. Format unpublished.",
+            "status": "unknown"
+          },
+          "dataflow": {
+            "text": "Weights possibly in SLC (10 MB official) or DRAM; placement unknown.",
+            "status": "unknown"
+          },
+          "design_trade_offs": {
+            "text": "Official 128K context vs 10 MB SLC — long contexts will spill to LPDDR5X; no official spill model.",
+            "status": "unknown"
+          },
+          "isa_software_interface": {
+            "text": "Unpublished.",
+            "status": "unknown"
+          },
+          "timing_latency": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "throughput": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "power_energy": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "materials": {
+            "text": "n/a",
+            "status": "unknown"
+          },
+          "physics": {
+            "text": "n/a",
+            "status": "unknown"
+          }
+        },
+        "specs": [
+          {
+            "key": "context_window",
+            "value": 128000,
+            "unit": "tokens",
+            "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500",
+            "status": "confirmed",
+            "notes": "MediaTek wording; not a measured Lab result."
+          }
+        ]
+      },
+      {
+        "id": "npu_l4_dual",
+        "name": "Dual-engine topology (NPU 990 + CIM eNPU)",
+        "scale": "engine_topology",
+        "facets": {
+          "structure": {
+            "text": "Two officially distinct blocks. 990 = gen-AI class (9th gen, Generative AI Engine 2.0); CIM Super Efficient NPU = always-on / light.",
+            "status": "confirmed",
+            "source": "https://www.mediatek.com/press-room/mediatek-dimensity-9500-unleashes-best-in-class-performance-ai-experiences-and-power-efficiency-for-the-next-generation-of-mobile-devices"
+          },
+          "dataflow": {
+            "text": "MediaTek positions CIM for small/always-on, 990 for heavier generative work. Exact dispatch rules unknown.",
+            "status": "unknown"
+          },
+          "power_energy": {
+            "text": "CIM marketing is efficiency; no official mW used.",
+            "status": "unknown"
+          },
+          "design_trade_offs": {
+            "text": "Two engines vs Apple Dual 16-core Neural Engine or Qualcomm Hexagon — different products, no TOPS comparison here.",
+            "status": "confirmed"
+          },
+          "throughput": {
+            "text": "Relative official claims only: '2x tokens' and '100% faster 3B LLM' vs previous gen — not absolute tokens/s.",
+            "status": "confirmed",
+            "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500"
+          },
+          "timing_latency": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "isa_software_interface": {
+            "text": "Vendor runtime chooses the engine.",
+            "status": "confirmed"
+          },
+          "materials": {
+            "text": "Same N3P die.",
+            "status": "confirmed",
+            "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500"
+          },
+          "physics": {
+            "text": "See CIM level for generic CIM physics.",
+            "status": "confirmed"
+          }
+        }
+      },
+      {
+        "id": "npu_l5_990",
+        "name": "NPU 990 datapath",
+        "scale": "npu_990",
+        "facets": {
+          "structure": {
+            "text": "9th-gen NPU, Generative AI Engine 2.0. Internal PE array, tensor SRAM, and DMA unknown.",
+            "status": "confirmed",
+            "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500",
+            "note": "Name/gen official; microarchitecture unknown."
+          },
+          "throughput": {
+            "text": "Official relative 2x tokens / 100% faster 3B LLM only. Absolute TOPS unknown. Aggregator 100 TOPS not used.",
+            "status": "unknown"
+          },
+          "dataflow": {
+            "text": "Tensors through unpublished PE array.",
+            "status": "confirmed"
+          },
+          "timing_latency": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "power_energy": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "isa_software_interface": {
+            "text": "Unpublished.",
+            "status": "unknown"
+          },
+          "design_trade_offs": {
+            "text": "Generative vs always-on CIM split.",
+            "status": "confirmed"
+          },
+          "materials": {
+            "text": "N3P.",
+            "status": "confirmed"
+          },
+          "physics": {
+            "text": "See cmos_energy.",
+            "status": "confirmed"
+          }
+        },
+        "specs": [
+          {
+            "key": "tops",
+            "value": null,
+            "unit": "TOPS",
+            "source": null,
+            "status": "unknown"
+          },
+          {
+            "key": "relative_tokens_vs_prev",
+            "value": "2x (MediaTek wording)",
+            "unit": null,
+            "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500",
+            "status": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "npu_l6_cim",
+        "name": "CIM Super Efficient NPU (sub-branch)",
+        "scale": "cim_enpu",
+        "facets": {
+          "structure": {
+            "text": "Compute-in-memory. Cell technology (SRAM-CIM vs eNVM, bit-cell, levels) unknown.",
+            "status": "confirmed",
+            "source": "https://www.mediatek.com/press-room/mediatek-dimensity-9500-unleashes-best-in-class-performance-ai-experiences-and-power-efficiency-for-the-next-generation-of-mobile-devices",
+            "note": "CIM presence official; cell tech unknown."
+          },
+          "physics": {
+            "text": "Generic, labeled: CIM reduces data-movement energy versus von Neumann NPU+SRAM, at the cost of precision and array size. No MediaTek energy/bit cited.",
+            "status": "confirmed",
+            "note": "Textbook."
+          },
+          "dataflow": {
+            "text": "Light models stay on-CIM; how 'light' is defined is unknown.",
+            "status": "unknown"
+          },
+          "power_energy": {
+            "text": "Official mW unknown.",
+            "status": "unknown"
+          },
+          "throughput": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "timing_latency": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "isa_software_interface": {
+            "text": "Unpublished.",
+            "status": "unknown"
+          },
+          "design_trade_offs": {
+            "text": "Efficiency vs precision.",
+            "status": "confirmed"
+          },
+          "materials": {
+            "text": "Unknown CIM device materials.",
+            "status": "unknown"
+          }
+        }
+      },
+      {
+        "id": "npu_l7_bitnet",
+        "name": "BitNet 1.58-bit and quantization path",
+        "scale": "quantization",
+        "facets": {
+          "structure": {
+            "text": "Ternary-style 1.58-bit weights (MediaTek 'BitNet 1.58-bit'). Activation dtype unknown.",
+            "status": "confirmed",
+            "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500",
+            "note": "Weight format official; activations unknown."
+          },
+          "dataflow": {
+            "text": "Quantize off-device or in runtime; 128K context official.",
+            "status": "confirmed"
+          },
+          "throughput": {
+            "text": "No official tokens/s.",
+            "status": "unknown"
+          },
+          "design_trade_offs": {
+            "text": "Quality vs memory; not measured in this dossier.",
+            "status": "confirmed"
+          },
+          "isa_software_interface": {
+            "text": "Framework/runtime path, not a public ISA.",
+            "status": "confirmed"
+          },
+          "timing_latency": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "power_energy": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "materials": {
+            "text": "n/a",
+            "status": "unknown"
+          },
+          "physics": {
+            "text": "Quantization error is numerical analysis, not device physics.",
+            "status": "confirmed"
+          }
+        }
+      },
+      {
+        "id": "npu_l8_xbar",
+        "name": "On-die interconnect to SLC / DRAM / CPU / ISP",
+        "scale": "interconnect",
+        "facets": {
+          "structure": {
+            "text": "Shared 10 MB SLC, Imagiq 1190 ISP (official), LPDDR5X. Bus widths unknown.",
+            "status": "confirmed",
+            "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500",
+            "note": "Clients official; bus width unknown."
+          },
+          "dataflow": {
+            "text": "Camera to ISP to optional NPU; LLM weights to NPU.",
+            "status": "confirmed"
+          },
+          "timing_latency": {
+            "text": "Unpublished.",
+            "status": "unknown"
+          },
+          "throughput": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "design_trade_offs": {
+            "text": "Shared SLC among CPU, GPU (incl. Neural queue), NPU 990/CIM — partitioning unknown.",
+            "status": "unknown"
+          },
+          "isa_software_interface": {
+            "text": "Not exposed.",
+            "status": "confirmed"
+          },
+          "power_energy": {
+            "text": "Data-movement energy dominates some AI workloads — qualitative.",
+            "status": "unknown"
+          },
+          "materials": {
+            "text": "On-die metal; stack unknown.",
+            "status": "unknown"
+          },
+          "physics": {
+            "text": "Wire RC, unpublished.",
+            "status": "unknown"
+          }
+        },
+        "specs": [
+          {
+            "key": "isp",
+            "value": "Imagiq 1190",
+            "unit": null,
+            "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500",
+            "status": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "npu_l9_weights",
+        "name": "Memory-side / weight compression",
+        "scale": "memory_side",
+        "facets": {
+          "structure": {
+            "text": "Official marketing mentions generative features and long context; compression ratios unpublished. Do not invent.",
+            "status": "unknown",
+            "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500"
+          },
+          "dataflow": {
+            "text": "Weights in DRAM/SLC; placement unknown.",
+            "status": "unknown"
+          },
+          "throughput": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "timing_latency": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "power_energy": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "isa_software_interface": {
+            "text": "Unpublished.",
+            "status": "unknown"
+          },
+          "design_trade_offs": {
+            "text": "Context length vs bandwidth.",
+            "status": "confirmed"
+          },
+          "materials": {
+            "text": "LPDDR5X package (device 9600).",
+            "status": "confirmed",
+            "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/"
+          },
+          "physics": {
+            "text": "n/a",
+            "status": "unknown"
+          }
+        }
+      },
+      {
+        "id": "npu_l10_circuit",
+        "name": "Circuit (MAC / CIM bit-cell / SRAM)",
+        "scale": "circuit",
+        "facets": {
+          "structure": {
+            "text": "Generic MAC array and SRAM-CIM diagrams only, clearly textbook. 990 floorplan unknown. Aggregator ~30B transistor counts stay unconfirmed.",
+            "status": "unknown"
+          },
+          "materials": {
+            "text": "N3P; CIM device unknown.",
+            "status": "unknown"
+          },
+          "physics": {
+            "text": "See cmos_energy; CIM analog noise textbook-only if analog.",
+            "status": "unknown"
+          },
+          "dataflow": {
+            "text": "Textbook MAC/CIM.",
+            "status": "confirmed"
+          },
+          "timing_latency": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "throughput": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "power_energy": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "isa_software_interface": {
+            "text": "Invisible.",
+            "status": "confirmed"
+          },
+          "design_trade_offs": {
+            "text": "Digital MAC vs CIM density/precision.",
+            "status": "confirmed"
+          }
+        },
+        "refs": ["cmos_energy"]
+      },
+      {
+        "id": "npu_l11_finfet",
+        "name": "Standard cell / FinFET (N3P)",
+        "scale": "transistor",
+        "facets": {
+          "structure": {
+            "text": "Same TSMC N3P FinFET die. Analog CIM (if any) vs digital standard-cell MACs: unknown mix. Never GAA.",
+            "status": "confirmed",
+            "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500"
+          },
+          "materials": {
+            "text": "See n3p_finfet.",
+            "status": "unknown"
+          },
+          "physics": {
+            "text": "See n3p_finfet.",
+            "status": "confirmed"
+          },
+          "dataflow": {
+            "text": "Charge in the channel / (unknown) CIM conductance.",
+            "status": "confirmed"
+          },
+          "timing_latency": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "throughput": {
+            "text": "n/a",
+            "status": "unknown"
+          },
+          "power_energy": {
+            "text": "See cmos_energy.",
+            "status": "unknown"
+          },
+          "isa_software_interface": {
+            "text": "n/a",
+            "status": "confirmed"
+          },
+          "design_trade_offs": {
+            "text": "Digital vs CIM devices on one process.",
+            "status": "confirmed"
+          }
+        },
+        "refs": ["n3p_finfet", "lithography_euv", "si_quantum"]
+      },
+      {
+        "id": "npu_l12_litho",
+        "name": "Materials / lithography",
+        "scale": "materials",
+        "facets": {
+          "structure": {
+            "text": "See lithography_euv. No special NPU metal stack citation.",
+            "status": "confirmed"
+          },
+          "physics": {
+            "text": "Rayleigh model, generic.",
+            "status": "confirmed",
+            "source": "generic ASML public EUV lambda=13.5 nm / NA 0.33 vs High-NA 0.55; see deep-dive.md"
+          },
+          "materials": {
+            "text": "Unpublished.",
+            "status": "unknown"
+          },
+          "dataflow": {
+            "text": "n/a",
+            "status": "unknown"
+          },
+          "timing_latency": {
+            "text": "n/a",
+            "status": "unknown"
+          },
+          "throughput": {
+            "text": "n/a",
+            "status": "unknown"
+          },
+          "power_energy": {
+            "text": "n/a",
+            "status": "unknown"
+          },
+          "isa_software_interface": {
+            "text": "n/a",
+            "status": "confirmed"
+          },
+          "design_trade_offs": {
+            "text": "High-NA not claimed for N3P.",
+            "status": "confirmed"
+          }
+        },
+        "refs": ["lithography_euv"]
+      },
+      {
+        "id": "npu_l13_quantum",
+        "name": "Quantum / device physics",
+        "scale": "quantum",
+        "facets": {
+          "structure": {
+            "text": "Digital MACs: same Si transport as CPU. CIM, if analog: conductance variation/noise — textbook only, not a cited MediaTek CIM paper.",
+            "status": "confirmed",
+            "source": "NIST/CODATA Si lattice a=5.431020511(89)e-10 m at 22.5 C vacuum; see deep-dive.md",
+            "note": "Generic."
+          },
+          "physics": {
+            "text": "See si_quantum.",
+            "status": "confirmed"
+          },
+          "materials": {
+            "text": "Si plus unknown CIM materials.",
+            "status": "unknown"
+          },
+          "dataflow": {
+            "text": "Carriers / (maybe) analog states.",
+            "status": "confirmed"
+          },
+          "timing_latency": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "throughput": {
+            "text": "n/a",
+            "status": "unknown"
+          },
+          "power_energy": {
+            "text": "Unknown.",
+            "status": "unknown"
+          },
+          "isa_software_interface": {
+            "text": "n/a",
+            "status": "confirmed"
+          },
+          "design_trade_offs": {
+            "text": "Precision vs energy if analog CIM.",
+            "status": "confirmed"
+          }
+        },
+        "refs": ["si_quantum"]
+      },
+      {
+        "id": "npu_l14_privacy",
+        "name": "Software safety / privacy / off-device (cannot use 990 from the page)",
+        "scale": "software_policy",
+        "facets": {
+          "structure": {
+            "text": "On-device vs cloud LLMs. Included because the Lab will be asked whether a web page can use the 990.",
+            "status": "confirmed"
+          },
+          "isa_software_interface": {
+            "text": "Answer: not reliably from a web origin. WebNN, if present, must be labeled with the UA-reported backend, never 'NPU 990 TOPS.'",
+            "status": "confirmed"
+          },
+          "design_trade_offs": {
+            "text": "Honest software BitNet model vs fake accelerator numbers.",
+            "status": "confirmed"
+          },
+          "dataflow": {
+            "text": "Web origin to WASM/WebNN, not NeuroPilot unless a native bridge exists (none in this Lab).",
+            "status": "confirmed"
+          },
+          "timing_latency": {
+            "text": "n/a",
+            "status": "unknown"
+          },
+          "throughput": {
+            "text": "n/a",
+            "status": "unknown"
+          },
+          "power_energy": {
+            "text": "n/a",
+            "status": "unknown"
+          },
+          "materials": {
+            "text": "n/a",
+            "status": "unknown"
+          },
+          "physics": {
+            "text": "n/a",
+            "status": "unknown"
+          }
+        }
+      }
+    ],
+    "experiment": {
+      "id": "npu_webnn_or_bitnet_model",
+      "title": "WebNN detection + honest BitNet-style software model",
+      "medium": "WebNN if the UA exposes it; otherwise JS/WASM ternary-weight matmul",
+      "measures": "If WebNN is present, run a tiny matmul/conv and label the implementation backend the UA reports (CPU/GPU/NPU). If the UA does not name the 990, do not title the result NPU 990 TOPS. If absent: JS/WASM BitNet-style matmul over a user-chosen context length up to a software 128K token buffer — a teaching model of MediaTek's 128K context claim, not a measurement of their accelerator. Quote MediaTek's relative 2x tokens / 100% faster 3B LLM with URL, never as absolute tokens/s. Computed model: energy per transferred bit vs MAC (generic E=alpha*C*V^2) with symbolic constants, to explain why CIM exists.",
+      "cannot_claim": "NPU 990 TOPS, CIM array dimensions, aggregator 100 TOPS, LiteRT MT6990 as a performance score.",
+      "status": "designed",
+      "source": "cpu-gpu-npu-deep.md section 3.3"
+    }
+  }
+}

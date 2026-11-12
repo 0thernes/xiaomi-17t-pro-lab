@@ -1,0 +1,1907 @@
+{
+  "meta": {
+    "title": "Xiaomi 17T Pro / MediaTek Dimensity 9500 hardware specs",
+    "compiled": "2026-11-12",
+    "timezone": "America/Los_Angeles",
+    "rules": "Every field has value, unit, source, and status in {confirmed, unconfirmed, unknown}. Official sources preferred. Do not invent unpublished figures.",
+    "sources": {
+      "XIAOMI-SPEC": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "XIAOMI-FAQ": "https://www.mi.com/uk/support/faq/details/KA-704973/",
+      "XIAOMI-LAUNCH": "https://www.mi.com/global/event/2026/xiaomi-launch-may-2026/",
+      "MTK-PHONE": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500",
+      "MTK-HUB": "https://www.mediatek.com/dimensity-9500",
+      "MTK-PR": "https://www.mediatek.com/press-room/mediatek-dimensity-9500-unleashes-best-in-class-performance-ai-experiences-and-power-efficiency-for-the-next-generation-of-mobile-devices",
+      "ARM-C1U": "https://www.arm.com/products/silicon-ip-cpu/c1-ultra",
+      "ARM-C1U-TRM": "https://support.arm.com/documentation/108014/0101/The-C1-Ultra--core/C1-Ultra--core-features",
+      "ARM-C1P-SOG": "https://developer.arm.com/documentation/109879",
+      "ARM-G1U": "https://www.arm.com/products/silicon-ip-multimedia/gpu/mali-g1-ultra",
+      "ARM-GPU-PDF": "https://documentation-service.arm.com/static/68c168ab8a337a2bc6645afb",
+      "ARM-MALI-G1-COUNTERS": "https://arm-software.github.io/libGPUCounters/mali_g1_counter_reference.html",
+      "KHRONOS-VK": "https://www.khronos.org/conformance/adopters/conformant-products/vulkan",
+      "TSMC-N3": "https://www.tsmc.com/english/dedicatedFoundry/technology/logic/l_3nm",
+      "TSMC-SMART": "https://www.tsmc.com/english/dedicatedFoundry/technology/platform_smartphone_tech_advancedTech",
+      "TSMC-PR-2023": "https://pr.tsmc.com/english/news/3021",
+      "JEDEC-UFS": "https://www.jedec.org/news/pressreleases/jedec%C2%AE-announces-updates-universal-flash-storage-ufs-and-memory-interface",
+      "KIOXIA-UFS": "https://americas.kioxia.com/en-us/business/memory/ufs/other.html",
+      "GSMA": "https://www.gsmarena.com/xiaomi_17t_pro-14651.php",
+      "NBC": "https://www.notebookcheck.net/Xiaomi-launches-new-flagship-smartphone-with-Leica-tuned-cameras-and-Dimensity-9500-chipset.1308049.0.html",
+      "CORNING-7I": "https://www.corning.com/microsites/csm/gorillaglass/PI_Sheets/Corning_Gorilla_Glass_7i_PI%20Sheet.pdf",
+      "TI-PKG": "https://www.techinsights.com/blog/mediatek-dimensity-9500-advanced-packaging-quick-look",
+      "CHROME-WG": "https://developer.chrome.com/blog/new-in-webgpu-121",
+      "GPUWEB": "https://github.com/gpuweb/gpuweb/wiki/Implementation-Status",
+      "CHROME-TIMER": "https://developer.chrome.com/blog/cross-origin-isolated-hr-timers",
+      "ASML-RAY": "https://www.asml.com/en/technology/lithography-principles/rayleigh-criterion",
+      "ASML-EUV": "https://www.asml.com/en/products/euv-lithography-systems",
+      "CODATA-SI": "https://physics.nist.gov/cuu/pdf/xray_2018.pdf",
+      "LITERT-MTK": "https://developers.google.com/edge/litert/next/mediatek",
+      "MTK-AI": "https://www.mediatek.com/technology/ai",
+      "MTK-NP-LITERT": "https://www.mediatek.com/tek-talk-blogs/mediatek-npus-neuropilot-and-litert-are-ready-to-bring-power-ai-in-millions-of-devices",
+      "APPLE-SPEC": "https://www.apple.com/iphone-18-pro/specs/",
+      "APPLE-NEWSROOM": "https://www.apple.com/newsroom/2026/09/apple-debuts-iphone-18-pro-and-iphone-18-pro-max/",
+      "APPLE-SUPPORT-18PRO": "https://support.apple.com/en-us/148591",
+      "SAMSUNG-S26U-NR": "https://news.samsung.com/global/samsung-unveils-galaxy-s26-series-the-most-intuitive-galaxy-ai-phone-yet",
+      "SAMSUNG-S26U-UK": "https://www.samsung.com/uk/smartphones/galaxy-s26-ultra/",
+      "QCOM-S26": "https://www.qualcomm.com/snapdragon/news/just-announced--the-samsung-galaxy-s26-series--powered-by-snapdr.md",
+      "NBC-S26U": "https://www.notebookcheck.net/Blocks-prying-eyes-Samsung-Galaxy-S26-Ultra-review.1278349.0.html",
+      "NBC-17T-LAUNCH": "https://www.notebookcheck.net/Xiaomi-launches-new-flagship-smartphone-with-Leica-tuned-cameras-and-Dimensity-9500-chipset.1308049.0.html",
+      "PA-17T-REVIEW": "https://www.phonearena.com/reviews/xiaomi-17t-pro-review_id7943",
+      "PA-A20-VS-S26U": "https://www.phonearena.com/news/I-tested-the-iPhone-18-Pro-Maxs-A20-Pro-performance-against-the-Galaxy-S26-Ultra_id183453",
+      "GSMA-17T": "https://www.gsmarena.com/xiaomi_17t_pro-14651.php",
+      "GSMA-17T-REVIEW": "https://www.gsmarena.com/xiaomi_17t_pro-review-2965p4.php",
+      "ENGADGET-S26U": "https://www.engadget.com/mobile/smartphones/samsung-galaxy-s26-ultra-review-the-stealth-upgrade-140000629.html",
+      "H2H": "see /workspace/xiaomi-lab/head-to-head.md"
+    },
+    "companion_files": [
+      "specs-dossier.md",
+      "deep-dive.md",
+      "cpu-gpu-npu-deep.md",
+      "taxonomy.json",
+      "predecessor-notes.md"
+    ]
+  },
+  "device": {
+    "name": {
+      "value": "Xiaomi 17T Pro",
+      "unit": null,
+      "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "status": "confirmed"
+    },
+    "launch_date": {
+      "value": "2026-05-28",
+      "unit": "date",
+      "source": "https://www.mi.com/uk/support/faq/details/KA-704973/",
+      "status": "confirmed",
+      "notes": "Also Xiaomi Global event: Vienna, 28.05.2026, 14:00 GMT+2."
+    },
+    "launch_venue": {
+      "value": "Vienna",
+      "unit": null,
+      "source": "https://www.mi.com/global/event/2026/xiaomi-launch-may-2026/",
+      "status": "confirmed"
+    },
+    "colors_official": {
+      "value": ["Black", "Deep Violet", "Deep Blue"],
+      "unit": null,
+      "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "status": "confirmed"
+    },
+    "os": {
+      "value": "Xiaomi HyperOS 3 (Android 16) first batch",
+      "unit": null,
+      "source": "https://www.mi.com/uk/support/faq/details/KA-704973/",
+      "status": "confirmed"
+    },
+    "model_number": {
+      "value": "2602EPTC0G",
+      "unit": null,
+      "source": "https://www.gsmarena.com/xiaomi_17t_pro-14651.php",
+      "status": "unconfirmed",
+      "notes": "GSMArena only; not on Xiaomi official spec page."
+    },
+    "height_mm": {
+      "value": 162.2,
+      "unit": "mm",
+      "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "status": "confirmed"
+    },
+    "width_mm": {
+      "value": 77.5,
+      "unit": "mm",
+      "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "status": "confirmed"
+    },
+    "thickness_mm": {
+      "value": 8.25,
+      "unit": "mm",
+      "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "status": "confirmed",
+      "notes": "GSMArena rounds to 8.3 mm."
+    },
+    "weight_g": {
+      "value": 219,
+      "unit": "g",
+      "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "status": "confirmed"
+    },
+    "front_glass": {
+      "value": "Corning Gorilla Glass 7i",
+      "unit": null,
+      "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "status": "confirmed"
+    },
+    "rear_cover": {
+      "value": "Glass, Gorilla Glass 7i",
+      "unit": null,
+      "source": "https://www.gsmarena.com/xiaomi_17t_pro-14651.php",
+      "status": "unconfirmed",
+      "notes": "Reputable outlet (GSMArena review also). Not stated on Xiaomi official spec sheet. Treated as outlet-confirmed in the dossier narrative; status unconfirmed officially."
+    },
+    "frame": {
+      "value": "Aluminum alloy",
+      "unit": null,
+      "source": "https://www.gsmarena.com/xiaomi_17t_pro-14651.php",
+      "status": "unconfirmed",
+      "notes": "GSMArena / review; not on official Xiaomi spec sheet."
+    },
+    "ingress_protection": {
+      "value": "IP68",
+      "unit": null,
+      "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "status": "confirmed",
+      "notes": "IEC 60529 lab: 1.5 m static freshwater, 30 min, ΔT ≤ 5 °C."
+    },
+    "cooling_system": {
+      "value": "Xiaomi 3D IceLoop System",
+      "unit": null,
+      "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "status": "confirmed"
+    },
+    "cooling_materials": {
+      "value": null,
+      "unit": null,
+      "source": null,
+      "status": "unknown"
+    },
+    "fingerprint": {
+      "value": "In-screen fingerprint sensor",
+      "unit": null,
+      "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "status": "confirmed",
+      "notes": "Optical vs ultrasonic not stated officially; GSMArena says optical."
+    },
+    "display_type": {
+      "value": "AMOLED, flat, flexible, on-cell full lamination",
+      "unit": null,
+      "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "status": "confirmed"
+    },
+    "display_diagonal_in": {
+      "value": 6.83,
+      "unit": "in",
+      "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "status": "confirmed"
+    },
+    "display_aspect_ratio": {
+      "value": "19.49:9",
+      "unit": null,
+      "source": "https://www.mi.com/uk/support/faq/details/KA-704973/",
+      "status": "confirmed"
+    },
+    "display_resolution_px": {
+      "value": [2772, 1280],
+      "unit": "px",
+      "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "status": "confirmed",
+      "notes": "Marketed as 1.5K."
+    },
+    "display_ppi": {
+      "value": 447,
+      "unit": "PPI",
+      "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "status": "confirmed"
+    },
+    "display_refresh_hz_max": {
+      "value": 144,
+      "unit": "Hz",
+      "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "status": "confirmed"
+    },
+    "display_refresh_modes_hz": {
+      "value": [30, 60, 120, 144],
+      "unit": "Hz",
+      "source": "https://www.mi.com/uk/support/faq/details/KA-704973/",
+      "status": "confirmed",
+      "notes": "30 Hz is AOD."
+    },
+    "touch_sampling_hz": {
+      "value": 480,
+      "unit": "Hz",
+      "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "status": "confirmed"
+    },
+    "touch_sampling_instantaneous_hz": {
+      "value": 3500,
+      "unit": "Hz",
+      "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "status": "confirmed",
+      "notes": "Game Turbo."
+    },
+    "color_depth": {
+      "value": 12,
+      "unit": "bit",
+      "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "status": "confirmed",
+      "notes": "68 billion colors. FAQ incorrectly says 8-bit; see conflicts."
+    },
+    "color_gamut_dci_p3": {
+      "value": 100,
+      "unit": "%",
+      "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "status": "confirmed",
+      "notes": "FAQ says 94%; conflict."
+    },
+    "brightness_typ_nits": {
+      "value": 600,
+      "unit": "nits",
+      "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "status": "confirmed"
+    },
+    "brightness_hbm_nits": {
+      "value": 2000,
+      "unit": "nits",
+      "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "status": "confirmed"
+    },
+    "brightness_peak_nits": {
+      "value": 3500,
+      "unit": "nits",
+      "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "status": "confirmed",
+      "notes": "UHBM at APL 25%."
+    },
+    "brightness_min_nits": {
+      "value": 1,
+      "unit": "nit",
+      "source": "https://www.mi.com/uk/support/faq/details/KA-704973/",
+      "status": "confirmed"
+    },
+    "contrast_ratio": {
+      "value": "5000000:1",
+      "unit": null,
+      "source": "https://www.mi.com/uk/support/faq/details/KA-704973/",
+      "status": "confirmed"
+    },
+    "hdr": {
+      "value": ["HDR10+", "Dolby Vision"],
+      "unit": null,
+      "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "status": "confirmed"
+    },
+    "dimming": {
+      "value": "DC dimming (default)",
+      "unit": null,
+      "source": "https://www.mi.com/uk/support/faq/details/KA-704973/",
+      "status": "confirmed"
+    },
+    "screen_to_body_percent_official": {
+      "value": 95.2,
+      "unit": "%",
+      "source": "https://www.mi.com/uk/support/faq/details/KA-704973/",
+      "status": "confirmed",
+      "notes": "GSMArena lists ~91.1%; methodology conflict."
+    },
+    "pwm_hz": {
+      "value": 3840,
+      "unit": "Hz",
+      "source": "https://www.gsmarena.com/xiaomi_17t_pro-14651.php",
+      "status": "unconfirmed",
+      "notes": "GSMArena only."
+    },
+    "panel_supplier": {
+      "value": null,
+      "unit": null,
+      "source": null,
+      "status": "unknown"
+    },
+    "ram_gb_official_skus": {
+      "value": 12,
+      "unit": "GB",
+      "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "status": "confirmed"
+    },
+    "storage_skus": {
+      "value": ["12+256", "12+512", "12+1TB"],
+      "unit": "GB",
+      "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "status": "confirmed"
+    },
+    "ram_type_rate_mbps": {
+      "value": "LPDDR5X 9600",
+      "unit": "Mbps",
+      "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "status": "confirmed",
+      "notes": "Below SoC max of 10667 Mbps; device bin."
+    },
+    "storage_interface": {
+      "value": "UFS 4.1",
+      "unit": null,
+      "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "status": "confirmed",
+      "notes": "Device lane count (2 vs 4) not stated by Xiaomi."
+    },
+    "ufs_lane_count_device": {
+      "value": null,
+      "unit": "lanes",
+      "source": null,
+      "status": "unknown"
+    },
+    "microsd": {
+      "value": false,
+      "unit": null,
+      "source": "https://www.mi.com/uk/support/faq/details/KA-704973/",
+      "status": "confirmed"
+    },
+    "ram_sku_16gb": {
+      "value": "512GB+16GB listed by GSMArena",
+      "unit": null,
+      "source": "https://www.gsmarena.com/xiaomi_17t_pro-14651.php",
+      "status": "unconfirmed",
+      "notes": "Not on official Global/UK specs."
+    },
+    "dram_vendor": {
+      "value": null,
+      "unit": null,
+      "source": null,
+      "status": "unknown"
+    },
+    "battery_typical_mah": {
+      "value": 7000,
+      "unit": "mAh",
+      "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "status": "confirmed",
+      "notes": "Silicon-carbon, typ."
+    },
+    "battery_rated_mah": {
+      "value": 6830,
+      "unit": "mAh",
+      "source": "https://www.mi.com/uk/support/faq/details/KA-704973/",
+      "status": "confirmed"
+    },
+    "battery_construction": {
+      "value": "dual-cell",
+      "unit": null,
+      "source": "https://www.mi.com/uk/support/faq/details/KA-704973/",
+      "status": "confirmed"
+    },
+    "battery_chemistry": {
+      "value": "silicon-carbon lithium polymer",
+      "unit": null,
+      "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "status": "confirmed",
+      "notes": "Spec: silicon-carbon battery; FAQ: lithium polymer. Complementary descriptions."
+    },
+    "battery_suppliers": {
+      "value": ["ATL", "LIWINON"],
+      "unit": null,
+      "source": "https://www.mi.com/uk/support/faq/details/KA-704973/",
+      "status": "confirmed"
+    },
+    "battery_cell_voltage_v": {
+      "value": 4.58,
+      "unit": "V",
+      "source": "https://www.mi.com/uk/support/faq/details/KA-704973/",
+      "status": "confirmed",
+      "notes": "High-voltage cell."
+    },
+    "wired_charge_w": {
+      "value": 100,
+      "unit": "W",
+      "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "status": "confirmed",
+      "notes": "HyperCharge, 100W PPS, USB-C."
+    },
+    "usb_pd": {
+      "value": ["PD3.0", "PD2.0", "PPS"],
+      "unit": null,
+      "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "status": "confirmed",
+      "notes": "FAQ omits PD3.0."
+    },
+    "wireless_charge_w": {
+      "value": 50,
+      "unit": "W",
+      "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "status": "confirmed"
+    },
+    "wired_reverse_w": {
+      "value": 22.5,
+      "unit": "W",
+      "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "status": "confirmed"
+    },
+    "wireless_reverse_w": {
+      "value": 5,
+      "unit": "W",
+      "source": "https://www.mi.com/uk/support/faq/details/KA-704973/",
+      "status": "unconfirmed",
+      "notes": "FAQ only; not on official spec sheet."
+    },
+    "full_charge_time_min": {
+      "value": 48,
+      "unit": "min",
+      "source": "https://www.mi.com/uk/support/faq/details/KA-704973/",
+      "status": "confirmed",
+      "notes": "Xiaomi Internal Labs."
+    },
+    "in_box_adapter": {
+      "value": false,
+      "unit": null,
+      "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "status": "confirmed"
+    },
+    "included_cable_usb": {
+      "value": "USB 2.0 Type-C",
+      "unit": null,
+      "source": "https://www.mi.com/uk/support/faq/details/KA-704973/",
+      "status": "confirmed",
+      "notes": "Cable spec, not necessarily phone SuperSpeed."
+    },
+    "phone_usb_data": {
+      "value": "USB Type-C 2.0, OTG (GSMArena); official page says USB-C charging port only",
+      "unit": null,
+      "source": "https://www.gsmarena.com/xiaomi_17t_pro-14651.php",
+      "status": "unconfirmed"
+    },
+    "pmic": {
+      "value": null,
+      "unit": null,
+      "source": null,
+      "status": "unknown"
+    },
+    "battery_si_c_ratio": {
+      "value": null,
+      "unit": null,
+      "source": null,
+      "status": "unknown"
+    },
+    "camera_main": {
+      "value": "50MP Light Fusion 950, 2.4μm 4-in-1, f/1.67, OIS, 23mm",
+      "unit": null,
+      "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "status": "confirmed"
+    },
+    "camera_tele": {
+      "value": "50MP periscope, f/3.0, OIS, 115mm, 5x",
+      "unit": null,
+      "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "status": "confirmed"
+    },
+    "camera_ultrawide": {
+      "value": "12MP, f/2.2, 15mm, 120° FOV",
+      "unit": null,
+      "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "status": "confirmed"
+    },
+    "camera_front": {
+      "value": "32MP in-display, f/2.2, 21mm, 90° FOV",
+      "unit": null,
+      "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "status": "confirmed"
+    },
+    "rear_video_8k": {
+      "value": "8K30 7680x4320",
+      "unit": null,
+      "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "status": "confirmed"
+    },
+    "rear_video_4k120": {
+      "value": "4K120",
+      "unit": null,
+      "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "status": "confirmed"
+    },
+    "sim": {
+      "value": ["nano+nano", "nano+eSIM", "eSIM+eSIM"],
+      "unit": null,
+      "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "status": "confirmed"
+    },
+    "wifi": {
+      "value": "Wi-Fi 7, 2x2 MIMO",
+      "unit": null,
+      "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "status": "confirmed"
+    },
+    "bluetooth": {
+      "value": "6.0 Dual-Bluetooth",
+      "unit": null,
+      "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "status": "confirmed"
+    },
+    "nfc": {
+      "value": true,
+      "unit": null,
+      "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "status": "confirmed"
+    },
+    "europe_msrp_eur_12_256": {
+      "value": 899.9,
+      "unit": "EUR",
+      "source": "https://www.notebookcheck.net/Xiaomi-launches-new-flagship-smartphone-with-Leica-tuned-cameras-and-Dimensity-9500-chipset.1308049.0.html",
+      "status": "confirmed",
+      "notes": "Notebookcheck citing Xiaomi pre-release material, 2026-05-28."
+    }
+  },
+  "soc": {
+    "name": {
+      "value": "MediaTek Dimensity 9500",
+      "unit": null,
+      "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500",
+      "status": "confirmed"
+    },
+    "announced": {
+      "value": "2025-09-22",
+      "unit": "date",
+      "source": "https://www.mediatek.com/press-room/mediatek-dimensity-9500-unleashes-best-in-class-performance-ai-experiences-and-power-efficiency-for-the-next-generation-of-mobile-devices",
+      "status": "confirmed"
+    },
+    "process_xiaomi_wording": {
+      "value": "3nm",
+      "unit": null,
+      "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+      "status": "confirmed"
+    },
+    "process_node": {
+      "value": "TSMC N3P",
+      "unit": null,
+      "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500",
+      "status": "confirmed"
+    },
+    "transistor_architecture": {
+      "value": "FinFET",
+      "unit": null,
+      "source": "https://www.tsmc.com/english/dedicatedFoundry/technology/logic/l_3nm",
+      "status": "confirmed",
+      "notes": "TSMC 3nm family is FinFET. GAA/nanosheet is official on TSMC N2, not N3P."
+    },
+    "transistor_count": {
+      "value": null,
+      "unit": "transistors",
+      "source": null,
+      "status": "unknown",
+      "notes": "Secondary outlets have used ~30 billion; not on MediaTek official pages."
+    },
+    "die_size_mm2": {
+      "value": null,
+      "unit": "mm^2",
+      "source": null,
+      "status": "unknown"
+    },
+    "package_this_phone": {
+      "value": null,
+      "unit": null,
+      "source": null,
+      "status": "unknown",
+      "notes": "TechInsights describes PoP (MT6993Z + Samsung LPDDR5X) on Vivo X300 Pro / OPPO Find X9 Pro, not this Xiaomi."
+    },
+    "cpu_cluster": {
+      "value": "1x C1-Ultra 4.21GHz 2MB L2 + 3x C1-Premium 3.5GHz 1MB L2 + 4x C1-Pro 2.7GHz 512KB L2",
+      "unit": null,
+      "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500",
+      "status": "confirmed"
+    },
+    "isa": {
+      "value": "Armv9.3-A with SME2 and SVE2",
+      "unit": null,
+      "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500",
+      "status": "confirmed"
+    },
+    "l3_mb": {
+      "value": 16,
+      "unit": "MB",
+      "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500",
+      "status": "confirmed"
+    },
+    "slc_mb": {
+      "value": 10,
+      "unit": "MB",
+      "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500",
+      "status": "confirmed"
+    },
+    "l1_cache_bytes": {
+      "value": null,
+      "unit": "KB",
+      "source": null,
+      "status": "unknown",
+      "notes": "MediaTek only says 100% bigger L1 vs previous gen. Absolute sizes unpublished in sources used here."
+    },
+    "gpu_name": {
+      "value": "Arm Mali-G1 Ultra MC12",
+      "unit": null,
+      "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500",
+      "status": "confirmed"
+    },
+    "gpu_cores": {
+      "value": 12,
+      "unit": "shader cores",
+      "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500",
+      "status": "confirmed"
+    },
+    "gpu_architecture": {
+      "value": "Arm 5th Gen GPU, tile-based with Deferred Vertex Shading, CSF, RTUv2 on Ultra",
+      "unit": null,
+      "source": "https://www.arm.com/products/silicon-ip-multimedia/gpu/mali-g1-ultra",
+      "status": "confirmed"
+    },
+    "gpu_vulkan": {
+      "value": "1.4",
+      "unit": null,
+      "source": "https://www.khronos.org/conformance/adopters/conformant-products/vulkan",
+      "status": "confirmed",
+      "notes": "Khronos: Mali-G1-Ultra Vulkan 1.4 conformant 2025-12-19. MediaTek also says Vulkan 1.4."
+    },
+    "gpu_opengl_es": {
+      "value": "3.2",
+      "unit": null,
+      "source": "https://documentation-service.arm.com/static/68c168ab8a337a2bc6645afb",
+      "status": "confirmed",
+      "notes": "Arm Mali G1 column: OpenGL ES 1.1–3.2."
+    },
+    "gpu_opencl": {
+      "value": "3.0",
+      "unit": null,
+      "source": "https://documentation-service.arm.com/static/68c168ab8a337a2bc6645afb",
+      "status": "confirmed"
+    },
+    "gpu_fp32_ops_per_core_per_cycle": {
+      "value": 256,
+      "unit": "ops/cycle",
+      "source": "https://documentation-service.arm.com/static/68c168ab8a337a2bc6645afb",
+      "status": "confirmed",
+      "notes": "Arm counts each FMA as 2 operations. Peak TFLOPS still unknown without official clock."
+    },
+    "gpu_fp16_ops_per_core_per_cycle": {
+      "value": 512,
+      "unit": "ops/cycle",
+      "source": "https://documentation-service.arm.com/static/68c168ab8a337a2bc6645afb",
+      "status": "confirmed"
+    },
+    "gpu_clock_mhz": {
+      "value": null,
+      "unit": "MHz",
+      "source": null,
+      "status": "unknown",
+      "notes": "Aggregator repeats of 1716 MHz are unconfirmed. Notebookcheck leaves clocks as unknown."
+    },
+    "npu_name": {
+      "value": "MediaTek NPU 990 + Super Efficient CIM NPU",
+      "unit": null,
+      "source": "https://www.mediatek.com/press-room/mediatek-dimensity-9500-unleashes-best-in-class-performance-ai-experiences-and-power-efficiency-for-the-next-generation-of-mobile-devices",
+      "status": "confirmed"
+    },
+    "npu_tops": {
+      "value": null,
+      "unit": "TOPS",
+      "source": null,
+      "status": "unknown",
+      "notes": "Not on MediaTek official pages. Secondary outlets repeat 100 TOPS (unconfirmed)."
+    },
+    "npu_llm_tokens_per_s": {
+      "value": null,
+      "unit": "token/s",
+      "source": null,
+      "status": "unknown",
+      "notes": "Official claims are relative only: 100% faster 3B-parameter LLM output; over 2x token generation vs previous gen."
+    },
+    "npu_bitnet": {
+      "value": "BitNet 1.58-bit",
+      "unit": null,
+      "source": "https://www.mediatek.com/press-room/mediatek-dimensity-9500-unleashes-best-in-class-performance-ai-experiences-and-power-efficiency-for-the-next-generation-of-mobile-devices",
+      "status": "confirmed"
+    },
+    "npu_context_tokens": {
+      "value": 128000,
+      "unit": "tokens",
+      "source": "https://www.mediatek.com/press-room/mediatek-dimensity-9500-unleashes-best-in-class-performance-ai-experiences-and-power-efficiency-for-the-next-generation-of-mobile-devices",
+      "status": "confirmed",
+      "notes": "On-device long-text capacity vs 32K on Dimensity 9400."
+    },
+    "isp": {
+      "value": "MediaTek Imagiq 1190",
+      "unit": null,
+      "source": "https://www.mediatek.com/press-room/mediatek-dimensity-9500-unleashes-best-in-class-performance-ai-experiences-and-power-efficiency-for-the-next-generation-of-mobile-devices",
+      "status": "confirmed"
+    },
+    "modem": {
+      "value": "3GPP Rel-17 5G, Sub-6 FR1, 5CC-CA up to 7.4 Gbps DL",
+      "unit": "Gbps",
+      "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500",
+      "status": "confirmed"
+    },
+    "mmwave": {
+      "value": null,
+      "unit": null,
+      "source": null,
+      "status": "unknown",
+      "notes": "FR2/mmWave not listed on official spec table."
+    },
+    "memory_max_mbps": {
+      "value": 10667,
+      "unit": "Mbps",
+      "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500",
+      "status": "confirmed",
+      "notes": "LPDDR5X SoC maximum."
+    },
+    "memory_channel_width_bits": {
+      "value": null,
+      "unit": "bit",
+      "source": null,
+      "status": "unknown"
+    },
+    "memory_theoretical_bandwidth_GBps": {
+      "value": null,
+      "unit": "GB/s",
+      "source": null,
+      "status": "unknown",
+      "notes": "A 64-bit (4x16) assumption yields 85.336 GB/s at 10667 Mbps and 76.8 GB/s at the phone's 9600 Mbps; unconfirmed."
+    },
+    "ufs_soc": {
+      "value": "UFS 4.1 4-lane",
+      "unit": null,
+      "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500",
+      "status": "confirmed"
+    },
+    "ufs_41_jedec_peak_GBps": {
+      "value": 4.2,
+      "unit": "GB/s",
+      "source": "https://www.jedec.org/news/pressreleases/jedec%C2%AE-announces-updates-universal-flash-storage-ufs-and-memory-interface",
+      "status": "confirmed",
+      "notes": "JEDEC wording for M-PHY 5.0 / UniPro 2.0, typical 2-lane ~4.2 GB/s."
+    },
+    "ufs_hs_g5_per_lane_gbps": {
+      "value": 23.2,
+      "unit": "Gbps",
+      "source": "https://americas.kioxia.com/en-us/business/memory/ufs/other.html",
+      "status": "confirmed",
+      "notes": "KIOXIA: theoretical 23.2 Gbps/lane or 46.4 Gbps/device (2-lane)."
+    }
+  },
+  "browser": {
+    "webgl2": {
+      "value": "Expected on modern Chrome Android; on-device smoke-test recommended",
+      "unit": null,
+      "source": "Khronos WebGL 2 / Chrome Android platform",
+      "status": "confirmed",
+      "notes": "Platform-standard, not a Xiaomi-published guarantee."
+    },
+    "webgpu_chrome_android_arm": {
+      "value": "Chrome 121+ default on Android 12+ for ARM/Qualcomm/Intel GPUs",
+      "unit": null,
+      "source": "https://developer.chrome.com/blog/new-in-webgpu-121",
+      "status": "confirmed",
+      "notes": "Mali-G1 Ultra is an Arm GPU but is not separately named; verify navigator.gpu on device."
+    },
+    "webgpu_mali_g1_ultra_specific": {
+      "value": null,
+      "unit": null,
+      "source": "https://github.com/gpuweb/gpuweb/wiki/Implementation-Status",
+      "status": "unknown",
+      "notes": "Class-level ARM support is documented; this exact GPU is unconfirmed."
+    },
+    "sharedarraybuffer": {
+      "value": "Requires cross-origin isolation (COOP/COEP or equivalent)",
+      "unit": null,
+      "source": "https://developer.chrome.com/blog/cross-origin-isolated-hr-timers",
+      "status": "confirmed"
+    },
+    "timer_resolution_non_isolated_us": {
+      "value": 100,
+      "unit": "us",
+      "source": "https://developer.chrome.com/blog/cross-origin-isolated-hr-timers",
+      "status": "confirmed",
+      "notes": "Chrome 91+ explicit timers."
+    },
+    "timer_resolution_isolated_us": {
+      "value": 5,
+      "unit": "us",
+      "source": "https://developer.chrome.com/blog/cross-origin-isolated-hr-timers",
+      "status": "confirmed"
+    }
+  },
+  "conflicts": [
+    {
+      "id": 1,
+      "classification": "error",
+      "topic": "Color depth",
+      "summary": "Spec page 12-bit / 68 billion colors vs FAQ 68.7 billion with 8-bit. 8-bit cannot represent 68.7e9 colors."
+    },
+    {
+      "id": 2,
+      "classification": "conflict",
+      "topic": "DCI-P3 gamut",
+      "summary": "Official spec 100% vs official FAQ 94%."
+    },
+    {
+      "id": 3,
+      "classification": "conflict",
+      "topic": "Wet Touch version",
+      "summary": "Spec Wet Touch Technology 2.0 vs FAQ wet hand touch 3.0."
+    },
+    {
+      "id": 4,
+      "classification": "error",
+      "topic": "Hexagon coprocessor",
+      "summary": "FAQ names a Hexagon coprocessor (Qualcomm DSP brand) on this MediaTek phone."
+    },
+    {
+      "id": 5,
+      "classification": "conflict",
+      "topic": "USB PD version",
+      "summary": "Spec PD3.0/PD2.0 vs FAQ BC1.2, PD2.0, and PPS (no PD3.0)."
+    },
+    {
+      "id": 6,
+      "classification": "conflict",
+      "topic": "Reverse wireless charging",
+      "summary": "Spec lists 22.5 W wired reverse only; FAQ lists 5 W reverse wireless. FAQ Q4 also contradicts 50 W wireless."
+    },
+    {
+      "id": 7,
+      "classification": "conflict",
+      "topic": "16 GB RAM SKU",
+      "summary": "Official Global/UK SKUs are 12 GB only; GSMArena lists 512 GB + 16 GB."
+    },
+    {
+      "id": 8,
+      "classification": "conflict",
+      "topic": "Screen-to-body ratio",
+      "summary": "FAQ 95.2% vs GSMArena ~91.1%."
+    },
+    {
+      "id": 9,
+      "classification": "issue",
+      "topic": "Thickness rounding",
+      "summary": "Official 8.25 mm vs GSMArena 8.3 mm."
+    },
+    {
+      "id": 10,
+      "classification": "issue",
+      "topic": "Main aperture rounding",
+      "summary": "Official f/1.67 vs GSMArena f/1.7."
+    },
+    {
+      "id": 11,
+      "classification": "error",
+      "topic": "MediaTek 8K resolution typo",
+      "summary": "SoC page 7690×4320 vs standard/Xiaomi 7680×4320."
+    },
+    {
+      "id": 12,
+      "classification": "issue",
+      "topic": "Vulkan 1.3 vs 1.4 on Arm comparison PDF",
+      "summary": "Arm comparison sheet still lists Vulkan 1.0–1.3 for Mali G1; Khronos and MediaTek document Vulkan 1.4."
+    },
+    {
+      "id": 13,
+      "classification": "conflict",
+      "topic": "Fingerprint sensing principle",
+      "summary": "Official in-screen only; GSMArena optical; some outlets have said ultrasonic."
+    },
+    {
+      "id": 14,
+      "classification": "error",
+      "topic": "FAQ wireless protocol Q4",
+      "summary": "FAQ says the phone does not support the wireless charging protocol while Q8 and the spec list 50 W wireless."
+    },
+    {
+      "id": 15,
+      "classification": "conflict",
+      "topic": "Dimensity 9500 part number",
+      "summary": "Google LiteRT lists Dimensity 9500 as MT6990; TechInsights packaging note uses MT6993Z. Not settled on a MediaTek official table in this research."
+    }
+  ],
+  "unknowns": [
+    "Absolute L1 I/D sizes per core",
+    "C1-Ultra/Premium decode width, ROB size, pipeline depth (numeric)",
+    "GPU clock and therefore peak TFLOPS",
+    "NPU TOPS by precision and absolute LLM tokens/s",
+    "MAC array organization of NPU 990",
+    "NPU 990-specific INT4/INT8/FP8/FP16 table (family MDLA docs exist; 990-specific table not found official)",
+    "Transistor count and official die size",
+    "Xiaomi 17T Pro package type, InFO vs PoP, DRAM vendor",
+    "Memory channel width and official theoretical bandwidth",
+    "Whether this phone's UFS is 4-lane",
+    "PMIC identity",
+    "Battery Si/C anode fraction and cathode chemistry",
+    "Display panel supplier, OLED emitter chemistry, official PWM",
+    "mmWave/FR2",
+    "Complete official launch-country list",
+    "Official 16 GB RAM SKU",
+    "Fingerprint optical vs ultrasonic",
+    "Phone USB SuperSpeed generation",
+    "Device-specific boot chain, physical memory map, GPU firmware clocks",
+    "N3P CPP/M0/M1 pitches, high-k/metal-gate stack, Cu/Co/Ru interconnect metals",
+    "Whether High-NA EUV (NA 0.55) is used on N3P (ASML says NXE NA 0.33 is used for 3 nm nodes; High-NA is aimed at 2 nm-class)"
+  ],
+  "competitors": {
+    "compared_as_of": {
+      "value": "2026-11-12",
+      "unit": "date",
+      "source": "internal compilation; America/Los_Angeles",
+      "status": "confirmed",
+      "notes": "All three devices are officially announced and released by this date. iPhone 18 Pro Max is not UNRELEASED."
+    },
+    "methodology": {
+      "value": "Official manufacturer pages preferred for hardware. Named-lab benchmarks only. Geekbench 6 never mixed with Geekbench 7. Vendor battery-hour claims are not ranked against third-party active-use tests.",
+      "unit": null,
+      "source": "https://www.phonearena.com/reviews/xiaomi-17t-pro-review_id7943",
+      "status": "confirmed",
+      "notes": "Full narrative, wins/losses, and caveats: head-to-head.md."
+    },
+    "xiaomi_17t_pro": {
+      "name": {
+        "value": "Xiaomi 17T Pro",
+        "unit": null,
+        "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+        "status": "confirmed"
+      },
+      "soc": {
+        "value": "MediaTek Dimensity 9500",
+        "unit": null,
+        "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500",
+        "status": "confirmed"
+      },
+      "process": {
+        "value": "TSMC N3P (FinFET)",
+        "unit": null,
+        "source": "https://www.mediatek.com/products/smartphones/mediatek-dimensity-9500",
+        "status": "confirmed"
+      },
+      "os": {
+        "value": "HyperOS 3 (Android 16)",
+        "unit": null,
+        "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+        "status": "confirmed"
+      },
+      "price_europe_start": {
+        "value": 899.9,
+        "unit": "EUR",
+        "source": "https://www.notebookcheck.net/Xiaomi-launches-new-flagship-smartphone-with-Leica-tuned-cameras-and-Dimensity-9500-chipset.1308049.0.html",
+        "status": "confirmed",
+        "notes": "12 GB + 256 GB official Europe launch price from Xiaomi pre-release material cited by Notebookcheck."
+      },
+      "price_us_msrp": {
+        "value": null,
+        "unit": "USD",
+        "source": null,
+        "status": "unknown",
+        "notes": "No official U.S. Xiaomi MSRP found in this research."
+      },
+      "height_mm": {
+        "value": 162.2,
+        "unit": "mm",
+        "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+        "status": "confirmed"
+      },
+      "width_mm": {
+        "value": 77.5,
+        "unit": "mm",
+        "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+        "status": "confirmed"
+      },
+      "thickness_mm": {
+        "value": 8.25,
+        "unit": "mm",
+        "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+        "status": "confirmed"
+      },
+      "weight_g": {
+        "value": 219,
+        "unit": "g",
+        "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+        "status": "confirmed"
+      },
+      "display_size_in": {
+        "value": 6.83,
+        "unit": "in",
+        "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+        "status": "confirmed"
+      },
+      "display_resolution_px": {
+        "value": "2772x1280",
+        "unit": "px",
+        "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+        "status": "confirmed"
+      },
+      "display_ppi": {
+        "value": 447,
+        "unit": "ppi",
+        "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+        "status": "confirmed"
+      },
+      "display_refresh_hz_max": {
+        "value": 144,
+        "unit": "Hz",
+        "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+        "status": "confirmed"
+      },
+      "brightness_typ_nits": {
+        "value": 600,
+        "unit": "nits",
+        "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+        "status": "confirmed"
+      },
+      "brightness_hbm_nits": {
+        "value": 2000,
+        "unit": "nits",
+        "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+        "status": "confirmed"
+      },
+      "brightness_peak_nits_official": {
+        "value": 3500,
+        "unit": "nits",
+        "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+        "status": "confirmed",
+        "notes": "UHBM at APL 25%. Not the same test as Apple 3000 outdoor or Samsung 2600 peak."
+      },
+      "brightness_peak_nits_gsmarena_measured": {
+        "value": 1069,
+        "unit": "nits",
+        "source": "https://www.gsmarena.com/xiaomi_17t_pro-14651.php",
+        "status": "confirmed",
+        "notes": "Independent lab; not comparable 1:1 to official UHBM."
+      },
+      "ip_rating": {
+        "value": "IP68 1.5 m / 30 min",
+        "unit": null,
+        "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+        "status": "confirmed"
+      },
+      "ram_gb": {
+        "value": 12,
+        "unit": "GB",
+        "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+        "status": "confirmed",
+        "notes": "Official SKUs 12 GB only."
+      },
+      "ram_type": {
+        "value": "LPDDR5X 9600",
+        "unit": null,
+        "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+        "status": "confirmed"
+      },
+      "storage": {
+        "value": "UFS 4.1, 256/512/1024 GB",
+        "unit": null,
+        "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+        "status": "confirmed"
+      },
+      "usb": {
+        "value": "USB-C; included cable USB 2.0; GSMArena lists Type-C 2.0",
+        "unit": null,
+        "source": "https://www.mi.com/uk/support/faq/details/KA-704973/",
+        "status": "confirmed",
+        "notes": "GSMArena: https://www.gsmarena.com/xiaomi_17t_pro-14651.php"
+      },
+      "battery_typical_mah": {
+        "value": 7000,
+        "unit": "mAh",
+        "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+        "status": "confirmed"
+      },
+      "battery_rated_mah": {
+        "value": 6830,
+        "unit": "mAh",
+        "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+        "status": "confirmed"
+      },
+      "charging_wired_w": {
+        "value": 100,
+        "unit": "W",
+        "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+        "status": "confirmed",
+        "notes": "HyperCharge / PPS; Xiaomi lab ~48 min 0-100%; no in-box adapter."
+      },
+      "charging_wireless_w": {
+        "value": 50,
+        "unit": "W",
+        "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+        "status": "confirmed"
+      },
+      "endurance_gsmarena_active_use": {
+        "value": "21:41",
+        "unit": "h:mm",
+        "source": "https://www.gsmarena.com/xiaomi_17t_pro-14651.php",
+        "status": "confirmed",
+        "notes": "Different methodology than Apple/Samsung vendor video-hour claims."
+      },
+      "camera_main": {
+        "value": "50 MP Light Fusion 950 f/1.67 OIS 23 mm",
+        "unit": null,
+        "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+        "status": "confirmed"
+      },
+      "camera_tele": {
+        "value": "50 MP 5x periscope f/3.0 115 mm OIS",
+        "unit": null,
+        "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+        "status": "confirmed"
+      },
+      "camera_uw": {
+        "value": "12 MP f/2.2 15 mm 120°",
+        "unit": null,
+        "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+        "status": "confirmed"
+      },
+      "camera_front": {
+        "value": "32 MP f/2.2",
+        "unit": null,
+        "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+        "status": "confirmed"
+      },
+      "video_max": {
+        "value": "8K30; 4K120",
+        "unit": null,
+        "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+        "status": "confirmed"
+      },
+      "geekbench6_single_phonearena": {
+        "value": 2903,
+        "unit": "score",
+        "source": "https://www.phonearena.com/reviews/xiaomi-17t-pro-review_id7943",
+        "status": "confirmed",
+        "notes": "Same-lab GB6 vs S26 Ultra 3753. Do not mix with GB7."
+      },
+      "geekbench6_multi_phonearena": {
+        "value": 9145,
+        "unit": "score",
+        "source": "https://www.phonearena.com/reviews/xiaomi-17t-pro-review_id7943",
+        "status": "confirmed",
+        "notes": "S26 Ultra same lab 11259."
+      },
+      "geekbench6_single_gsmarena": {
+        "value": 3158,
+        "unit": "score",
+        "source": "https://www.gsmarena.com/xiaomi_17t_pro-review-2965p4.php",
+        "status": "confirmed",
+        "notes": "Different lab; higher than PhoneArena. Still below PA S26 Ultra multi."
+      },
+      "geekbench6_multi_gsmarena": {
+        "value": 9766,
+        "unit": "score",
+        "source": "https://www.gsmarena.com/xiaomi_17t_pro-review-2965p4.php",
+        "status": "confirmed"
+      },
+      "3dmark_wle_high_phonearena": {
+        "value": 6363,
+        "unit": "score",
+        "source": "https://www.phonearena.com/reviews/xiaomi-17t-pro-review_id7943",
+        "status": "confirmed"
+      },
+      "3dmark_wle_low_phonearena": {
+        "value": 3377,
+        "unit": "score",
+        "source": "https://www.phonearena.com/reviews/xiaomi-17t-pro-review_id7943",
+        "status": "confirmed"
+      },
+      "3dmark_snl_high_phonearena": {
+        "value": 2476,
+        "unit": "score",
+        "source": "https://www.phonearena.com/reviews/xiaomi-17t-pro-review_id7943",
+        "status": "confirmed"
+      },
+      "3dmark_snl_low_phonearena": {
+        "value": 1871,
+        "unit": "score",
+        "source": "https://www.phonearena.com/reviews/xiaomi-17t-pro-review_id7943",
+        "status": "confirmed",
+        "notes": "Beats S26 Ultra Low 1498 in the same lab; trails iPhone 18 Pro Max 2443."
+      }
+    },
+    "iphone_18_pro_max": {
+      "name": {
+        "value": "iPhone 18 Pro Max",
+        "unit": null,
+        "source": "https://www.apple.com/iphone-18-pro/specs/",
+        "status": "confirmed",
+        "notes": "Announced 9 Sep 2026; pre-order 12 Sep; available 18 Sep 2026."
+      },
+      "release_status": {
+        "value": "released",
+        "unit": null,
+        "source": "https://www.apple.com/newsroom/2026/09/apple-debuts-iphone-18-pro-and-iphone-18-pro-max/",
+        "status": "confirmed",
+        "notes": "Not UNRELEASED as of 2026-11-12."
+      },
+      "soc": {
+        "value": "Apple A20 Pro",
+        "unit": null,
+        "source": "https://www.apple.com/newsroom/2026/09/apple-debuts-iphone-18-pro-and-iphone-18-pro-max/",
+        "status": "confirmed"
+      },
+      "process": {
+        "value": "latest 2-nanometer",
+        "unit": null,
+        "source": "https://www.apple.com/newsroom/2026/09/apple-debuts-iphone-18-pro-and-iphone-18-pro-max/",
+        "status": "confirmed",
+        "notes": "Apple wording. Foundry not named in the cited Newsroom/spec pages."
+      },
+      "foundry": {
+        "value": null,
+        "unit": null,
+        "source": "https://www.apple.com/newsroom/2026/09/apple-debuts-iphone-18-pro-and-iphone-18-pro-max/",
+        "status": "unknown",
+        "notes": "Apple did not name the foundry in the cited official pages."
+      },
+      "cpu": {
+        "value": "6-core (2 performance + 4 efficiency)",
+        "unit": null,
+        "source": "https://www.apple.com/iphone-18-pro/specs/",
+        "status": "confirmed"
+      },
+      "gpu": {
+        "value": "7-core GPU with Neural Accelerators; hardware ray tracing",
+        "unit": null,
+        "source": "https://www.apple.com/iphone-18-pro/specs/",
+        "status": "confirmed",
+        "notes": "Apple: GPU up to 40% vs A19 Pro / 17 Pro."
+      },
+      "neural_engine": {
+        "value": "Dual 16-core Neural Engine",
+        "unit": null,
+        "source": "https://www.apple.com/iphone-18-pro/specs/",
+        "status": "confirmed"
+      },
+      "os": {
+        "value": "iOS 27",
+        "unit": null,
+        "source": "https://www.apple.com/newsroom/2026/09/apple-debuts-iphone-18-pro-and-iphone-18-pro-max/",
+        "status": "confirmed"
+      },
+      "price_us_256gb": {
+        "value": 1299,
+        "unit": "USD",
+        "source": "https://www.apple.com/newsroom/2026/09/apple-debuts-iphone-18-pro-and-iphone-18-pro-max/",
+        "status": "confirmed",
+        "notes": "Official U.S. starting price."
+      },
+      "price_us_512gb": {
+        "value": 1499,
+        "unit": "USD",
+        "source": "https://www.apple.com/newsroom/2026/09/apple-debuts-iphone-18-pro-and-iphone-18-pro-max/",
+        "status": "unconfirmed",
+        "notes": "Shop/Newsroom tier snippets; treat as unconfirmed if not re-verified on the live Apple shop page."
+      },
+      "price_us_1tb": {
+        "value": 1899,
+        "unit": "USD",
+        "source": "https://www.apple.com/newsroom/2026/09/apple-debuts-iphone-18-pro-and-iphone-18-pro-max/",
+        "status": "unconfirmed"
+      },
+      "price_us_2tb": {
+        "value": 2499,
+        "unit": "USD",
+        "source": "https://www.apple.com/newsroom/2026/09/apple-debuts-iphone-18-pro-and-iphone-18-pro-max/",
+        "status": "unconfirmed"
+      },
+      "height_mm": {
+        "value": 163.4,
+        "unit": "mm",
+        "source": "https://www.apple.com/iphone-18-pro/specs/",
+        "status": "confirmed"
+      },
+      "width_mm": {
+        "value": 78.0,
+        "unit": "mm",
+        "source": "https://www.apple.com/iphone-18-pro/specs/",
+        "status": "confirmed"
+      },
+      "thickness_mm": {
+        "value": 8.75,
+        "unit": "mm",
+        "source": "https://www.apple.com/iphone-18-pro/specs/",
+        "status": "confirmed"
+      },
+      "weight_g": {
+        "value": 249,
+        "unit": "g",
+        "source": "https://www.apple.com/iphone-18-pro/specs/",
+        "status": "confirmed"
+      },
+      "display_size_in": {
+        "value": 6.9,
+        "unit": "in",
+        "source": "https://www.apple.com/iphone-18-pro/specs/",
+        "status": "confirmed"
+      },
+      "display_resolution_px": {
+        "value": "2868x1320",
+        "unit": "px",
+        "source": "https://www.apple.com/iphone-18-pro/specs/",
+        "status": "confirmed"
+      },
+      "display_ppi": {
+        "value": 460,
+        "unit": "ppi",
+        "source": "https://www.apple.com/iphone-18-pro/specs/",
+        "status": "confirmed"
+      },
+      "display_refresh_hz_max": {
+        "value": 120,
+        "unit": "Hz",
+        "source": "https://www.apple.com/iphone-18-pro/specs/",
+        "status": "confirmed",
+        "notes": "ProMotion."
+      },
+      "brightness_typ_nits": {
+        "value": 1000,
+        "unit": "nits",
+        "source": "https://www.apple.com/iphone-18-pro/specs/",
+        "status": "confirmed"
+      },
+      "brightness_hdr_nits": {
+        "value": 1600,
+        "unit": "nits",
+        "source": "https://www.apple.com/iphone-18-pro/specs/",
+        "status": "confirmed"
+      },
+      "brightness_peak_outdoor_nits": {
+        "value": 3000,
+        "unit": "nits",
+        "source": "https://www.apple.com/iphone-18-pro/specs/",
+        "status": "confirmed",
+        "notes": "Not the same test as Xiaomi UHBM 3500 @ APL 25%."
+      },
+      "brightness_min_nits": {
+        "value": 1,
+        "unit": "nits",
+        "source": "https://www.apple.com/iphone-18-pro/specs/",
+        "status": "confirmed"
+      },
+      "contrast_ratio": {
+        "value": "2000000:1",
+        "unit": null,
+        "source": "https://www.apple.com/iphone-18-pro/specs/",
+        "status": "confirmed"
+      },
+      "ip_rating": {
+        "value": "IP68 IEC 60529, 6 m / 30 min",
+        "unit": null,
+        "source": "https://www.apple.com/iphone-18-pro/specs/",
+        "status": "confirmed"
+      },
+      "build": {
+        "value": "Aluminum unibody; Ceramic Shield 2 front; Ceramic Shield back",
+        "unit": null,
+        "source": "https://www.apple.com/iphone-18-pro/specs/",
+        "status": "confirmed"
+      },
+      "ram_gb": {
+        "value": null,
+        "unit": "GB",
+        "source": "https://www.apple.com/iphone-18-pro/specs/",
+        "status": "unknown",
+        "notes": "Apple does not list RAM on the cited official spec page."
+      },
+      "storage": {
+        "value": "256/512/1024/2048 GB",
+        "unit": null,
+        "source": "https://www.apple.com/iphone-18-pro/specs/",
+        "status": "confirmed",
+        "notes": "Interface type unpublished."
+      },
+      "usb": {
+        "value": "USB-C, USB 3 up to 10 Gb/s, DisplayPort",
+        "unit": null,
+        "source": "https://www.apple.com/iphone-18-pro/specs/",
+        "status": "confirmed"
+      },
+      "modem": {
+        "value": "Apple C2; 5G sub-6 and mmWave (U.S.)",
+        "unit": null,
+        "source": "https://www.apple.com/iphone-18-pro/specs/",
+        "status": "confirmed"
+      },
+      "wifi": {
+        "value": "Apple N1; Wi-Fi 7 2x2; Bluetooth 6; Thread",
+        "unit": null,
+        "source": "https://www.apple.com/iphone-18-pro/specs/",
+        "status": "confirmed"
+      },
+      "battery_typical_mah": {
+        "value": null,
+        "unit": "mAh",
+        "source": "https://www.apple.com/iphone-18-pro/specs/",
+        "status": "unknown",
+        "notes": "Apple does not publish mAh on the cited spec page."
+      },
+      "battery_typical_use_h": {
+        "value": 30,
+        "unit": "h",
+        "source": "https://www.apple.com/iphone-18-pro/specs/",
+        "status": "confirmed",
+        "notes": "Apple lab, Aug 2026 preproduction, typical-use profile. Not comparable to GSMArena active-use."
+      },
+      "battery_video_playback_h": {
+        "value": 45,
+        "unit": "h",
+        "source": "https://www.apple.com/iphone-18-pro/specs/",
+        "status": "confirmed",
+        "notes": "Apple lab, July 2026, iTunes HDR movie loop."
+      },
+      "battery_streamed_video_h": {
+        "value": 40,
+        "unit": "h",
+        "source": "https://www.apple.com/iphone-18-pro/specs/",
+        "status": "confirmed"
+      },
+      "charging_wired": {
+        "value": "50% in ~15 min with 60 W+ AVS USB-C PD 3.1 adapter (sold separately)",
+        "unit": null,
+        "source": "https://www.apple.com/iphone-18-pro/specs/",
+        "status": "confirmed"
+      },
+      "charging_wireless": {
+        "value": "MagSafe/Qi2 up to 25 W; 50% in 30 min with 35 W+ MagSafe",
+        "unit": null,
+        "source": "https://www.apple.com/iphone-18-pro/specs/",
+        "status": "confirmed"
+      },
+      "camera_main": {
+        "value": "48 MP Fusion Main, variable aperture f/1.48/1.8/2.8/4.0, 24 mm, sensor-shift OIS",
+        "unit": null,
+        "source": "https://www.apple.com/iphone-18-pro/specs/",
+        "status": "confirmed"
+      },
+      "camera_tele": {
+        "value": "48 MP 4x tetraprism 100 mm f/2.8; 8x optical-quality 200 mm",
+        "unit": null,
+        "source": "https://www.apple.com/iphone-18-pro/specs/",
+        "status": "confirmed"
+      },
+      "camera_uw": {
+        "value": "48 MP Fusion Ultra Wide 13 mm f/2.2 120°",
+        "unit": null,
+        "source": "https://www.apple.com/iphone-18-pro/specs/",
+        "status": "confirmed"
+      },
+      "camera_front": {
+        "value": "18 MP Center Stage f/1.9, autofocus with Focus Pixels",
+        "unit": null,
+        "source": "https://www.apple.com/iphone-18-pro/specs/",
+        "status": "confirmed"
+      },
+      "lidar": {
+        "value": true,
+        "unit": null,
+        "source": "https://www.apple.com/iphone-18-pro/specs/",
+        "status": "confirmed"
+      },
+      "video_max": {
+        "value": "4K Dolby Vision up to 120 fps (Fusion Main); no 8K listed on cited spec table",
+        "unit": null,
+        "source": "https://www.apple.com/iphone-18-pro/specs/",
+        "status": "confirmed"
+      },
+      "geekbench6_single": {
+        "value": null,
+        "unit": "score",
+        "source": "https://www.phonearena.com/news/I-tested-the-iPhone-18-Pro-Maxs-A20-Pro-performance-against-the-Galaxy-S26-Ultra_id183453",
+        "status": "unknown",
+        "notes": "No same-lab GB6 isolated here. Do not use mixed v7/v6 PhoneArena aggregate tables or pcspecs.io as GB6."
+      },
+      "geekbench6_multi": {
+        "value": null,
+        "unit": "score",
+        "source": "https://www.phonearena.com/news/I-tested-the-iPhone-18-Pro-Maxs-A20-Pro-performance-against-the-Galaxy-S26-Ultra_id183453",
+        "status": "unknown"
+      },
+      "3dmark_snl_high_phonearena": {
+        "value": 3850,
+        "unit": "score",
+        "source": "https://www.phonearena.com/news/I-tested-the-iPhone-18-Pro-Maxs-A20-Pro-performance-against-the-Galaxy-S26-Ultra_id183453",
+        "status": "confirmed",
+        "notes": "Same Steel Nomad Light protocol as S26 Ultra 2761 and (via 17T review) Xiaomi 2476."
+      },
+      "3dmark_snl_low_phonearena": {
+        "value": 2443,
+        "unit": "score",
+        "source": "https://www.phonearena.com/news/I-tested-the-iPhone-18-Pro-Maxs-A20-Pro-performance-against-the-Galaxy-S26-Ultra_id183453",
+        "status": "confirmed"
+      },
+      "3dmark_wle_high_phonearena": {
+        "value": null,
+        "unit": "score",
+        "source": "https://www.phonearena.com/reviews/xiaomi-17t-pro-review_id7943",
+        "status": "unknown",
+        "notes": "Not in the 17T review same-table set used for Xiaomi vs Ultra."
+      }
+    },
+    "galaxy_s26_ultra": {
+      "name": {
+        "value": "Samsung Galaxy S26 Ultra",
+        "unit": null,
+        "source": "https://news.samsung.com/global/samsung-unveils-galaxy-s26-series-the-most-intuitive-galaxy-ai-phone-yet",
+        "status": "confirmed"
+      },
+      "soc": {
+        "value": "Snapdragon 8 Elite Gen 5 Mobile Platform for Galaxy",
+        "unit": null,
+        "source": "https://www.qualcomm.com/snapdragon/news/just-announced--the-samsung-galaxy-s26-series--powered-by-snapdr.md",
+        "status": "confirmed",
+        "notes": "Qualcomm: 3rd-gen Oryon; global Ultra SKU."
+      },
+      "cpu_clocks_official": {
+        "value": "octa-core 4.74 GHz and 3.6 GHz",
+        "unit": "GHz",
+        "source": "https://news.samsung.com/global/samsung-unveils-galaxy-s26-series-the-most-intuitive-galaxy-ai-phone-yet",
+        "status": "confirmed",
+        "notes": "Samsung official wording of the two published cluster speeds. Full core-count split beyond octa-core not copied here without a more detailed official table."
+      },
+      "gpu_notebookcheck": {
+        "value": "Adreno 840 at 1300 MHz",
+        "unit": "MHz",
+        "source": "https://www.notebookcheck.net/Blocks-prying-eyes-Samsung-Galaxy-S26-Ultra-review.1278349.0.html",
+        "status": "confirmed",
+        "notes": "Review measurement/identification, not a Qualcomm public GPU-clock citation."
+      },
+      "process": {
+        "value": null,
+        "unit": null,
+        "source": "https://www.qualcomm.com/snapdragon/news/just-announced--the-samsung-galaxy-s26-series--powered-by-snapdr.md",
+        "status": "unknown",
+        "notes": "Do not invent a foundry/node for the Galaxy SKU without a Qualcomm official citation."
+      },
+      "os": {
+        "value": "Android 16, One UI 8.5",
+        "unit": null,
+        "source": "https://news.samsung.com/global/samsung-unveils-galaxy-s26-series-the-most-intuitive-galaxy-ai-phone-yet",
+        "status": "confirmed"
+      },
+      "price_europe_list_nbc": {
+        "value": 1449,
+        "unit": "EUR",
+        "source": "https://www.notebookcheck.net/Blocks-prying-eyes-Samsung-Galaxy-S26-Ultra-review.1278349.0.html",
+        "status": "confirmed",
+        "notes": "European list price as stated in Notebookcheck's review context."
+      },
+      "price_us_official_msrp": {
+        "value": null,
+        "unit": "USD",
+        "source": null,
+        "status": "unknown",
+        "notes": "Official Samsung U.S. MSRP not independently fetched in this compilation. NBC street prices as of 2026-11-12: about $1048 (256 GB) / $1282 (512 GB) — street, not MSRP."
+      },
+      "price_us_street_256_nbc": {
+        "value": 1048,
+        "unit": "USD",
+        "source": "https://www.notebookcheck.net/Blocks-prying-eyes-Samsung-Galaxy-S26-Ultra-review.1278349.0.html",
+        "status": "unconfirmed",
+        "notes": "Street price cited by Notebookcheck as of 12 Nov 2026, not official MSRP."
+      },
+      "price_us_street_512_nbc": {
+        "value": 1282,
+        "unit": "USD",
+        "source": "https://www.notebookcheck.net/Blocks-prying-eyes-Samsung-Galaxy-S26-Ultra-review.1278349.0.html",
+        "status": "unconfirmed"
+      },
+      "height_mm": {
+        "value": 163.6,
+        "unit": "mm",
+        "source": "https://news.samsung.com/global/samsung-unveils-galaxy-s26-series-the-most-intuitive-galaxy-ai-phone-yet",
+        "status": "confirmed"
+      },
+      "width_mm": {
+        "value": 78.1,
+        "unit": "mm",
+        "source": "https://news.samsung.com/global/samsung-unveils-galaxy-s26-series-the-most-intuitive-galaxy-ai-phone-yet",
+        "status": "confirmed"
+      },
+      "thickness_mm": {
+        "value": 7.9,
+        "unit": "mm",
+        "source": "https://news.samsung.com/global/samsung-unveils-galaxy-s26-series-the-most-intuitive-galaxy-ai-phone-yet",
+        "status": "confirmed"
+      },
+      "weight_g": {
+        "value": 214,
+        "unit": "g",
+        "source": "https://news.samsung.com/global/samsung-unveils-galaxy-s26-series-the-most-intuitive-galaxy-ai-phone-yet",
+        "status": "confirmed"
+      },
+      "display_size_in": {
+        "value": 6.9,
+        "unit": "in",
+        "source": "https://news.samsung.com/global/samsung-unveils-galaxy-s26-series-the-most-intuitive-galaxy-ai-phone-yet",
+        "status": "confirmed"
+      },
+      "display_resolution_px": {
+        "value": "3120x1440",
+        "unit": "px",
+        "source": "https://news.samsung.com/global/samsung-unveils-galaxy-s26-series-the-most-intuitive-galaxy-ai-phone-yet",
+        "status": "confirmed",
+        "notes": "QHD+ Dynamic AMOLED 2X."
+      },
+      "display_refresh_hz": {
+        "value": "1-120",
+        "unit": "Hz",
+        "source": "https://news.samsung.com/global/samsung-unveils-galaxy-s26-series-the-most-intuitive-galaxy-ai-phone-yet",
+        "status": "confirmed"
+      },
+      "brightness_peak_nits_official_uk": {
+        "value": 2600,
+        "unit": "nits",
+        "source": "https://www.samsung.com/uk/smartphones/galaxy-s26-ultra/",
+        "status": "confirmed",
+        "notes": "Samsung UK official peak. Not the same test as Xiaomi 3500 UHBM or Apple 3000 outdoor."
+      },
+      "brightness_peak_nits_nbc_measured": {
+        "value": 1424,
+        "unit": "cd/m2",
+        "source": "https://www.notebookcheck.net/Blocks-prying-eyes-Samsung-Galaxy-S26-Ultra-review.1278349.0.html",
+        "status": "confirmed"
+      },
+      "ip_rating": {
+        "value": "IP68 1.5 m / 30 min",
+        "unit": null,
+        "source": "https://news.samsung.com/global/samsung-unveils-galaxy-s26-series-the-most-intuitive-galaxy-ai-phone-yet",
+        "status": "confirmed"
+      },
+      "glass": {
+        "value": "Gorilla Glass Armor 2",
+        "unit": null,
+        "source": "https://www.notebookcheck.net/Blocks-prying-eyes-Samsung-Galaxy-S26-Ultra-review.1278349.0.html",
+        "status": "confirmed",
+        "notes": "From Notebookcheck review identification."
+      },
+      "ram_gb": {
+        "value": "12 (256/512 GB SKUs) or 16 (1 TB, market-dependent)",
+        "unit": "GB",
+        "source": "https://news.samsung.com/global/samsung-unveils-galaxy-s26-series-the-most-intuitive-galaxy-ai-phone-yet",
+        "status": "confirmed"
+      },
+      "storage": {
+        "value": "256/512/1024 GB; NBC unit was UFS 4.0",
+        "unit": null,
+        "source": "https://www.notebookcheck.net/Blocks-prying-eyes-Samsung-Galaxy-S26-Ultra-review.1278349.0.html",
+        "status": "confirmed",
+        "notes": "Do not assume UFS 4.1 across all SKUs."
+      },
+      "usb": {
+        "value": "USB 3.2 (Notebookcheck)",
+        "unit": null,
+        "source": "https://www.notebookcheck.net/Blocks-prying-eyes-Samsung-Galaxy-S26-Ultra-review.1278349.0.html",
+        "status": "confirmed"
+      },
+      "battery_typical_mah": {
+        "value": 5000,
+        "unit": "mAh",
+        "source": "https://news.samsung.com/global/samsung-unveils-galaxy-s26-series-the-most-intuitive-galaxy-ai-phone-yet",
+        "status": "confirmed"
+      },
+      "battery_rated_mah": {
+        "value": 4855,
+        "unit": "mAh",
+        "source": "https://news.samsung.com/global/samsung-unveils-galaxy-s26-series-the-most-intuitive-galaxy-ai-phone-yet",
+        "status": "confirmed"
+      },
+      "charging_wired": {
+        "value": "Up to 75% in ~30 min with 60 W adapter (sold separately)",
+        "unit": null,
+        "source": "https://news.samsung.com/global/samsung-unveils-galaxy-s26-series-the-most-intuitive-galaxy-ai-phone-yet",
+        "status": "confirmed",
+        "notes": "NBC: up to 60 W wired, full charge <1 h."
+      },
+      "charging_wireless_w_nbc": {
+        "value": 25,
+        "unit": "W",
+        "source": "https://www.notebookcheck.net/Blocks-prying-eyes-Samsung-Galaxy-S26-Ultra-review.1278349.0.html",
+        "status": "confirmed",
+        "notes": "Super Fast Wireless / WPC; Wireless PowerShare official."
+      },
+      "endurance_official_video_h": {
+        "value": 31,
+        "unit": "h",
+        "source": "https://news.samsung.com/global/samsung-unveils-galaxy-s26-series-the-most-intuitive-galaxy-ai-phone-yet",
+        "status": "confirmed",
+        "notes": "Samsung official video-playback claim; methodology differs from Apple and GSMArena."
+      },
+      "endurance_engadget_local_video": {
+        "value": "30:03",
+        "unit": "h:mm",
+        "source": "https://www.engadget.com/mobile/smartphones/samsung-galaxy-s26-ultra-review-the-stealth-upgrade-140000629.html",
+        "status": "confirmed"
+      },
+      "camera_main": {
+        "value": "200 MP wide f/1.4",
+        "unit": null,
+        "source": "https://news.samsung.com/global/samsung-unveils-galaxy-s26-series-the-most-intuitive-galaxy-ai-phone-yet",
+        "status": "confirmed"
+      },
+      "camera_tele_5x": {
+        "value": "50 MP 5x optical f/2.9 (10x optical-quality)",
+        "unit": null,
+        "source": "https://news.samsung.com/global/samsung-unveils-galaxy-s26-series-the-most-intuitive-galaxy-ai-phone-yet",
+        "status": "confirmed"
+      },
+      "camera_tele_3x": {
+        "value": "10 MP 3x f/2.4",
+        "unit": null,
+        "source": "https://news.samsung.com/global/samsung-unveils-galaxy-s26-series-the-most-intuitive-galaxy-ai-phone-yet",
+        "status": "confirmed"
+      },
+      "camera_uw": {
+        "value": "50 MP f/1.9",
+        "unit": null,
+        "source": "https://news.samsung.com/global/samsung-unveils-galaxy-s26-series-the-most-intuitive-galaxy-ai-phone-yet",
+        "status": "confirmed"
+      },
+      "camera_front": {
+        "value": "12 MP f/2.2",
+        "unit": null,
+        "source": "https://news.samsung.com/global/samsung-unveils-galaxy-s26-series-the-most-intuitive-galaxy-ai-phone-yet",
+        "status": "confirmed"
+      },
+      "video_max": {
+        "value": "8K30",
+        "unit": null,
+        "source": "https://news.samsung.com/global/samsung-unveils-galaxy-s26-series-the-most-intuitive-galaxy-ai-phone-yet",
+        "status": "confirmed"
+      },
+      "geekbench6_single_phonearena": {
+        "value": 3753,
+        "unit": "score",
+        "source": "https://www.phonearena.com/reviews/xiaomi-17t-pro-review_id7943",
+        "status": "confirmed",
+        "notes": "Same-lab GB6 vs 17T Pro 2903."
+      },
+      "geekbench6_multi_phonearena": {
+        "value": 11259,
+        "unit": "score",
+        "source": "https://www.phonearena.com/reviews/xiaomi-17t-pro-review_id7943",
+        "status": "confirmed"
+      },
+      "3dmark_wle_high_phonearena": {
+        "value": 7801,
+        "unit": "score",
+        "source": "https://www.phonearena.com/reviews/xiaomi-17t-pro-review_id7943",
+        "status": "confirmed"
+      },
+      "3dmark_wle_low_phonearena": {
+        "value": 3741,
+        "unit": "score",
+        "source": "https://www.phonearena.com/reviews/xiaomi-17t-pro-review_id7943",
+        "status": "confirmed"
+      },
+      "3dmark_snl_high_phonearena": {
+        "value": 2761,
+        "unit": "score",
+        "source": "https://www.phonearena.com/reviews/xiaomi-17t-pro-review_id7943",
+        "status": "confirmed"
+      },
+      "3dmark_snl_low_phonearena": {
+        "value": 1498,
+        "unit": "score",
+        "source": "https://www.phonearena.com/reviews/xiaomi-17t-pro-review_id7943",
+        "status": "confirmed",
+        "notes": "Trails 17T Pro Low 1871 in the same lab; trails iPhone 18 Pro Max 2443."
+      },
+      "wifi": {
+        "value": "Wi-Fi 7, Bluetooth 6.0",
+        "unit": null,
+        "source": "https://news.samsung.com/global/samsung-unveils-galaxy-s26-series-the-most-intuitive-galaxy-ai-phone-yet",
+        "status": "confirmed"
+      }
+    },
+    "scoreboard": {
+      "price_documented_official": {
+        "value": "xiaomi_17t_pro",
+        "unit": null,
+        "source": "https://www.notebookcheck.net/Xiaomi-launches-new-flagship-smartphone-with-Leica-tuned-cameras-and-Dimensity-9500-chipset.1308049.0.html",
+        "status": "confirmed",
+        "notes": "Europe €899.90 vs iPhone official $1299 vs S26 European list €1449 (NBC). U.S. Xiaomi MSRP unknown; S26 U.S. official MSRP unknown."
+      },
+      "weight_thickness": {
+        "value": "galaxy_s26_ultra",
+        "unit": null,
+        "source": "https://news.samsung.com/global/samsung-unveils-galaxy-s26-series-the-most-intuitive-galaxy-ai-phone-yet",
+        "status": "confirmed"
+      },
+      "display_resolution": {
+        "value": "galaxy_s26_ultra",
+        "unit": null,
+        "source": "https://news.samsung.com/global/samsung-unveils-galaxy-s26-series-the-most-intuitive-galaxy-ai-phone-yet",
+        "status": "confirmed"
+      },
+      "max_refresh_hz": {
+        "value": "xiaomi_17t_pro",
+        "unit": null,
+        "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+        "status": "confirmed"
+      },
+      "official_peak_nits_vendor_mixed": {
+        "value": "xiaomi_17t_pro",
+        "unit": null,
+        "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+        "status": "confirmed",
+        "notes": "Vendor figures use different tests; independent measurements (GSMA 1069, NBC 1424) are not a three-way winner."
+      },
+      "ip_lab_depth": {
+        "value": "iphone_18_pro_max",
+        "unit": null,
+        "source": "https://www.apple.com/iphone-18-pro/specs/",
+        "status": "confirmed"
+      },
+      "geekbench6_cpu_phonearena": {
+        "value": "galaxy_s26_ultra",
+        "unit": null,
+        "source": "https://www.phonearena.com/reviews/xiaomi-17t-pro-review_id7943",
+        "status": "confirmed",
+        "notes": "vs Xiaomi only; iPhone GB6 same-lab not ranked."
+      },
+      "3dmark_snl_peak": {
+        "value": "iphone_18_pro_max",
+        "unit": null,
+        "source": "https://www.phonearena.com/news/I-tested-the-iPhone-18-Pro-Maxs-A20-Pro-performance-against-the-Galaxy-S26-Ultra_id183453",
+        "status": "confirmed"
+      },
+      "3dmark_snl_sustained": {
+        "value": "iphone_18_pro_max",
+        "unit": null,
+        "source": "https://www.phonearena.com/news/I-tested-the-iPhone-18-Pro-Maxs-A20-Pro-performance-against-the-Galaxy-S26-Ultra_id183453",
+        "status": "confirmed",
+        "notes": "Xiaomi Low 1871 beats S26 Ultra 1498 but loses to iPhone 2443."
+      },
+      "battery_capacity_mah": {
+        "value": "xiaomi_17t_pro",
+        "unit": null,
+        "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+        "status": "confirmed",
+        "notes": "Apple mAh unknown."
+      },
+      "official_charge_watts": {
+        "value": "xiaomi_17t_pro",
+        "unit": null,
+        "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+        "status": "confirmed"
+      },
+      "usb_data": {
+        "value": "iphone_18_pro_max / galaxy_s26_ultra",
+        "unit": null,
+        "source": "https://www.apple.com/iphone-18-pro/specs/",
+        "status": "confirmed",
+        "notes": "Xiaomi loss if USB 2.0 (FAQ cable / GSMArena)."
+      },
+      "storage_max": {
+        "value": "iphone_18_pro_max",
+        "unit": null,
+        "source": "https://www.apple.com/iphone-18-pro/specs/",
+        "status": "confirmed"
+      },
+      "uw_resolution": {
+        "value": "iphone_18_pro_max / galaxy_s26_ultra",
+        "unit": null,
+        "source": "https://www.apple.com/iphone-18-pro/specs/",
+        "status": "confirmed"
+      },
+      "front_camera_mp": {
+        "value": "xiaomi_17t_pro",
+        "unit": null,
+        "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+        "status": "confirmed"
+      },
+      "video_8k_checkbox": {
+        "value": "xiaomi_17t_pro and galaxy_s26_ultra",
+        "unit": null,
+        "source": "https://www.mi.com/global/product/xiaomi-17t-pro/specs/",
+        "status": "confirmed"
+      },
+      "mmwave_us": {
+        "value": "iphone_18_pro_max",
+        "unit": null,
+        "source": "https://www.apple.com/iphone-18-pro/specs/",
+        "status": "confirmed"
+      }
+    }
+  }
+}
