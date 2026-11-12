@@ -431,26 +431,35 @@ export function buildCell(materials) {
   return group;
 }
 
-export function buildFinfet(materials) {
+export function buildFinfet(materials, opts = {}) {
   const specs = getSpecs();
-  const pitch = specs.soc.process_n3e_cpp_nm.value;
+  const citedPitch = specs.soc.process_n3e_cpp_nm.value;
   const metal = specs.soc.process_n3e_min_metal_pitch_nm.value;
+  const pitch = opts.pitchNm > 0 ? opts.pitchNm : citedPitch;
+  const finHeightNm = opts.finHeightNm > 0 ? opts.finHeightNm : 60;
+  const finThickNm = opts.finThickNm > 0 ? opts.finThickNm : 8;
+  const gateNm = opts.gateNm > 0 ? opts.gateNm : 20;
+  const eotNm = opts.eotNm > 0 ? opts.eotNm : 1;
+  const s = 0.08;
+  const gap = pitch * s;
+  const finLen = finHeightNm * s;
+  const finR = Math.max(0.06, finThickNm * s * 0.35);
+  const gateZ = Math.max(0.16, gateNm * s * 0.45);
+  const hkT = Math.max(0.05, eotNm * s * 0.35);
   const group = new THREE.Group();
   group.name = "finfet";
-  const u = 0.08;
-  const gap = pitch * u;
   for (let i = 0; i < 3; i++) {
     const x = (i - 1) * gap;
-    const fin = new THREE.Mesh(new THREE.CapsuleGeometry(0.22, 4.8, 6, 10), materials.silicon);
+    const fin = new THREE.Mesh(new THREE.CapsuleGeometry(finR, finLen, 6, 10), materials.silicon);
     fin.position.set(x, 0.4, 0);
     group.add(fin);
-    group.add(box(0.7, 0.55, 0.7, materials.gold, x, -1.6, 1.1));
-    group.add(box(0.7, 0.55, 0.7, materials.gold, x, -1.6, -1.1));
-    group.add(box(0.55, 1.5, 0.28, materials.hik, x, 1.15, 0));
-    group.add(box(0.7, 1.7, 0.45, materials.frame, x, 1.35, 0));
+    group.add(box(finR * 3, 0.55, 0.7, materials.gold, x, -1.6, finLen * 0.22));
+    group.add(box(finR * 3, 0.55, 0.7, materials.gold, x, -1.6, -finLen * 0.22));
+    group.add(box(finR * 2.4, finLen * 0.42, hkT, materials.hik, x, finLen * 0.22, 0));
+    group.add(box(finR * 2.8, finLen * 0.48, gateZ, materials.frame, x, finLen * 0.24, 0));
   }
   for (let i = 0; i < 5; i++) {
-    group.add(box(metal * u * 0.7, 0.12, 6.2, materials.copper, 0, 2.5 + i * (metal / pitch) * 0.9, 0));
+    group.add(box((metal / citedPitch) * 1.4, 0.12, gap * 2.2, materials.copper, 0, finLen * 0.55 + i * 0.28, 0));
   }
   return group;
 }

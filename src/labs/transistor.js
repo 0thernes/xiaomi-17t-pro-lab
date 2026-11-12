@@ -3,6 +3,7 @@ import { doubleGateScaleLength, potentialDecay, shortChannelRatio } from "../sim
 import { energyAtAlphaA, kronigPenneyRhs, scanBands } from "../sim/kronig.js";
 import { infiniteWellAnalyticEv, infiniteWellEnergies } from "../sim/schrodinger.js";
 import { siliconNearestNeighbor } from "../sim/device-math.js";
+import { getSpecs } from "../specs.js";
 import { el, kv, note, panel } from "../dom.js";
 import { fmt } from "../format.js";
 import { provCited, provComputed } from "../provenance.js";
@@ -12,12 +13,17 @@ import { buildFinfet, makeMaterials, mountView } from "../graphics/view.js";
 const NIST = "https://physics.nist.gov/cuu/pdf/xray_2018.pdf";
 
 export async function mount(main, ctx = {}) {
+  const citedPitch = getSpecs().soc.process_n3e_cpp_nm.value;
   const length = range("Well width nm", 1, 6, 0.1, 2);
   const points = range("Interior points", 24, 64, 4, 40);
   const barrier = range("Kronig–Penney P", 0, 6, 0.1, 2);
-  const fin = range("Illustrative fin thickness nm", 4, 20, 0.5, 8);
-  const eot = range("Illustrative EOT nm", 0.5, 3, 0.1, 1);
-  const gate = range("Illustrative gate length nm", 8, 40, 1, 20);
+  const pitch = range("Gate pitch nm", 24, 80, 1, citedPitch);
+  const height = range("Fin height nm, drawing, not cited", 20, 90, 1, 60);
+  const fin = range("Fin thickness nm, drawing, not cited", 4, 20, 0.5, 8);
+  const eot = range("EOT nm, drawing, not cited", 0.5, 3, 0.1, 1);
+  const gate = range("Gate length nm, drawing, not cited", 8, 40, 1, 20);
+  const reset = el("button", { type: "button" }, [`Reset pitch to ${citedPitch} nm`]);
+  const drawing = await transistorStage(ctx.cap);
   const wellHost = el("div");
   const bandHost = el("div");
   const finHost = el("div");
@@ -28,7 +34,15 @@ export async function mount(main, ctx = {}) {
     el("p", { class: "lede" }, [
       "A finite-difference Schrödinger well, a Dirac-comb Kronig–Penney scan, and a double-gate scale length. TSMC N3P is FinFET. Fin height, fin count, and the high-k stack of this tapeout are UNKNOWN. The sliders are a model, not a TEM of the 9500.",
     ]),
-    panel("Drawing", [await transistorStage(ctx.cap)]),
+    panel("Drawing", [
+      note(
+        `${citedPitch} nm is the cited N3E contacted-poly pitch. Reset restores that pitch. Fin height, fin thickness, EOT, and gate length are a drawing. They are not a TEM of this die.`,
+      ),
+      pitch.node,
+      height.node,
+      reset,
+      drawing.node,
+    ]),
     panel("1D infinite well", [length.node, points.node, wellHost]),
     panel("Kronig–Penney", [barrier.node, bandHost]),
     panel("FinFET electrostatics", [fin.node, eot.node, gate.node, finHost, plotHost]),
@@ -117,28 +131,60 @@ export async function mount(main, ctx = {}) {
         "Double-gate formula used as the sketch’s scale length. A real fin is gated on three sides; the N3P geometry is unpublished. SiO2 EOT stands in for an unknown high-k stack.",
       ),
     );
-    sketch.setState({ lambda, tSi, tOx, lg });
+    sketch.setState({ lambda, tSi, tOx, lg, finHeightNm: Number(height.input.value) });
+    drawing.setGeometry({
+      pitchNm: Number(pitch.input.value),
+      finHeightNm: Number(height.input.value),
+      finThickNm: tSi,
+      gateNm: lg,
+      eotNm: tOx,
+    });
   }
-  for (const control of [length, points, barrier, fin, eot, gate]) {
+  reset.addEventListener("click", () => {
+    pitch.input.value = String(citedPitch);
+    pitch.input.dispatchEvent(new Event("input"));
+  });
+  for (const control of [length, points, barrier, pitch, height, fin, eot, gate]) {
     control.input.addEventListener("input", recompute);
   }
   recompute();
-  return { dispose: () => sketch.dispose() };
+  return {
+    dispose() {
+      sketch.dispose();
+      drawing.dispose();
+    },
+  };
 }
 
 async function transistorStage(cap) {
   const stage = el("div", { class: "stage" });
   const canvas = el("canvas", { "aria-label": "FinFET drawing with source, drain, high-k wrap, and gate" });
   stage.append(canvas);
+  let view = null;
+  let materials = null;
+  let current = null;
   try {
-    const view = await mountView(canvas, cap || { tier: "medium", pixelRatio: 1 });
-    const mesh = buildFinfet(makeMaterials(cap?.tier || "medium"));
-    view.root.add(mesh);
-    view.frame(mesh, 0.8);
+    view = await mountView(canvas, cap || { tier: "medium", pixelRatio: 1 });
+    materials = makeMaterials(cap?.tier || "medium");
   } catch (error) {
     stage.append(note(error.message));
   }
-  return stage;
+  return {
+    node: stage,
+    setGeometry(params) {
+      if (!view || !materials) return;
+      if (current) {
+        view.root.remove(current);
+        current.traverse((child) => child.geometry?.dispose?.());
+      }
+      current = buildFinfet(materials, params);
+      view.root.add(current);
+      view.frame(current, 0.8);
+    },
+    dispose() {
+      view?.dispose();
+    },
+  };
 }
 
 function range(label, min, max, step, value) {
@@ -164,7 +210,7 @@ function drawFin(p, state) {
   const base = p.height - 36;
   const scale = 4;
   const finW = Math.min(80, state.tSi * scale);
-  const finH = 110;
+  const finH = 40 + (state.finHeightNm || 60) * 1.2;
   p.noStroke();
   p.fill("#3a3d32");
   p.rect(40, base, p.width - 80, 16);

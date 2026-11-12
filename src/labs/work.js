@@ -1,7 +1,7 @@
 import { el, kv, note, panel } from "../dom.js";
 import { fmt } from "../format.js";
 import { provComputed, provMeasured } from "../provenance.js";
-import { dopri54, lorenzDeriv, rk4, robertsonDeriv, vanDerPolDeriv } from "../sim/ode.js";
+import { dopri54, lorenzDeriv, rk4Step, robertsonDeriv, vanDerPolDeriv } from "../sim/ode.js";
 import { makeMaterials, mountView } from "../graphics/view.js";
 import * as THREE from "three";
 
@@ -49,7 +49,7 @@ async function mountGame(host, cap) {
   host.replaceChildren(
     panel("Gaming stress", [
       note(
-        "One instanced mesh. Draw calls stay in the tens. Frame time is measured here, not claimed as a 144 Hz phone mode.",
+        "One instanced mesh of this page. The millisecond figure is the live requestAnimationFrame interval. It is not a game and it is not a 144 Hz claim.",
       ),
       stage,
       readout,
@@ -79,6 +79,7 @@ async function mountGame(host, cap) {
   }
   view.root.add(mesh);
   view.look(22);
+  const history = [];
   view.setFrame((now) => {
     const t = now * 0.001;
     for (let i = 0; i < count; i++) {
@@ -89,7 +90,11 @@ async function mountGame(host, cap) {
       mesh.setMatrixAt(i, dummy.matrix);
     }
     mesh.instanceMatrix.needsUpdate = true;
-    readout.textContent = `${view.frameMs.toFixed(1)} ms · ${count} instances · 1 instanced draw`;
+    history.push(view.frameMs);
+    if (history.length > 48) history.shift();
+    const min = Math.min(...history);
+    const max = Math.max(...history);
+    readout.textContent = `live ${view.frameMs.toFixed(1)} ms · last ${history.length} frames ${min.toFixed(1)}–${max.toFixed(1)} ms · ${count} instances · 1 instanced draw`;
   });
   return () => view.dispose();
 }
@@ -116,10 +121,14 @@ function mountLlm(host) {
     const prompt = "Once upon a time";
     const ids = tokenizer.encode(prompt);
     const genT = performance.now();
-    const produced = greedyTokens(weights, ids, 8);
+    const trace = [];
+    const produced = greedyTokens(weights, ids, 8, trace);
     const seconds = (performance.now() - genT) / 1000;
-    log.textContent = prompt + tokenizer.decode(produced);
-    out.textContent = `${fmt(produced.length / seconds, 3)} tokens/s greedy after load (${fmt((performance.now() - t0) / 1000, 3)} s including weights). JavaScript, not the NPU.`;
+    log.textContent = [
+      prompt,
+      ...produced.map((id, i) => `${tokenizer.decode([id])}   ${trace[i].toFixed(2)} ms`),
+    ].join("\n");
+    out.textContent = `${fmt(produced.length / seconds, 3)} tokens/s over the greedy loop (${fmt(seconds, 3)} s, load ${fmt((performance.now() - t0) / 1000, 3)} s). Each line is one argmax timed inside that loop. Not a server stream. Not the NPU.`;
     button.disabled = false;
   });
   host.replaceChildren(
@@ -153,10 +162,13 @@ async function mountLife(host) {
   const GL = run();
   const creature = new GL.Glitchling(1, GL.DEFAULT_FLAWS);
   const ctx = canvas.getContext("2d");
+  const trail = [];
   let alive = true;
   function frame() {
     if (!alive) return;
     for (let i = 0; i < 4; i++) creature.step();
+    trail.push(creature.pos.x, creature.pos.y);
+    if (trail.length > 48) trail.splice(0, 2);
     ctx.fillStyle = "#100e0c";
     ctx.fillRect(0, 0, 320, 320);
     for (let k = 0; k < GL.SITES; k++) {
@@ -166,11 +178,20 @@ async function mountLife(host) {
       ctx.arc(p.x * 320, p.y * 320, 10, 0, Math.PI * 2);
       ctx.fill();
     }
+    ctx.strokeStyle = "#f6efe6";
+    ctx.beginPath();
+    for (let i = 0; i < trail.length; i += 2) {
+      const x = trail[i] * 320;
+      const y = trail[i + 1] * 320;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
     ctx.fillStyle = "#f6efe6";
     ctx.beginPath();
     ctx.arc(creature.pos.x * 320, creature.pos.y * 320, 8, 0, Math.PI * 2);
     ctx.fill();
-    status.textContent = `tick ${creature.t} foraged ${creature.foraged} rewards ${creature.rewards} glucose ${creature.glc.toFixed(2)}`;
+    status.textContent = `live · 4 step() calls this frame · tick ${creature.t} foraged ${creature.foraged} rewards ${creature.rewards} glucose ${creature.glc.toFixed(2)}`;
     requestAnimationFrame(frame);
   }
   frame();
@@ -180,36 +201,96 @@ async function mountLife(host) {
 }
 
 function mountSci(host) {
-  const lorenz = rk4(lorenzDeriv(), [1, 1, 1], { t1: 2, dt: 0.01 });
-  const stiff = dopri54(robertsonDeriv, [1, 0, 0], { t1: 1, dt: 0.01, tol: 1e-5 });
-  const vdp = dopri54(vanDerPolDeriv(8), [2, 0], { t1: 5, dt: 0.05, tol: 1e-4 });
+  const status = el("p", { class: "status" }, ["Integrating Lorenz with RK4…"]);
+  const canvas = el("canvas", { width: "640", height: "280", "aria-label": "Live Lorenz trajectory from RK4" });
+  const rest = el("div");
   host.replaceChildren(
     panel("Differential equations", [
       note(
-        "RK4 and Dormand–Prince 5(4), written for this page. Lorenz is the chaotic case. Robertson is the stiff case. The ideas sit next to moonlab, tsotchke-chaos, eshkol, and the PINN work; those solvers are not copied.",
+        "RK4 and Dormand–Prince 5(4), written for this page. The curve is this tab’s own steps, drawn as they are accepted. Lorenz runs first. Robertson and Van der Pol run when it finishes. The ideas sit next to moonlab, tsotchke-chaos, eshkol, and the PINN work; those solvers are not copied.",
       ),
-      kv(
-        "Lorenz RK4",
-        el("span", {}, [
-          `${lorenz.steps} steps, y0=${fmt(lorenz.y[0], 4)} `,
-          provComputed("classic RK4, dt=0.01, t=2"),
-        ]),
-      ),
-      kv(
-        "Robertson DOPRI",
-        el("span", {}, [
-          `${stiff.accepted} accepted / ${stiff.steps} tries, y1=${fmt(stiff.y[0], 4)} `,
-          provComputed("Dormand–Prince 5(4), tol 1e-5"),
-        ]),
-      ),
-      kv(
-        "Van der Pol",
-        el("span", {}, [`${vdp.accepted} accepted, y=${fmt(vdp.y[0], 4)} `, provComputed("μ=8, adaptive")]),
-      ),
-      kv("Measured", el("span", {}, ["the step counts above ", provMeasured("this JavaScript process")])),
+      canvas,
+      status,
+      rest,
     ]),
   );
-  return () => {};
+  const deriv = lorenzDeriv();
+  let y = new Float64Array([1, 1, 1]);
+  let t = 0;
+  const dt = 0.01;
+  const t1 = 8;
+  const pts = [];
+  const ctx = canvas.getContext("2d");
+  let alive = true;
+  let finished = false;
+  function draw() {
+    ctx.fillStyle = "#100e0c";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    if (pts.length < 2) return;
+    let minX = Infinity;
+    let maxX = -Infinity;
+    let minZ = Infinity;
+    let maxZ = -Infinity;
+    for (const p of pts) {
+      if (p[0] < minX) minX = p[0];
+      if (p[0] > maxX) maxX = p[0];
+      if (p[1] < minZ) minZ = p[1];
+      if (p[1] > maxZ) maxZ = p[1];
+    }
+    const pad = 16;
+    const sx = maxX - minX || 1;
+    const sz = maxZ - minZ || 1;
+    ctx.strokeStyle = "#ff7a1a";
+    ctx.beginPath();
+    for (let i = 0; i < pts.length; i++) {
+      const x = pad + ((pts[i][0] - minX) / sx) * (canvas.width - pad * 2);
+      const z = pad + ((pts[i][1] - minZ) / sz) * (canvas.height - pad * 2);
+      if (i === 0) ctx.moveTo(x, z);
+      else ctx.lineTo(x, z);
+    }
+    ctx.stroke();
+  }
+  function frame() {
+    if (!alive) return;
+    if (t < t1) {
+      for (let i = 0; i < 6 && t < t1; i++) {
+        y = rk4Step(deriv, y, t, dt);
+        t += dt;
+        pts.push([y[0], y[2]]);
+      }
+      draw();
+      status.textContent = `Lorenz RK4 live. t=${t.toFixed(2)} / ${t1}, ${pts.length} steps, dt=${dt}. x versus z. This tab, not a recording.`;
+      requestAnimationFrame(frame);
+      return;
+    }
+    if (!finished) {
+      finished = true;
+      const stiff = dopri54(robertsonDeriv, [1, 0, 0], { t1: 1, dt: 0.01, tol: 1e-5 });
+      const vdp = dopri54(vanDerPolDeriv(8), [2, 0], { t1: 5, dt: 0.05, tol: 1e-4 });
+      status.textContent = `Lorenz RK4 finished. ${pts.length} steps, y0=${y[0].toFixed(4)}. Robertson and Van der Pol ran in this turn.`;
+      rest.replaceChildren(
+        kv(
+          "Robertson DOPRI",
+          el("span", {}, [
+            `${stiff.accepted} accepted / ${stiff.steps} tries, y1=${fmt(stiff.y[0], 4)} `,
+            provComputed("Dormand–Prince 5(4), tol 1e-5, after Lorenz"),
+          ]),
+        ),
+        kv(
+          "Van der Pol",
+          el("span", {}, [
+            `${vdp.accepted} accepted, y=${fmt(vdp.y[0], 4)} `,
+            provComputed("μ=8, adaptive, after Lorenz"),
+          ]),
+        ),
+        kv("Measured", el("span", {}, ["the counts above ", provMeasured("this JavaScript process")])),
+      );
+    }
+  }
+  frame();
+  return () => {
+    alive = false;
+  };
 }
 
 function mountBrowser(host) {

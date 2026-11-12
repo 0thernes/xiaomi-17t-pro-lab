@@ -176,15 +176,17 @@ export function createStream(weights) {
 }
 
 /** Greedy continuation. `promptIds` are consumed first; their last hidden state predicts the next token. */
-export function greedyTokens(weights, promptIds, count) {
+export function greedyTokens(weights, promptIds, count, trace) {
   const stream = createStream(weights);
   let hidden = null;
   for (const id of promptIds) hidden = stream.step(id);
   const produced = [];
   for (let i = 0; i < count; i++) {
+    const started = performance.now();
     const next = stream.argmax(hidden);
     produced.push(next);
     hidden = stream.step(next);
+    if (trace) trace.push(performance.now() - started);
   }
   return produced;
 }
