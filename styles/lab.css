@@ -341,6 +341,19 @@ h2 {
   display: block;
   touch-action: none;
 }
+.viewport-error {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+  z-index: 3;
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #3a1612;
+  color: #ffd2c8;
+  font-size: 0.95rem;
+}
 .stage-caption {
   position: absolute;
   left: var(--s-4);

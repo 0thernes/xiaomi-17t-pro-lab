@@ -61,6 +61,28 @@ test("every route at a phone viewport", async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
+test("high tier hero is not a black canvas", async ({ page }) => {
+  const errors = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("/?tier=high#/");
+  await expect(page.locator("#main[data-ready='true'] canvas")).toBeVisible();
+  await page.waitForTimeout(800);
+  const brightest = await page.evaluate(() => {
+    const canvas = document.querySelector("canvas");
+    const probe = document.createElement("canvas");
+    probe.width = 48;
+    probe.height = 48;
+    const ctx = probe.getContext("2d", { willReadFrequently: true });
+    ctx.drawImage(canvas, 0, 0, 48, 48);
+    const data = ctx.getImageData(0, 0, 48, 48).data;
+    let max = 0;
+    for (let i = 0; i < data.length; i += 4) max = Math.max(max, data[i], data[i + 1], data[i + 2]);
+    return max;
+  });
+  expect(brightest).toBeGreaterThan(12);
+  expect(errors).toEqual([]);
+});
+
 test("WebGL2 matmul matches the CPU reference", async ({ page }) => {
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));

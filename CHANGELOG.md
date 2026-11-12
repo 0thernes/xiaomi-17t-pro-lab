@@ -18,6 +18,10 @@ Rebuild after v0.1 was rejected. The verified solvers stay. The shell, the model
 - Specs page lists the nine still-open leaves and conflicts 16–20.
 - `data/specs.json` replaced with the 2026-11-12 pass, including `confidence` where that pass recorded it.
 
+### Fixed
+
+- The high tier no longer opens on a black viewport. SSAO was the first post pass and only multiplied occlusion onto an empty buffer, so the product was black on every machine that measured a fast fill. The scene is drawn first. If a later pass still returns black, the page drops the chain and says so on the canvas.
+
 ### Changed
 
 - iPhone Geekbench 6.7 stays on its own row. It is Notebookcheck, not the PhoneArena table, and it is not divided into the Xiaomi score.

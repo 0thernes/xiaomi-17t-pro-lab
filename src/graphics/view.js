@@ -49,6 +49,7 @@ export async function mountView(canvas, cap) {
     antialias: cap.tier !== "low",
     alpha: false,
     powerPreference: "high-performance",
+    preserveDrawingBuffer: true,
   });
   renderer.setPixelRatio(cap.pixelRatio || 1);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -100,12 +101,14 @@ export async function mountView(canvas, cap) {
   floor.position.y = -86;
   floor.receiveShadow = true;
   scene.add(floor);
-  const composer = cap.tier === "low" ? null : makeComposer(renderer, scene, camera, cap);
+  let composer = cap.tier === "low" ? null : makeComposer(renderer, scene, camera, cap);
+  let droppedComposer = false;
   const root = new THREE.Group();
   scene.add(root);
   const orbit = attachOrbit(canvas, camera, cap.reducedMotion);
 
   let frame = 0;
+  let frames = 0;
   let last = performance.now();
   let frameMs = 16;
   let running = true;
@@ -132,8 +135,26 @@ export async function mountView(canvas, cap) {
     last = now;
     onFrame?.(now);
     if (!cap.reducedMotion && orbit.auto) orbit.spin(0.0016);
-    if (composer) composer.render();
-    else renderer.render(scene, camera);
+    try {
+      if (composer) composer.render();
+      else renderer.render(scene, camera);
+    } catch (error) {
+      composer = null;
+      renderer.setRenderTarget(null);
+      renderer.render(scene, camera);
+      reportViewport(canvas, `The post-process chain threw (${error.message}). Showing the scene directly.`);
+    }
+    frames += 1;
+    if (frames === 12 && composer && !droppedComposer && brightestPixel(renderer) < 12) {
+      droppedComposer = true;
+      composer = null;
+      renderer.setRenderTarget(null);
+      renderer.render(scene, camera);
+      reportViewport(
+        canvas,
+        "The post-process chain returned a black frame. Showing the scene without it. Reload if this stays empty.",
+      );
+    }
   }
   frame = requestAnimationFrame(loop);
 
@@ -196,6 +217,36 @@ export async function mountView(canvas, cap) {
   };
 }
 
+function brightestPixel(renderer) {
+  const gl = renderer.getContext();
+  const width = gl.drawingBufferWidth;
+  const height = gl.drawingBufferHeight;
+  if (!width || !height) return 0;
+  const pixel = new Uint8Array(4);
+  let max = 0;
+  for (const [x, y] of [
+    [0.5, 0.5],
+    [0.3, 0.4],
+    [0.7, 0.6],
+    [0.5, 0.75],
+    [0.5, 0.25],
+  ]) {
+    gl.readPixels((width * x) | 0, (height * y) | 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixel);
+    max = Math.max(max, pixel[0], pixel[1], pixel[2]);
+  }
+  return max;
+}
+
+function reportViewport(canvas, message) {
+  const host = canvas.parentElement;
+  if (!host || host.querySelector(".viewport-error")) return;
+  const note = document.createElement("p");
+  note.className = "viewport-error";
+  note.setAttribute("role", "alert");
+  note.textContent = message;
+  host.append(note);
+}
+
 function makeComposer(renderer, scene, camera, cap) {
   const samples = cap.tier === "ultra" ? 4 : cap.tier === "high" ? 4 : 2;
   let target;
@@ -205,18 +256,24 @@ function makeComposer(renderer, scene, camera, cap) {
     target = new THREE.WebGLRenderTarget(2, 2, { type: THREE.HalfFloatType, samples: 0 });
   }
   const composer = new EffectComposer(renderer, target);
+  // The beauty pass has to land in the buffer before SSAO. SSAOPass only
+  // multiplies its occlusion texture onto the read buffer (DST_COLOR, ZERO).
+  // With an empty read buffer that product is black, which is what the live
+  // page showed on every high tier.
+  composer.addPass(new RenderPass(scene, camera));
   if (cap.tier === "high" || cap.tier === "ultra") {
     try {
       const ssao = new SSAOPass(scene, camera, 512, 512, 16);
-      ssao.kernelRadius = 6;
-      ssao.minDistance = 0.0004;
-      ssao.maxDistance = 0.035;
+      ssao.kernelRadius = 8;
+      ssao.minDistance = 0.001;
+      ssao.maxDistance = 0.08;
+      // It writes into the read buffer in place. Swapping would hand the next
+      // pass the untouched black buffer.
+      ssao.needsSwap = false;
       composer.addPass(ssao);
-    } catch {
-      composer.addPass(new RenderPass(scene, camera));
+    } catch (error) {
+      console.warn("SSAO disabled", error);
     }
-  } else {
-    composer.addPass(new RenderPass(scene, camera));
   }
   const bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), 0.16, 0.35, 0.94);
   composer.addPass(bloom);
