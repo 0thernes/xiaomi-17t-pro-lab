@@ -5,17 +5,12 @@ import { provCited, provComputed } from "../provenance.js";
 import { fillUnit, matmulFp, matmulQuantized, mulberry32, quantizeSymmetricInt8, rmse } from "../sim/quant.js";
 import { engineLevels } from "../sim/taxonomy-walk.js";
 import { getSpecs, npuCounts } from "../specs.js";
-import { buildMac, makeMaterials, mountView } from "../graphics/view.js";
+import { mountExplore } from "./explore.js";
 
 export async function mount(main, { cap }) {
   const specs = getSpecs();
   const counts = npuCounts();
   const levels = engineLevels(taxonomy, "npu");
-  const stage = el("div", { class: "stage" });
-  const canvas = el("canvas", { "aria-label": "MAC array computing a quantized product in JavaScript" });
-  stage.append(canvas);
-  const rail = el("div", { class: "level-rail" });
-  const sheet = el("div");
   const n = 8;
   const rng = mulberry32(9);
   const A = fillUnit(n * n, rng);
@@ -26,41 +21,14 @@ export async function mount(main, { cap }) {
   const q = matmulQuantized(aq.q, aq.scale, bq.q, bq.scale, n);
   const error = rmse(fp, q);
 
-  let view = null;
-  try {
-    view = await mountView(canvas, cap);
-    const materials = makeMaterials(cap.tier);
-    view.root.add(buildMac(materials, n));
-    view.look(14);
-    let tick = 0;
-    view.setFrame(() => {
-      tick += 1;
-      if (tick % 20 !== 0) return;
-      const cell = view.root.getObjectByName(`mac-${tick % n}-${Math.floor(tick / n) % n}`);
-      if (cell?.material?.emissive) cell.material.emissive.setHex(tick % 2 ? 0xff7a1a : 0x221408);
-    });
-  } catch (err) {
-    stage.append(note(err.message));
-  }
-
-  for (const level of levels) {
-    const button = el("button", { type: "button" }, [level.name.slice(0, 32)]);
-    button.addEventListener("click", () => {
-      for (const item of rail.querySelectorAll("button"))
-        item.setAttribute("aria-pressed", item === button ? "true" : "false");
-      sheet.replaceChildren(panel(level.name, [el("p", {}, [level.facets.structure.text])]));
-    });
-    rail.append(button);
-  }
+  const explore = await mountExplore(cap, "npu", levels);
 
   main.replaceChildren(
     el("h1", {}, ["NPU"]),
     el("p", { class: "lede warn" }, [
       "These products run in JavaScript and WASM on the CPU thread this browser scheduled. They do not run on the MediaTek NPU 990 or the CIM Super Efficient NPU. A web page cannot dispatch to that accelerator.",
     ]),
-    stage,
-    rail,
-    sheet,
+    explore.node,
     panel("What was published", [
       kv("Structure", el("span", {}, [`${counts.mdla} MDLA + ${counts.mvpu} MVPU `, provCited(counts.entry)])),
       kv(
@@ -80,9 +48,5 @@ export async function mount(main, { cap }) {
       ),
     ]),
   );
-  return {
-    dispose() {
-      view?.dispose();
-    },
-  };
+  return { dispose: () => explore.dispose() };
 }

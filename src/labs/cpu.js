@@ -4,10 +4,9 @@ import { fmt, fmtBytes } from "../format.js";
 import { provCited, provComputed, provMeasured } from "../provenance.js";
 import { buildChase, timeChase } from "../sim/chase.js";
 import { chaseJumps, referenceMarks } from "../sim/cache-curve.js";
-import { createPipeline } from "../sim/pipeline.js";
 import { engineLevels } from "../sim/taxonomy-walk.js";
 import { getSpecs } from "../specs.js";
-import { buildBars, buildDie, makeMaterials, mountView } from "../graphics/view.js";
+import { mountExplore } from "./explore.js";
 
 const SIZES = [32 * 1024, 256 * 1024, 2 * 1024 * 1024, 8 * 1024 * 1024];
 
@@ -15,65 +14,7 @@ export async function mount(main, { cap }) {
   const specs = getSpecs();
   const levels = engineLevels(taxonomy, "cpu");
   const status = el("p", { class: "status", role: "status" }, ["Running the pointer chase…"]);
-  const stage = el("div", { class: "stage" });
-  const canvas = el("canvas", { "aria-label": "CPU die reconstruction and measured chase bars" });
-  stage.append(canvas);
-  const rail = el("div", { class: "level-rail" });
-  const sheet = el("div");
-  let view = null;
-  const materials = makeMaterials(cap.tier);
-  try {
-    view = await mountView(canvas, cap);
-    view.root.add(buildDie(materials));
-    view.look(80);
-  } catch (error) {
-    stage.append(note(error.message));
-  }
-
-  const pipeline = createPipeline(
-    [
-      { op: "load", dst: 1, addr: 0 },
-      { op: "add", dst: 2, a: 1, b: 1 },
-      { op: "add", dst: 3, a: 2, b: 1 },
-    ],
-    { loadLatency: 3 },
-  );
-  const pipeOut = el("p", { class: "mono" }, ["pipeline idle"]);
-  const stepButton = el("button", { type: "button", class: "primary" }, ["Step pipeline"]);
-  stepButton.addEventListener("click", () => {
-    const tick = pipeline.tick();
-    pipeOut.textContent = `cycle ${tick.cycle} stalls ${tick.stalls} retired ${tick.retired} ${tick.occupied.map((item) => item.stage + ":" + item.op).join(" ")}`;
-  });
-
-  function select(level) {
-    for (const button of rail.querySelectorAll("button")) {
-      button.setAttribute("aria-pressed", button.dataset.id === level.id ? "true" : "false");
-    }
-    const facet = level.facets.structure;
-    sheet.replaceChildren(
-      panel(level.name, [
-        el("p", {}, [facet.text]),
-        provCited({ status: facet.status, value: facet.text, source: facet.source || "" }),
-        level.id === "cpu_l8_fu" || level.id === "cpu_l7_frontend" ? el("div", {}, [stepButton, pipeOut]) : null,
-        note(
-          "The pipeline is a five-stage in-order teaching model. It is not the unpublished C1 microarchitecture. L1 sizes below are the Arm manual figures in specs.json.",
-        ),
-      ]),
-    );
-    if (view && (level.id === "cpu_l5_cores" || level.id === "cpu_l4_dsu")) {
-      view.clear();
-      view.root.add(buildDie(materials));
-      view.look(80);
-    }
-  }
-
-  for (const level of levels) {
-    const button = el("button", { type: "button", dataset: { id: level.id } }, [
-      level.name.replace(/\(.*\)/, "").slice(0, 28),
-    ]);
-    button.addEventListener("click", () => select(level));
-    rail.append(button);
-  }
+  const explore = await mountExplore(cap, "cpu", levels);
 
   main.replaceChildren(
     el("h1", {}, ["CPU"]),
@@ -81,9 +22,7 @@ export async function mount(main, { cap }) {
       "Fifteen levels from the taxonomy. The chase reports ns/load on this device. Cited L2, L3, and SLC sizes are reference marks, not names read off the curve. L1 comes from the Arm manuals.",
     ]),
     status,
-    stage,
-    rail,
-    sheet,
+    explore.node,
     panel("Arm L1, from the manuals", [
       kv(
         "C1-Ultra",
@@ -108,8 +47,6 @@ export async function mount(main, { cap }) {
       ),
     ]),
   );
-  select(levels[4]);
-
   const points = [];
   for (const bytes of SIZES) {
     const built = buildChase(bytes);
@@ -120,12 +57,8 @@ export async function mount(main, { cap }) {
   }
   const jumps = chaseJumps(points);
   const marks = referenceMarks(specs);
-  if (view) {
-    view.clear();
-    view.root.add(buildBars(materials, points));
-    view.look(18);
-  }
-  sheet.append(
+  explore.setMeasured(points);
+  explore.node.append(
     panel("Measured chase", [
       ...points.map((point) =>
         kv(
@@ -142,9 +75,5 @@ export async function mount(main, { cap }) {
     ]),
   );
 
-  return {
-    dispose() {
-      view?.dispose();
-    },
-  };
+  return { dispose: () => explore.dispose() };
 }

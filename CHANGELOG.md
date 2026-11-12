@@ -28,6 +28,7 @@ Rebuild after v0.1 was rejected. The verified solvers stay. The shell, the model
 - The phone body is an extruded rounded slab (9 mm plan radius, reconstructed), with transmission glass, a camera plateau, side buttons, and a USB-C port. The hero starts assembled and fills the stage. Tiers above medium add the vendored three.js SSAO pass.
 - Open findings are tracked as GitHub issues, not as pull requests: [#2](https://github.com/0thernes/xiaomi-17t-pro-lab/issues/2), [#3](https://github.com/0thernes/xiaomi-17t-pro-lab/issues/3), [#4](https://github.com/0thernes/xiaomi-17t-pro-lab/issues/4).
 - The hero and the die view can show a Real vs model card. Copyrighted product, repair, Kurnal, and TechInsights photographs are linked from [CREDITS.md](CREDITS.md) and are not in the repo. `refs/` is gitignored for local modeling copies.
+- CPU, GPU, and NPU levels fly between 3D subjects. Package, floorplan, C1-Ultra ports, cache, SRAM, FinFET, BEOL, the live aerial image, the shader cores, the tile bins, and the MAC values are labeled reconstructions except where a leaf is cited. TSVs and hybrid bonding are not claimed. N2 GAA is a comparison only.
 
 ## [0.1.0] - 2026-11-12
 

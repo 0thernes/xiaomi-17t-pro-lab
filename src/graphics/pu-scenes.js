@@ -1,0 +1,427 @@
+import * as THREE from "three";
+import { aerialImage } from "../sim/lithography.js";
+import { createPipeline } from "../sim/pipeline.js";
+import { rasterizeTiles } from "../sim/tiler.js";
+import { fillUnit, matmulQuantized, mulberry32, quantizeSymmetricInt8 } from "../sim/quant.js";
+import { floorplan, getSpecs, npuCounts, parseDieMm, parsePackageMm } from "../specs.js";
+
+const box = (w, h, d, material, x, y, z) => {
+  const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), material);
+  mesh.position.set(x, y, z);
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  return mesh;
+};
+
+function bars(values, material, scale) {
+  const group = new THREE.Group();
+  const max = Math.max(...values, 1e-6);
+  values.forEach((value, i) => {
+    const h = 0.15 + (value / max) * scale;
+    group.add(box(0.35, h, 0.35, material, (i - values.length / 2) * 0.42, h / 2, 0));
+  });
+  return group;
+}
+
+/** PoP as published. TSV and hybrid bonding are context, not a claim for this phone. */
+export function scenePackage(materials) {
+  const specs = getSpecs();
+  const pkg = parsePackageMm(specs);
+  const die = parseDieMm(specs);
+  const group = new THREE.Group();
+  const w = pkg?.widthMm || 16.4;
+  const h = pkg?.heightMm || 14;
+  const thick = pkg?.thickMm || 0.455;
+  group.add(box(w, h, Math.max(thick, 0.35), materials.substrate, 0, 0, 0));
+  const pitch = 0.35;
+  const cols = Math.min(28, Math.floor((w - 0.6) / pitch));
+  const rows = Math.min(24, Math.floor((h - 0.6) / pitch));
+  const balls = new THREE.InstancedMesh(new THREE.SphereGeometry(0.12, 8, 6), materials.gold, cols * rows);
+  const dummy = new THREE.Object3D();
+  let n = 0;
+  for (let j = 0; j < rows; j++) {
+    for (let i = 0; i < cols; i++) {
+      dummy.position.set(-w / 2 + 0.5 + i * pitch, -h / 2 + 0.5 + j * pitch, -thick / 2 - 0.12);
+      dummy.updateMatrix();
+      balls.setMatrixAt(n++, dummy.matrix);
+    }
+  }
+  balls.count = n;
+  group.add(balls);
+  if (die) group.add(box(die.widthMm * 0.92, die.heightMm * 0.92, 0.2, materials.die, 0, 0, thick / 2 + 0.2));
+  group.add(box(w * 0.82, h * 0.78, 0.28, materials.accent, 0, 0, thick / 2 + 0.55));
+  const note =
+    "PoP DRAM over the SoC, flip-chip balls at the cited 0.35 mm pitch. InFO is not evidenced. TSVs and hybrid bonding are not claimed for this phone.";
+  return { group, note, update() {} };
+}
+
+export function sceneFloor(materials) {
+  const plan = floorplan();
+  const die = parseDieMm();
+  const group = new THREE.Group();
+  if (!plan || !die) return { group, note: "Die size is missing.", update() {} };
+  group.add(box(die.widthMm, die.heightMm, 0.18, materials.die, 0, 0, 0));
+  const colors = { cpu: 0xc4552a, gpu: 0x3d6ea8, npu: 0x7a5aaa };
+  for (const block of plan.blocks) {
+    group.add(
+      box(
+        block.widthMm * 0.94,
+        block.heightMm * 0.88,
+        0.16,
+        new THREE.MeshStandardMaterial({
+          color: colors[block.id],
+          roughness: 0.45,
+          metalness: 0.3,
+          map: materials.die.map,
+        }),
+        block.xMm + block.widthMm / 2 - die.widthMm / 2,
+        block.yMm + block.heightMm / 2 - die.heightMm / 2,
+        0.16,
+      ),
+    );
+  }
+  for (let i = -4; i <= 4; i++) {
+    group.add(box(die.widthMm * 0.9, 0.08, 0.04, materials.gold, 0, i * (die.heightMm / 10), 0.28));
+  }
+  return {
+    group,
+    note: "Block areas are Kurnal’s. Positions preserve those areas and are not a trace of the copyrighted die photo. The gold straps are a reconstructed power grid, not a published mesh.",
+    update() {},
+  };
+}
+
+export function scenePipeline(materials) {
+  const group = new THREE.Group();
+  const names = ["Fetch", "Decode", "Issue", "Execute", "Write"];
+  const stages = names.map((name, i) => {
+    const mesh = box(2.2, 1.4, 1.6, materials.silicon, i * 3.2 - 6, 0, 0);
+    mesh.name = name;
+    group.add(mesh);
+    return mesh;
+  });
+  const token = new THREE.Mesh(new THREE.SphereGeometry(0.28, 16, 12), materials.accent);
+  group.add(token);
+  const sim = createPipeline(
+    [
+      { op: "load", dst: 1, addr: 0 },
+      { op: "add", dst: 2, a: 1, b: 1 },
+      { op: "add", dst: 3, a: 2, b: 1 },
+    ],
+    { loadLatency: 3 },
+  );
+  let acc = 0;
+  let last = null;
+  return {
+    group,
+    note: "Five-stage in-order model. A dependent load stalls. C1-Ultra’s cited decode is 10 MOPs/cycle and 23 issue ports. This animation is not that microarchitecture.",
+    update(dt) {
+      acc += dt;
+      if (acc > 0.35) {
+        acc = 0;
+        last = sim.tick();
+      }
+      const occupied = last?.occupied?.[0];
+      const index = occupied ? names.findIndex((name) => name.toLowerCase().startsWith(occupied.stage.slice(0, 3))) : 0;
+      const x = Math.max(0, index) * 3.2 - 6;
+      token.position.x += (x - token.position.x) * Math.min(1, dt * 4);
+      token.position.y = 1.2;
+    },
+  };
+}
+
+export function sceneUltra(materials) {
+  const specs = getSpecs();
+  const group = new THREE.Group();
+  group.add(box(14, 1.2, 3, materials.frame, 0, 2.2, 0));
+  for (let i = 0; i < 10; i++) group.add(box(0.7, 1.6, 0.7, materials.accent, -6 + i * 1.15, 0.2, 1.2));
+  for (let i = 0; i < 23; i++) group.add(box(0.28, 2.4, 0.45, materials.copper, -6 + i * 0.52, -1.6, -0.4));
+  group.add(box(4, 1.2, 2, materials.silicon, -4, -3.4, 0.4));
+  group.add(box(3, 1.2, 2, materials.gold, 2, -3.4, 0.4));
+  const text = specs.soc.c1_ultra_frontend_width?.value || "10-wide decode";
+  return {
+    group,
+    note: `C1-Ultra reconstruction. Cited: ${text}. L1I ${specs.soc.l1i_kb_c1_ultra.value} KB, L1D ${specs.soc.l1d_kb_c1_ultra.value} KB. The 10 orange blocks are the decode width. The 23 copper posts are the issue ports. Placement is not a die photo.`,
+    update(dt) {
+      group.rotation.y += dt * 0.15;
+    },
+  };
+}
+
+export function sceneCache(materials, points) {
+  const group = new THREE.Group();
+  const levels = [
+    { name: "L1", y: 3.2, w: 3 },
+    { name: "L2", y: 1.2, w: 5 },
+    { name: "L3", y: -0.8, w: 7 },
+    { name: "SLC", y: -2.8, w: 9 },
+  ];
+  for (const level of levels) group.add(box(level.w, 0.35, 2.2, materials.silicon, 0, level.y, 0));
+  const packet = new THREE.Mesh(new THREE.SphereGeometry(0.22, 14, 10), materials.accent);
+  group.add(packet);
+  return {
+    group,
+    note: "The packet falls through L1, L2, L3, and SLC. Its pause uses the measured pointer-chase ns/load when that sweep has finished. The rises are not named L1.",
+    update(dt, data) {
+      const ns = data?.points?.[data.points.length - 1]?.nsPerLoad || 8;
+      const speed = 1.2 / Math.max(1, ns / 8);
+      packet.userData.t = (packet.userData.t || 0) + dt * speed;
+      const u = (packet.userData.t % 4) / 4;
+      packet.position.y = 3.2 - u * 6;
+      packet.position.x = Math.sin(packet.userData.t * 3) * 0.4;
+    },
+  };
+}
+
+export function sceneSram(materials) {
+  const group = new THREE.Group();
+  const cell = new THREE.Group();
+  for (let i = 0; i < 6; i++)
+    cell.add(box(0.35, 0.7, 0.25, i < 4 ? materials.silicon : materials.copper, (i - 2.5) * 0.55, 0, 0));
+  cell.add(box(3.4, 0.08, 0.08, materials.gold, 0, 0.55, 0));
+  cell.add(box(3.4, 0.08, 0.08, materials.gold, 0, -0.55, 0));
+  const mesh = new THREE.InstancedMesh(new THREE.BoxGeometry(3.6, 1.6, 0.4), materials.frame, 16);
+  const dummy = new THREE.Object3D();
+  for (let i = 0; i < 16; i++) {
+    dummy.position.set((i % 4) * 4 - 6, Math.floor(i / 4) * 2 - 3, -0.6);
+    dummy.updateMatrix();
+    mesh.setMatrixAt(i, dummy.matrix);
+  }
+  group.add(mesh, cell);
+  return {
+    group,
+    note: "Textbook 6T SRAM: four logic transistors and two pass devices, plus bitlines. Cell height in tracks for N3P is not published. This is not a MediaTek bitcell.",
+    update(dt) {
+      cell.position.y = Math.sin(performance.now() * 0.004) * 0.15;
+    },
+  };
+}
+
+export function sceneFinfet(materials) {
+  const specs = getSpecs();
+  const pitch = specs.soc.process_n3e_cpp_nm.value;
+  const group = new THREE.Group();
+  const u = 0.09;
+  const fins = new THREE.InstancedMesh(new THREE.CapsuleGeometry(pitch * u * 0.07, 5.5, 4, 8), materials.silicon, 6);
+  const dummy = new THREE.Object3D();
+  for (let i = 0; i < 6; i++) {
+    dummy.position.set((i - 2.5) * pitch * u, 0, 0);
+    dummy.updateMatrix();
+    fins.setMatrixAt(i, dummy.matrix);
+  }
+  group.add(fins);
+  group.add(box(pitch * u * 6.4, 0.9, 2.8, materials.copper, 0, 2.2, 0));
+  group.add(box(1.2, 0.35, 2.2, materials.gold, 0, 2.8, 0));
+  const gaa = new THREE.Group();
+  for (let i = 0; i < 3; i++) gaa.add(box(4.2, 0.18, 1.1, materials.accent, 0, i * 0.45, 0));
+  gaa.position.set(8, 0, 0);
+  group.add(gaa);
+  return {
+    group,
+    note: `N3P FinFET. Gate pitch ${pitch} nm is the cited N3E rule N3P keeps. Fin count and fin pitch are unpublished, so the six fins are a drawing. The sheets on the right are TSMC N2 GAA, a comparison, not this die.`,
+    update() {},
+  };
+}
+
+export function sceneBeol(materials) {
+  const group = new THREE.Group();
+  const pitches = [23, 28, 36, 48, 64, 80, 100, 130];
+  pitches.forEach((pitch, i) => {
+    const w = 1.2 + i * 0.55;
+    group.add(box(w * 3.2, 0.12, w, i === 0 ? materials.gold : materials.copper, 0, i * 0.55, 0));
+  });
+  return {
+    group,
+    note: "Only the 23 nm minimum metal pitch is cited. The taller layers use wider pitches as a reconstruction of a typical BEOL, not a TSMC N3P deck. Dielectrics between the sheets are not a published stack.",
+    update() {},
+  };
+}
+
+export function sceneLitho(materials) {
+  const image = aerialImage({ na: 0.33, pitchNm: 40, sigma: 0.5, n: 64, periods: 2 });
+  const group = bars(Array.from(image.intensity), materials.accent, 3.2);
+  return {
+    group,
+    note: `Live Abbe aerial image at NA 0.33, pitch 40 nm. Contrast ${image.contrast.toFixed(3)}. High-NA 0.55 is not claimed for N3P. Bar height is the computed intensity.`,
+    update(dt) {
+      group.rotation.y += dt * 0.2;
+    },
+  };
+}
+
+export function sceneWave(materials) {
+  const n = 48;
+  const values = [];
+  for (let i = 0; i < n; i++) {
+    const x = (i + 1) / (n + 1);
+    values.push(Math.sin(2 * Math.PI * x) ** 2);
+  }
+  const group = bars(values, materials.silicon, 2.8);
+  return {
+    group,
+    note: "Probability density of the n=2 infinite well, analytic sin². It is textbook confinement in a fin-scale well, not a 9500 device wavefunction.",
+    update(dt) {
+      group.rotation.y += dt * 0.25;
+    },
+  };
+}
+
+export function sceneTiler(materials) {
+  const shaded = rasterizeTiles(
+    [
+      { x0: 2, y0: 2, x1: 26, y1: 4, x2: 6, y2: 24, r: 255, g: 122, b: 26 },
+      { x0: 10, y0: 8, x1: 28, y1: 28, x2: 16, y2: 6, r: 80, g: 140, b: 220 },
+    ],
+    { width: 32, height: 32, tileSize: 8 },
+  );
+  const tiles = shaded.tilesX * shaded.tilesY;
+  const geo = new THREE.BoxGeometry(0.9, 0.3, 0.9);
+  const mat = new THREE.MeshStandardMaterial({
+    color: 0x223044,
+    emissive: 0xff7a1a,
+    emissiveIntensity: 0.2,
+    roughness: 0.4,
+  });
+  const mesh = new THREE.InstancedMesh(geo, mat, tiles);
+  const dummy = new THREE.Object3D();
+  const heights = [];
+  for (let i = 0; i < tiles; i++) {
+    const x = i % shaded.tilesX;
+    const y = Math.floor(i / shaded.tilesX);
+    const count = shaded.bins[i].length;
+    heights.push(count);
+    dummy.position.set(x - 1.5, count * 0.35, y - 1.5);
+    dummy.scale.set(1, 0.4 + count, 1);
+    dummy.updateMatrix();
+    mesh.setMatrixAt(i, dummy.matrix);
+  }
+  const group = new THREE.Group();
+  group.add(mesh);
+  return {
+    group,
+    note: `Live binning. ${shaded.touched} tiles touched, ${shaded.shaded} pixels shaded. Tile height is the triangle count in that bin. This is not Mali’s tiler.`,
+    update(dt) {
+      mesh.material.emissiveIntensity = 0.25 + 0.55 * (0.5 + 0.5 * Math.sin(performance.now() * 0.004));
+    },
+  };
+}
+
+export function sceneGpuCore(materials) {
+  const group = new THREE.Group();
+  for (let i = 0; i < 12; i++) {
+    group.add(box(1.3, 0.8, 1.1, materials.silicon, (i % 4) * 1.8 - 2.7, Math.floor(i / 4) * 1.3 - 1.2, 0));
+  }
+  group.add(box(6, 0.35, 1.4, materials.gold, 0, -2.4, 0));
+  return {
+    group,
+    note: "Twelve shader cores, the cited MC12 count, plus an L2 bar. The opened core’s execution engines are not a Mali floorplan. GPU block area is 24.23 mm².",
+    update(dt) {
+      group.rotation.y += dt * 0.2;
+    },
+  };
+}
+
+export function sceneNpu(materials) {
+  const counts = npuCounts();
+  const n = 8;
+  const rng = mulberry32(9);
+  const A = fillUnit(n * n, rng);
+  const B = fillUnit(n * n, rng);
+  const aq = quantizeSymmetricInt8(A);
+  const bq = quantizeSymmetricInt8(B);
+  const C = matmulQuantized(aq.q, aq.scale, bq.q, bq.scale, n);
+  let max = 1e-6;
+  for (const v of C) max = Math.max(max, Math.abs(v));
+  const group = new THREE.Group();
+  const cells = [];
+  for (let y = 0; y < n; y++) {
+    for (let x = 0; x < n; x++) {
+      const mag = Math.abs(C[y * n + x]) / max;
+      const mesh = box(0.62, 0.2 + mag * 1.4, 0.62, materials.accent, x - n / 2, mag * 0.4, y - n / 2);
+      mesh.material = materials.accent.clone();
+      mesh.material.emissiveIntensity = 0.2 + mag;
+      cells.push(mesh);
+      group.add(mesh);
+    }
+  }
+  for (let i = 0; i < (counts.mdla || 4); i++) group.add(box(1.2, 0.4, 0.5, materials.silicon, -5.2, i * 0.7 - 1, 0));
+  return {
+    group,
+    note: `${counts.mdla} MDLA and ${counts.mvpu} MVPU are cited. Column height and glow are the absolute values of a live INT8 matmul. This JavaScript product does not run on NPU 990. CIM cell geometry is unpublished.`,
+    update() {
+      const pulse = 0.5 + 0.5 * Math.sin(performance.now() * 0.006);
+      for (const cell of cells) cell.material.emissiveIntensity = 0.15 + pulse * (cell.scale?.y || 0.4);
+    },
+  };
+}
+
+const CPU_SCENE = {
+  cpu_l1_software: "pipeline",
+  cpu_l2_os: "pipeline",
+  cpu_l3_isa: "pipeline",
+  cpu_l4_dsu: "floor",
+  cpu_l5_cores: "ultra",
+  cpu_l6_uarch: "ultra",
+  cpu_l7_frontend: "pipeline",
+  cpu_l8_fu: "pipeline",
+  cpu_l9_sme2: "pipeline",
+  cpu_l10_cache: "cache",
+  cpu_l11_mmu: "cache",
+  cpu_l12_circuit: "sram",
+  cpu_l13_finfet: "finfet",
+  cpu_l14_litho: "litho",
+  cpu_l15_quantum: "wave",
+};
+
+const GPU_SCENE = {
+  gpu_l1_api: "tiler",
+  gpu_l2_driver: "tiler",
+  gpu_l3_csf: "tiler",
+  gpu_l4_queues: "tiler",
+  gpu_l5_mc12: "gpu",
+  gpu_l6_tbdr: "tiler",
+  gpu_l7_warp: "gpu",
+  gpu_l8_alu: "gpu",
+  gpu_l9_rtu: "gpu",
+  gpu_l10_cache: "cache",
+  gpu_l11_display: "tiler",
+  gpu_l12_circuit: "sram",
+  gpu_l13_finfet: "finfet",
+  gpu_l14_litho: "litho",
+  gpu_l15_quantum: "wave",
+  gpu_l16_thermal: "beol",
+};
+
+const NPU_SCENE = {
+  npu_l1_api: "npu",
+  npu_l2_runtime: "npu",
+  npu_l3_ir: "npu",
+  npu_l4_dual: "npu",
+  npu_l5_990: "npu",
+  npu_l6_cim: "npu",
+  npu_l7_bitnet: "npu",
+  npu_l8_xbar: "package",
+  npu_l9_weights: "cache",
+  npu_l10_circuit: "sram",
+  npu_l11_finfet: "finfet",
+  npu_l12_litho: "litho",
+  npu_l13_quantum: "wave",
+  npu_l14_privacy: "package",
+};
+
+export function sceneFor(engine, levelId, materials) {
+  const table = engine === "gpu" ? GPU_SCENE : engine === "npu" ? NPU_SCENE : CPU_SCENE;
+  const key = table[levelId] || "package";
+  if (key === "package") return scenePackage(materials);
+  if (key === "floor") return sceneFloor(materials);
+  if (key === "pipeline") return scenePipeline(materials);
+  if (key === "ultra") return sceneUltra(materials);
+  if (key === "cache") return sceneCache(materials);
+  if (key === "sram") return sceneSram(materials);
+  if (key === "finfet") return sceneFinfet(materials);
+  if (key === "beol") return sceneBeol(materials);
+  if (key === "litho") return sceneLitho(materials);
+  if (key === "wave") return sceneWave(materials);
+  if (key === "tiler") return sceneTiler(materials);
+  if (key === "gpu") return sceneGpuCore(materials);
+  return sceneNpu(materials);
+}
