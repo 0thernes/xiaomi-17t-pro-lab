@@ -4,7 +4,6 @@ import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
 import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
 import { ShaderPass } from "three/addons/postprocessing/ShaderPass.js";
 import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
-import { SAOPass } from "three/addons/postprocessing/SAOPass.js";
 import { SMAAPass } from "three/addons/postprocessing/SMAAPass.js";
 import { agMaps, brushMaps } from "./pbr-maps.js";
 import {
@@ -67,8 +66,8 @@ export async function mountView(canvas, cap) {
   if (shadows) {
     key.shadow.mapSize.set(2048, 2048);
     key.shadow.radius = 2;
-    key.shadow.bias = -0.0004;
-    key.shadow.normalBias = 0.04;
+    key.shadow.bias = -0.002;
+    key.shadow.normalBias = 0.2;
     key.shadow.camera.near = 1;
     key.shadow.camera.far = 200;
     key.shadow.camera.left = -140;
@@ -97,6 +96,7 @@ export async function mountView(canvas, cap) {
     new THREE.CircleGeometry(280, 64),
     new THREE.MeshStandardMaterial({ color: 0x5a4638, roughness: 0.84, metalness: 0.08 }),
   );
+  floor.name = "stage-floor";
   floor.rotation.x = -Math.PI / 2;
   floor.position.y = -86;
   floor.receiveShadow = true;
@@ -284,6 +284,7 @@ function createRenderer(canvas, cap) {
     canvas,
     antialias: cap.tier === "low",
     alpha: false,
+    premultipliedAlpha: false,
     powerPreference: "high-performance",
     preserveDrawingBuffer: true,
   };
@@ -291,29 +292,15 @@ function createRenderer(canvas, cap) {
 }
 
 function makeComposer(renderer, scene, camera, cap) {
-  const samples = cap.tier === "ultra" ? 4 : cap.tier === "high" ? 4 : 2;
-  let target;
-  try {
-    target = new THREE.WebGLRenderTarget(2, 2, { type: THREE.HalfFloatType, samples });
-  } catch {
-    target = new THREE.WebGLRenderTarget(2, 2, { type: THREE.HalfFloatType, samples: 0 });
-  }
+  const target = new THREE.WebGLRenderTarget(2, 2, { type: THREE.HalfFloatType, samples: 0 });
   const composer = new EffectComposer(renderer, target);
   // The beauty pass has to land in the buffer before SSAO. SSAOPass only
   // multiplies its occlusion texture onto the read buffer (DST_COLOR, ZERO).
   // With an empty read buffer that product is black, which is what the live
   // page showed on every high tier.
   composer.addPass(new RenderPass(scene, camera));
-  if (cap.tier === "high" || cap.tier === "ultra") {
-    const sao = new SAOPass(scene, camera, new THREE.Vector2(512, 512));
-    sao.params.saoIntensity = 0.08;
-    sao.params.saoScale = 8;
-    sao.params.saoKernelRadius = 24;
-    sao.params.saoBias = 0.5;
-    sao.params.saoBlurRadius = 6;
-    composer.addPass(sao);
-  }
-  const bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), 0.22, 0.42, 0.86);
+  // SAO multiplied a dark halo onto every thin silhouette. SMAA covers edges.
+  const bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), 0.04, 0.15, 0.985);
   composer.addPass(bloom);
   composer.addPass(new SMAAPass());
   composer.addPass(new ShaderPass(GRADE));
@@ -467,9 +454,7 @@ export function makeMaterials(tier) {
     color: 0x6e8ea8,
     metalness: 0.02,
     roughness: 0.18,
-    clearcoat: rich ? 0.4 : 0,
-    transparent: true,
-    opacity: 0.72,
+    clearcoat: rich ? 0.35 : 0,
   });
   const hik = new THREE.MeshPhysicalMaterial({
     color: 0xd7e4c4,

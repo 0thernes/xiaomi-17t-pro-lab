@@ -26,7 +26,7 @@ export async function mount(main, ctx = {}) {
   main.replaceChildren(
     el("h1", {}, ["Lithography, computed"]),
     el("p", { class: "lede" }, [
-      "Rayleigh’s criterion and a 1D Abbe aerial image, evaluated in the page. EUV is 13.5 nm. High-NA 0.55 is not a claim about the Dimensity 9500 mask set. N3P pitches are UNKNOWN, so this is not a TSMC ground rule.",
+      "Rayleigh’s criterion and a 1D Abbe aerial image, evaluated in the page. EUV is 13.5 nm. High-NA 0.55 is not a claim about the Dimensity 9500 mask set. Gate pitch and minimum metal pitch are the cited N3E rules. The full N3P metal deck is not published.",
     ]),
     panel("Scanner", [
       na,
@@ -103,6 +103,8 @@ async function scannerStage(cap) {
     view.root.add(built.group);
     view.scene.background = new view.THREE.Color(0x1a2430);
     view.scene.fog = null;
+    const floor = view.scene.getObjectByName("stage-floor");
+    if (floor) floor.visible = false;
     built.group.scale.setScalar(2.2);
     view.release();
     view.orbit.set(34, new view.THREE.Vector3(1, 1.6, 0));

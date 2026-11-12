@@ -7,10 +7,11 @@ import { el, kv, note, panel } from "../dom.js";
 import { fmt } from "../format.js";
 import { provCited, provComputed } from "../provenance.js";
 import { mountSketch } from "../p5-loader.js";
+import { buildFinfet, makeMaterials, mountView } from "../graphics/view.js";
 
 const NIST = "https://physics.nist.gov/cuu/pdf/xray_2018.pdf";
 
-export async function mount(main) {
+export async function mount(main, ctx = {}) {
   const length = range("Well width nm", 1, 6, 0.1, 2);
   const points = range("Interior points", 24, 64, 4, 40);
   const barrier = range("Kronig–Penney P", 0, 6, 0.1, 2);
@@ -27,6 +28,7 @@ export async function mount(main) {
     el("p", { class: "lede" }, [
       "A finite-difference Schrödinger well, a Dirac-comb Kronig–Penney scan, and a double-gate scale length. TSMC N3P is FinFET. Fin height, fin count, and the high-k stack of this tapeout are UNKNOWN. The sliders are a model, not a TEM of the 9500.",
     ]),
+    panel("Drawing", [await transistorStage(ctx.cap)]),
     panel("1D infinite well", [length.node, points.node, wellHost]),
     panel("Kronig–Penney", [barrier.node, bandHost]),
     panel("FinFET electrostatics", [fin.node, eot.node, gate.node, finHost, plotHost]),
@@ -122,6 +124,21 @@ export async function mount(main) {
   }
   recompute();
   return { dispose: () => sketch.dispose() };
+}
+
+async function transistorStage(cap) {
+  const stage = el("div", { class: "stage" });
+  const canvas = el("canvas", { "aria-label": "FinFET drawing with source, drain, high-k wrap, and gate" });
+  stage.append(canvas);
+  try {
+    const view = await mountView(canvas, cap || { tier: "medium", pixelRatio: 1 });
+    const mesh = buildFinfet(makeMaterials(cap?.tier || "medium"));
+    view.root.add(mesh);
+    view.frame(mesh, 0.8);
+  } catch (error) {
+    stage.append(note(error.message));
+  }
+  return stage;
 }
 
 function range(label, min, max, step, value) {

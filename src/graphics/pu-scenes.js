@@ -8,8 +8,8 @@ import { floorplan, getSpecs, npuCounts, parseDieMm, parsePackageMm } from "../s
 const box = (w, h, d, material, x, y, z) => {
   const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), material);
   mesh.position.set(x, y, z);
-  mesh.castShadow = true;
-  mesh.receiveShadow = true;
+  mesh.castShadow = false;
+  mesh.receiveShadow = false;
   return mesh;
 };
 
@@ -436,6 +436,10 @@ function resistSurface(materials, intensity) {
   }
   geo.computeVertexNormals();
   const mesh = new THREE.Mesh(geo, materials.hik);
+  mesh.castShadow = false;
+  mesh.receiveShadow = false;
+  mesh.material = materials.hik.clone();
+  mesh.material.side = THREE.DoubleSide;
   mesh.position.set(5.5, 0.2, 0);
   return mesh;
 }

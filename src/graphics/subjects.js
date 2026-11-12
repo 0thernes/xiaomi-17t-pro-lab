@@ -39,25 +39,22 @@ function frameBand(w, h, depth, radius, lip, material) {
   geo.translate(0, 0, -depth / 2);
   geo.computeVertexNormals();
   const mesh = new THREE.Mesh(geo, material);
-  mesh.castShadow = true;
-  mesh.receiveShadow = true;
+  mesh.castShadow = false;
+  mesh.receiveShadow = false;
   return mesh;
 }
 
 function slab(w, h, depth, radius, material) {
   const geo = new THREE.ExtrudeGeometry(roundedRect(w, h, radius), {
     depth,
-    bevelEnabled: true,
-    bevelThickness: Math.min(0.28, depth * 0.12),
-    bevelSize: Math.min(0.35, depth * 0.12),
-    bevelSegments: 3,
-    curveSegments: 20,
+    bevelEnabled: false,
+    curveSegments: 24,
   });
   geo.translate(0, 0, -depth / 2);
   geo.computeVertexNormals();
   const mesh = new THREE.Mesh(geo, material);
-  mesh.castShadow = true;
-  mesh.receiveShadow = true;
+  mesh.castShadow = false;
+  mesh.receiveShadow = false;
   return mesh;
 }
 
@@ -67,7 +64,10 @@ function put(mesh, x, y, z) {
 }
 
 function box(w, h, d, material, x, y, z) {
-  return put(new THREE.Mesh(new THREE.BoxGeometry(w, h, d), material), x, y, z);
+  const mesh = put(new THREE.Mesh(new THREE.BoxGeometry(w, h, d), material), x, y, z);
+  mesh.castShadow = false;
+  mesh.receiveShadow = false;
+  return mesh;
 }
 
 function oledTexture() {
