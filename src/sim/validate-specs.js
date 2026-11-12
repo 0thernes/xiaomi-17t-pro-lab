@@ -38,7 +38,40 @@ export function validateSpecs(specs) {
   if (!Array.isArray(specs.unknowns) || specs.unknowns.some((u) => typeof u !== "string")) {
     errors.push("unknowns must be an array of strings");
   }
+  for (const section of ["parts", "versions", "supply_chain"]) {
+    const node = specs[section];
+    if (!node || typeof node !== "object") {
+      errors.push(`${section} must be an object`);
+      continue;
+    }
+    for (const [key, value] of Object.entries(node)) {
+      if (key === "_note") continue;
+      checkRecord(value, `${section}.${key}`, errors);
+    }
+  }
+  if (!Array.isArray(specs.issues) || specs.issues.length < 12) {
+    errors.push("issues must list I1–I12");
+  } else {
+    for (const item of specs.issues) {
+      if (!CONFLICT_CLASSES.has(item.classification)) {
+        errors.push(`issue ${item.id} has classification ${item.classification}`);
+      }
+      checkRecord(item, `issues.${item.id}`, errors);
+      if (!item.topic || !item.summary) errors.push(`issue ${item.id} is missing topic or summary`);
+    }
+  }
   return errors;
+}
+
+function checkRecord(node, path, errors) {
+  if (!node || typeof node !== "object" || !("status" in node)) {
+    errors.push(`${path} is missing status`);
+    return;
+  }
+  const status = String(node.status);
+  if (!/^(confirmed|unconfirmed|unknown)\b/.test(status)) {
+    errors.push(`${path} status ${status} is not a known status`);
+  }
 }
 
 function walk(node, path, errors, isRoot) {
@@ -52,7 +85,18 @@ function walk(node, path, errors, isRoot) {
     return;
   }
   for (const [key, value] of Object.entries(node)) {
-    if (isRoot && (key === "meta" || key === "conflicts" || key === "unknowns")) continue;
+    if (
+      isRoot &&
+      (key === "meta" ||
+        key === "conflicts" ||
+        key === "unknowns" ||
+        key === "parts" ||
+        key === "versions" ||
+        key === "issues" ||
+        key === "supply_chain")
+    ) {
+      continue;
+    }
     walk(value, `${path}.${key}`, errors, false);
   }
 }

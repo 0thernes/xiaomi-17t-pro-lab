@@ -56,7 +56,7 @@ export async function mount(main) {
   main.replaceChildren(
     el("h1", {}, ["Wins and losses"]),
     el("p", { class: "lede" }, [
-      `${model.phones.xiaomi.text} against ${model.phones.iphone.text} and ${model.phones.samsung.text}, as of ${model.asOf.value}. Geekbench 6 is never mixed with Geekbench 7. The iPhone Geekbench 6.7 figures are Notebookcheck, a different lab from the PhoneArena row, and they are not divided into the Xiaomi score.`,
+      `${model.phones.xiaomi.text} against ${model.phones.iphone.text} and ${model.phones.samsung.text}, as of ${model.asOf.value}. Geekbench 6 is never mixed with Geekbench 7. The iPhone Geekbench 6.7 figures are Notebookcheck, a different lab from the PhoneArena row, and they are not divided into the Xiaomi score. On 3DMark Wild Life Extreme the UL medians are 6209 for this phone and 8059 for the iPhone 18 Pro Max. That is a loss on one source.`,
     ]),
     panel("Scoreboard", [board, note(model.methodology.value)]),
     panel("Numbers the page divides", [

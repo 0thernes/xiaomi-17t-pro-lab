@@ -4,6 +4,11 @@ All notable changes to this project are documented here. The format is based on 
 
 ## [0.2.0] - 2026-11-12
 
+### Changed
+
+- three.js is r187, with AgX tone mapping. The page tries `WebGPURenderer` and falls back to WebGL2. The studio backdrop is a warm gradient, not an empty black clear. p5.js is 2.4 and sketches use a high-DPI pixel density up to 2.
+- The phone body is a 10 mm rounded profile (the published corner radius is still unpublished, so this radius is a reconstruction) with an anisotropic aluminum frame, AG clearcoat back, iridescent lenses, side buttons, and a USB-C port.
+
 Rebuild after v0.1 was rejected. The verified solvers stay. The shell, the models, and the spec leaves do not.
 
 ### Added
@@ -15,8 +20,8 @@ Rebuild after v0.1 was rejected. The verified solvers stay. The shell, the model
 - Zoom rail: phone, die, FinFET pitch (48 nm gate, 23 nm metal, NA 0.33), silicon lattice with the NIST nearest-neighbor distance.
 - CPU, GPU, and NPU rails walk the taxonomy. The chase, a five-stage pipeline, a software tile rasterizer, and an INT8 matmul are live. 1716 MHz and 100 TOPS render as unconfirmed.
 - Workloads: instanced stress scene, vendored TinyStories-8M (float16) greedy decode, vendored Glitchling play sim, RK4 and Dormand–Prince, a local-page browser shell.
-- Specs page lists the nine still-open leaves and conflicts 16–20.
-- `data/specs.json` replaced with the 2026-11-12 pass, including `confidence` where that pass recorded it.
+- Specs page lists the leaves still open after pass 2, conflicts 16–22, and the parts, versions, issues, and supply-chain catalogs.
+- `data/specs.json` replaced with the 2026-11-12 pass, then with pass 2. Pass 2 names the SK hynix DRAM and UFS, the MT6661/MT6667, MT6379, and MT6681 PMICs, the cameras, the radios, and the board parts. Positions on the model are a reconstruction. FCC photos are not shipped. Wild Life Extreme UL medians are 6209 for this phone and 8059 for the iPhone 18 Pro Max.
 
 ### Fixed
 

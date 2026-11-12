@@ -34,8 +34,10 @@ export async function mount(main, { cap }) {
   try {
     view = await mountView(canvas, cap);
     const phone = buildPhone(materials, 0);
+    phone.rotation.y = 0.2;
+    phone.rotation.x = 0.08;
     view.root.add(phone);
-    view.frame(phone, 0.92);
+    view.frame(phone, 0.78);
     applyMetalPlate(materials).catch(() => {});
   } catch (error) {
     stage.append(note(`WebGL unavailable (${error.message}). The numbers below still come from specs.json.`));
@@ -61,8 +63,10 @@ export async function mount(main, { cap }) {
     if (!view) return;
     view.clear();
     const phone = buildPhone(materials, Number(explode.value));
+    phone.rotation.y = 0.2;
+    phone.rotation.x = 0.08;
     view.root.add(phone);
-    view.frame(phone, 0.9);
+    view.frame(phone, 0.78);
   });
   const timer = window.setInterval(() => {
     if (view) frameReadout.textContent = `${view.frameMs.toFixed(1)} ms`;

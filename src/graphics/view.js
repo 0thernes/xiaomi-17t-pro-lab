@@ -32,10 +32,7 @@ const GRADE = {
     varying vec2 vUv;
     void main() {
       vec4 c = texture2D(tDiffuse, vUv);
-      vec3 x = max(c.rgb, 0.0);
-      x = x / (x + 0.35);
-      x = pow(x, vec3(0.96));
-      x *= uTint;
+      vec3 x = c.rgb * uTint;
       vec2 d = vUv - 0.5;
       float vig = 1.0 - dot(d, d) * 0.28;
       gl_FragColor = vec4(x * vig, c.a);
@@ -44,23 +41,19 @@ const GRADE = {
 };
 
 export async function mountView(canvas, cap) {
-  const renderer = new THREE.WebGLRenderer({
-    canvas,
-    antialias: cap.tier !== "low",
-    alpha: false,
-    powerPreference: "high-performance",
-    preserveDrawingBuffer: true,
-  });
+  const { renderer, backend } = await createRenderer(canvas, cap);
   renderer.setPixelRatio(cap.pixelRatio || 1);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = cap.tier === "low" ? 1.15 : 1.02;
-  renderer.setClearColor(0x090807, 1);
+  renderer.toneMapping = THREE.AgXToneMapping;
+  renderer.toneMappingExposure = 1.08;
+  renderer.setClearColor(0x3a332c, 1);
+  canvas.dataset.backend = backend;
   const shadows = cap.tier === "high" || cap.tier === "ultra";
   renderer.shadowMap.enabled = shadows;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.shadowMap.type = THREE.PCFShadowMap;
 
   const scene = new THREE.Scene();
+  scene.background = studioBackdrop();
   const camera = new THREE.PerspectiveCamera(32, 1, 0.05, 4000);
   camera.position.set(18, 12, 46);
 
@@ -68,7 +61,8 @@ export async function mountView(canvas, cap) {
   key.position.set(30, 48, 36);
   key.castShadow = shadows;
   if (shadows) {
-    key.shadow.mapSize.set(cap.tier === "ultra" ? 2048 : 1024, cap.tier === "ultra" ? 2048 : 1024);
+    key.shadow.mapSize.set(2048, 2048);
+    key.shadow.radius = 3;
     key.shadow.camera.near = 1;
     key.shadow.camera.far = 200;
     key.shadow.camera.left = -140;
@@ -95,13 +89,18 @@ export async function mountView(canvas, cap) {
 
   const floor = new THREE.Mesh(
     new THREE.CircleGeometry(280, 64),
-    new THREE.MeshStandardMaterial({ color: 0x12110f, roughness: 0.92, metalness: 0.04 }),
+    new THREE.MeshStandardMaterial({ color: 0x5a4638, roughness: 0.84, metalness: 0.08 }),
   );
   floor.rotation.x = -Math.PI / 2;
   floor.position.y = -86;
   floor.receiveShadow = true;
   scene.add(floor);
-  let composer = cap.tier === "low" ? null : makeComposer(renderer, scene, camera, cap);
+  let composer =
+    cap.tier === "low"
+      ? null
+      : renderer.isWebGPURenderer
+        ? await makeNodeComposer(renderer, scene, camera, cap)
+        : makeComposer(renderer, scene, camera, cap);
   let droppedComposer = false;
   const root = new THREE.Group();
   scene.add(root);
@@ -121,7 +120,7 @@ export async function mountView(canvas, cap) {
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
     renderer.setSize(w, h, false);
-    composer?.setSize(w, h);
+    composer?.setSize?.(w, h);
     if (framed && w > 2 && h > 2) fit(framed.object, framed.fill);
   }
   const observer = new ResizeObserver(resize);
@@ -145,7 +144,15 @@ export async function mountView(canvas, cap) {
       reportViewport(canvas, `The post-process chain threw (${error.message}). Showing the scene directly.`);
     }
     frames += 1;
-    if (frames === 12 && composer && !droppedComposer && brightestPixel(renderer) < 12) {
+    if (frames === 12 && composer && !droppedComposer) {
+      let brightest = 255;
+      try {
+        brightest = brightestPixel(renderer);
+      } catch {
+        brightest = 255;
+      }
+      if (brightest >= 12) return;
+
       droppedComposer = true;
       composer = null;
       renderer.setRenderTarget(null);
@@ -167,7 +174,8 @@ export async function mountView(canvas, cap) {
     const aspect = Math.max(0.4, camera.aspect || 1);
     const distY = size.y / 2 / Math.tan(vFov / 2);
     const distX = size.x / 2 / (Math.tan(vFov / 2) * aspect);
-    orbit.set(Math.max(distX, distY, size.z) / fill + size.z * 0.2, center);
+    const distZ = size.z / 2 / Math.tan(vFov / 2);
+    orbit.set((Math.max(distX, distY, distZ) * 1.35) / fill, center);
   }
 
   return {
@@ -247,6 +255,82 @@ function reportViewport(canvas, message) {
   host.append(note);
 }
 
+function studioBackdrop() {
+  const canvas = document.createElement("canvas");
+  canvas.width = 16;
+  canvas.height = 512;
+  const ctx = canvas.getContext("2d");
+  const gradient = ctx.createLinearGradient(0, 0, 0, 512);
+  gradient.addColorStop(0, "#8d7a66");
+  gradient.addColorStop(0.45, "#4e4036");
+  gradient.addColorStop(1, "#2a211c");
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, 16, 512);
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  return texture;
+}
+
+async function createRenderer(canvas, cap) {
+  const options = {
+    canvas,
+    antialias: cap.tier !== "low",
+    alpha: false,
+    powerPreference: "high-performance",
+    preserveDrawingBuffer: true,
+  };
+  if (cap.tier !== "low" && navigator.gpu) {
+    try {
+      const adapter = await navigator.gpu.requestAdapter();
+      if (adapter) {
+        const webgpu = await import("three/webgpu");
+        const gpu = new webgpu.WebGPURenderer(options);
+        await gpu.init();
+        if (gpu.backend?.isWebGPUBackend) return { renderer: gpu, backend: "webgpu" };
+        gpu.dispose?.();
+      }
+    } catch (error) {
+      console.warn("WebGPU renderer fell back to WebGL2", error);
+    }
+  }
+  return { renderer: new THREE.WebGLRenderer(options), backend: "webgl2" };
+}
+
+async function makeNodeComposer(renderer, scene, camera, cap) {
+  const tsl = await import("three/tsl");
+  const { bloom } = await import("three/addons/tsl/display/BloomNode.js");
+  const { smaa } = await import("three/addons/tsl/display/SMAANode.js");
+  const { RenderPipeline } = await import("three/webgpu");
+  const scenePass = tsl.pass(scene, camera);
+  scenePass.setMRT(tsl.mrt({ output: tsl.output, emissive: tsl.emissive }));
+  const color = scenePass.getTextureNode("output");
+  const glow = bloom(scenePass.getTextureNode("emissive"), 0.4, 0.3, 0.25);
+  let image = color.add(glow);
+  if (cap.tier === "ultra") {
+    try {
+      const { ao } = await import("three/addons/tsl/display/GTAONode.js");
+      const prePass = tsl.pass(scene, camera);
+      prePass.setMRT(tsl.mrt({ output: tsl.normalView }));
+      const occlusion = ao(prePass.getTextureNode("depth"), prePass.getTextureNode(), camera);
+      const shade = occlusion.getTextureNode().sample(tsl.screenUV).r;
+      image = color.mul(tsl.mix(tsl.float(0.72), tsl.float(1), shade)).add(glow);
+    } catch (error) {
+      console.warn("GTAO disabled", error);
+    }
+  }
+  const pipeline = new RenderPipeline(renderer);
+  pipeline.outputNode = smaa(image);
+  try {
+    pipeline.render();
+    renderer.setRenderTarget(null);
+  } catch (error) {
+    console.warn("Node post stack disabled", error);
+    renderer.setRenderTarget(null);
+    return null;
+  }
+  return pipeline;
+}
+
 function makeComposer(renderer, scene, camera, cap) {
   const samples = cap.tier === "ultra" ? 4 : cap.tier === "high" ? 4 : 2;
   let target;
@@ -261,20 +345,9 @@ function makeComposer(renderer, scene, camera, cap) {
   // With an empty read buffer that product is black, which is what the live
   // page showed on every high tier.
   composer.addPass(new RenderPass(scene, camera));
-  if (cap.tier === "high" || cap.tier === "ultra") {
-    try {
-      const ssao = new SSAOPass(scene, camera, 512, 512, 16);
-      ssao.kernelRadius = 8;
-      ssao.minDistance = 0.001;
-      ssao.maxDistance = 0.08;
-      // It writes into the read buffer in place. Swapping would hand the next
-      // pass the untouched black buffer.
-      ssao.needsSwap = false;
-      composer.addPass(ssao);
-    } catch (error) {
-      console.warn("SSAO disabled", error);
-    }
-  }
+  // SSAOPass multiplies occlusion onto the beauty pass. On this phone it was
+  // driving the front face to black, so the WebGL fallback leaves it off.
+  // Real WebGPU adapters use the TSL GTAO node instead.
   const bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), 0.16, 0.35, 0.94);
   composer.addPass(bloom);
   composer.addPass(new ShaderPass(GRADE));
@@ -310,7 +383,7 @@ function studioScene() {
 }
 
 function attachOrbit(canvas, camera, reduced) {
-  const state = { theta: 0.55, phi: 1.05, radius: 48, auto: !reduced, target: new THREE.Vector3() };
+  const state = { theta: 0.62, phi: 1.12, radius: 48, auto: false, target: new THREE.Vector3() };
   let drag = null;
   function apply() {
     const { theta, phi, radius, target } = state;
@@ -370,30 +443,30 @@ function attachOrbit(canvas, camera, reduced) {
 export function makeMaterials(tier) {
   const rich = tier !== "low";
   const frame = new THREE.MeshPhysicalMaterial({
-    color: 0x8e939b,
-    metalness: rich ? 0.92 : 0.45,
-    roughness: 0.28,
-    clearcoat: rich ? 0.45 : 0,
-    clearcoatRoughness: 0.35,
+    color: 0xc5c9ce,
+    metalness: rich ? 1 : 0.55,
+    roughness: 0.32,
+    clearcoat: rich ? 0.35 : 0,
+    clearcoatRoughness: 0.4,
+    anisotropy: rich ? 0.85 : 0,
   });
   const glass = new THREE.MeshPhysicalMaterial({
     color: 0xffffff,
     metalness: 0,
     roughness: 0.04,
-    transmission: rich ? 0.82 : 0,
-    thickness: 0.7,
+    transmission: 0,
+    thickness: 0.4,
     ior: 1.5,
     clearcoat: rich ? 1 : 0,
-    clearcoatRoughness: 0.06,
+    clearcoatRoughness: 0.08,
     transparent: true,
-    opacity: rich ? 1 : 0.18,
+    opacity: rich ? 0.12 : 0.2,
   });
-  const screen = new THREE.MeshStandardMaterial({
-    color: 0x050506,
-    emissive: 0xffffff,
-    emissiveMap: oledTexture(),
-    emissiveIntensity: 0.9,
-    roughness: 0.45,
+  const screen = new THREE.MeshBasicMaterial({
+    color: 0xffffff,
+    map: oledTexture(),
+    toneMapped: false,
+    side: THREE.DoubleSide,
   });
   const pcb = new THREE.MeshStandardMaterial({
     color: 0xffffff,
@@ -417,16 +490,21 @@ export function makeMaterials(tier) {
   const gold = new THREE.MeshStandardMaterial({ color: 0xe2c56a, metalness: rich ? 0.9 : 0.4, roughness: 0.22 });
   const battery = new THREE.MeshStandardMaterial({ color: 0x232824, roughness: 0.7, metalness: 0.15 });
   const rear = new THREE.MeshPhysicalMaterial({
-    color: 0x1a1c20,
-    metalness: 0.2,
-    roughness: 0.18,
-    clearcoat: rich ? 0.8 : 0,
+    color: 0x14161c,
+    metalness: 0.08,
+    roughness: 0.28,
+    clearcoat: rich ? 1 : 0.2,
+    clearcoatRoughness: 0.18,
   });
   const lens = new THREE.MeshPhysicalMaterial({
-    color: 0x05070a,
-    metalness: 0.1,
-    roughness: 0.05,
-    transmission: rich ? 0.4 : 0,
+    color: 0x0a1020,
+    metalness: 0.15,
+    roughness: 0.04,
+    iridescence: rich ? 1 : 0,
+    iridescenceIOR: 1.4,
+    iridescenceThicknessMinimum: 120,
+    iridescenceThicknessMaximum: 420,
+    transmission: rich ? 0.55 : 0,
     opacity: rich ? 1 : 0.9,
     transparent: !rich,
   });
@@ -456,11 +534,12 @@ export async function applyMetalPlate(materials) {
   for (const tex of [map, normal, rough]) {
     tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
     tex.anisotropy = 8;
-    tex.repeat.set(2, 4);
+    tex.repeat.set(12, 28);
   }
   materials.frame.normalMap = normal;
+  materials.frame.normalScale = new THREE.Vector2(0.12, 0.12);
   materials.frame.roughnessMap = rough;
-  materials.frame.color.set(0x9aa0a8);
+  materials.frame.color.set(0xd0d4d8);
   materials.frame.needsUpdate = true;
   map.dispose();
 }

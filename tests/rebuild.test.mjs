@@ -6,7 +6,8 @@ import { dopri54, rk4, robertsonDeriv } from "../src/sim/ode.js";
 import { createPipeline } from "../src/sim/pipeline.js";
 import { rasterizeTiles } from "../src/sim/tiler.js";
 import { chooseTier } from "../src/quality.js";
-import { floorplan, npuCounts, openItems, parseDieMm, parsePackageMm } from "../src/specs.js";
+import { boardPlacements, cameraModules } from "../src/graphics/board-layout.js";
+import { floorplan, getSpecs, npuCounts, openItems, parseDieMm, parsePackageMm, recordEntries } from "../src/specs.js";
 import { REFERENCES } from "../src/references.js";
 import { buildWeights, greedyTokens } from "../src/workloads/gpt-neo.js";
 import { parseSafetensors } from "../src/workloads/safetensors.js";
@@ -28,8 +29,38 @@ describe("corrected geometry", () => {
     assert.ok(plan.blocks.reduce((sum, block) => sum + block.heightMm, 0) < die.heightMm);
     assert.equal(npuCounts().mdla, 4);
     assert.equal(npuCounts().mvpu, 2);
-    assert.equal(openItems().length, 9);
+    assert.equal(openItems().length, 7);
     assert.ok(openItems().every((item) => item.reason && item.reason.length > 8));
+    assert.ok(recordEntries("parts").length >= 29);
+    assert.equal(getSpecs().issues.length, 12);
+    assert.ok(getSpecs().conflicts.some((item) => item.id === 21));
+    assert.ok(getSpecs().conflicts.some((item) => item.id === 22));
+    assert.ok(recordEntries("versions").length >= 8);
+    assert.ok(recordEntries("supply_chain").length >= 10);
+    const labels = boardPlacements().map((part) => part.label);
+    for (const name of [
+      "H58GG6AV9H",
+      "HN8T271EJK",
+      "MT6661BP",
+      "MT6667CP",
+      "MT6379",
+      "MT6681",
+      "MT6199W",
+      "MT6653",
+      "NXP NFC",
+      "TFA9874 / RT5512",
+      "AW86927",
+      "GT9916R",
+      "BQ28Z610",
+      "SC858x",
+      "NU1671",
+    ]) {
+      assert.ok(labels.includes(name), name);
+    }
+    assert.deepEqual(
+      cameraModules().map((cam) => cam.label),
+      ["OVX9500", "OV13B", "JN5"],
+    );
   });
 
   it("does not ship copyrighted reference photographs", () => {

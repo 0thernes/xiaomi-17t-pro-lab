@@ -16,7 +16,7 @@ import {
 
 const SCALES = [
   { id: "phone", label: "Phone", mm: 162.2 },
-  { id: "board", label: "Board", mm: 78 },
+  { id: "board", label: "Board", mm: 72 },
   { id: "package", label: "Package", mm: 16.4 },
   { id: "die", label: "Die", mm: 12.92 },
   { id: "finfet", label: "FinFET", mm: 48e-6 },
@@ -68,7 +68,9 @@ export async function mount(main, { cap }) {
               ? `Gate pitch ${specs.soc.process_n3e_cpp_nm.value} nm and minimum metal pitch ${specs.soc.process_n3e_min_metal_pitch_nm.value} nm are the cited N3E rules N3P keeps. Fin height on this die is not published. EUV NA ${specs.soc.euv_numerical_aperture.value}.`
               : id === "die"
                 ? "Block areas are Kurnal’s. Positions preserve those areas and are not a copy of the copyrighted die photo."
-                : "Outer millimeters are the Xiaomi spec. The exploded stack names the repair-manual layers.",
+                : id === "board"
+                  ? "Compeq board, about 58 × 72 mm from the FCC sample notes. Part names are the pass-2 catalog. Positions are a reconstruction. The FCC photographs are not shipped."
+                  : "Outer millimeters are the Xiaomi spec. The exploded stack names the repair-manual layers. Camera modules are OVX9500, OV13B, and JN5.",
         ),
         id === "finfet" ? provCited(specs.soc.process_n3e_cpp_nm) : null,
         id === "die" ? referenceCards(["kurnal-die", "kurnal-pdf", "techinsights"]) : null,

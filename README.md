@@ -24,7 +24,7 @@ Owner: Alex Donahue (GitHub [0thernes](https://github.com/0thernes)).
 | Litho  | Rayleigh CD and a live 1D Abbe aerial image                                                            |
 | Atom   | Finite-difference well, Kronig–Penney, double-gate scale length                                        |
 | Versus | PhoneArena table, plus iPhone Geekbench 6.7 marked as Notebookcheck                                    |
-| Specs  | The nine open leaves, with the reason each is open, and conflicts 16–20                                |
+| Specs  | Open leaves, conflicts 16–22, and the parts, versions, issues, and supply-chain catalogs               |
 
 ## Screenshots
 

@@ -72,7 +72,8 @@ export async function mountExplore(cap, engine, levels) {
     button.addEventListener("click", () => show(level));
     rail.append(button);
   }
-  if (levels[0]) show(levels[Math.min(6, levels.length - 1)]);
+  const featured = levels.find((level) => /cores|mc12|990/.test(level.id)) || levels[0];
+  if (featured) show(featured);
 
   if (view) {
     view.setFrame((now) => {

@@ -23,7 +23,7 @@ export async function mountSketch(host, draw) {
     p.setup = () => {
       const width = Math.max(280, host.clientWidth || 320);
       p.createCanvas(width, 280);
-      p.pixelDensity(1);
+      p.pixelDensity(Math.min(2, window.devicePixelRatio || 1));
       p.noLoop();
       api?.redraw?.();
     };

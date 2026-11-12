@@ -82,8 +82,14 @@ describe("specs integrity", () => {
     assert.equal(specs.soc.npu_tops.value, 100);
     assert.equal(specs.soc.die_size_mm2.value, 140.57);
     assert.equal(specs.soc.transistor_architecture.value, "FinFET");
-    assert.equal(specs.device.ufs_lane_count_device.value, null);
-    assert.equal(specs.device.pmic.value, null);
+    assert.equal(specs.device.ufs_lane_count_device.value, 2);
+    assert.equal(specs.device.ufs_lane_count_device.status, "unconfirmed");
+    assert.equal(specs.device.dram_vendor.value, "SK hynix");
+    assert.equal(specs.device.dram_vendor.status, "confirmed");
+    assert.ok(String(specs.device.pmic.value).includes("MT6661"));
+    assert.ok(String(specs.device.pmic.value).includes("MT6379"));
+    assert.equal(specs.competitors.xiaomi_17t_pro["3dmark_wle_ul_median"].value, 6209);
+    assert.equal(specs.competitors.iphone_18_pro_max["3dmark_wle_ul_median"].value, 8059);
   });
 });
 
@@ -274,6 +280,11 @@ describe("comparison model", () => {
     assert.equal(cross.crossLab, true);
     assert.equal(cross.iphone.numeric, 4725);
     assert.equal(cross.ratioVsIphone, null);
+    const wle = model.rows.find((r) => r.id === "wle_ul");
+    assert.equal(wle.xiaomi.numeric, 6209);
+    assert.equal(wle.iphone.numeric, 8059);
+    assert.ok(wle.ratioVsIphone < 1);
+    assert.equal(wle.ratioVsSamsung, null);
     assert.equal(model.scoreboard.geekbench6_cpu_phonearena.value, "galaxy_s26_ultra");
     assert.ok(Math.abs(model.ppi.xiaomiComputed.ppi - 447) < 0.2);
     assert.equal(model.ppi.samsungCited, null);

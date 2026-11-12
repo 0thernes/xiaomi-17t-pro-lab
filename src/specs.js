@@ -21,13 +21,12 @@ export function isOpen(entry) {
 }
 
 /**
- * The nine items the 2026-11-12 pass left open: five unknown, four unconfirmed.
- * Reasons stay on the leaves (notes / searched_2026_11_12) so a later specs.json edit flows through.
+ * Leaves still open after the 2026-11-12 pass 2.
+ * DRAM vendor and the PMIC set are confirmed from FCC markings and are not in this list.
+ * Reasons stay on the leaves so a later specs.json edit flows through.
  */
 export const OPEN_PATHS = [
   "device.ufs_lane_count_device",
-  "device.dram_vendor",
-  "device.pmic",
   "browser.webgpu_mali_g1_ultra_specific",
   "competitors.iphone_18_pro_max.3dmark_wle_high_phonearena",
   "device.rear_cover",
@@ -35,6 +34,14 @@ export const OPEN_PATHS = [
   "competitors.galaxy_s26_ultra.price_us_street_256_nbc",
   "competitors.galaxy_s26_ultra.price_us_street_512_nbc",
 ];
+
+export function recordEntries(section) {
+  const node = specs[section];
+  if (!node || typeof node !== "object") return [];
+  return Object.entries(node)
+    .filter(([key, value]) => key !== "_note" && value && typeof value === "object" && "status" in value)
+    .map(([id, entry]) => ({ id, entry }));
+}
 
 export function openItems() {
   return OPEN_PATHS.map((path) => {

@@ -135,6 +135,15 @@ export function buildComparison() {
       S["3dmark_wle_high_phonearena"],
       null,
     ),
+    row(
+      "wle_ul",
+      "3DMark Wild Life Extreme, UL median (same source)",
+      "score",
+      X["3dmark_wle_ul_median"],
+      I["3dmark_wle_ul_median"],
+      phoneArenaGap("No UL median stored for this phone."),
+      null,
+    ),
   ];
 
   // The Samsung refresh cell above replaced the entry's value with a parsed number

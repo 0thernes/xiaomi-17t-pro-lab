@@ -2,7 +2,7 @@
 
 The lab’s own source is MIT (see `LICENSE`). The following are vendored unmodified.
 
-## three.js r170
+## three.js r187
 
 - Path: `vendor/three/`
 - Copyright 2010-2024 Three.js Authors
@@ -11,7 +11,7 @@ The lab’s own source is MIT (see `LICENSE`). The following are vendored unmodi
 
 The postprocessing and environment helpers under `vendor/three/examples/jsm/` are part of the same project and the same MIT license. `RoomEnvironment` is adapted upstream from the Google model-viewer environment scene, also distributed with three.js.
 
-## p5.js 1.11.3
+## p5.js 2.4.0
 
 - Path: `vendor/p5/p5.min.js`
 - License: LGPL-2.1 (`vendor/p5/license.txt`)

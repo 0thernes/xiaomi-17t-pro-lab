@@ -90,17 +90,55 @@ export function sceneFloor(materials) {
   };
 }
 
+function stageLabel(text) {
+  const canvas = document.createElement("canvas");
+  canvas.width = 256;
+  canvas.height = 64;
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle = "rgba(12, 11, 10, 0.8)";
+  ctx.fillRect(0, 0, 256, 64);
+  ctx.fillStyle = "#f4efe8";
+  ctx.font = "600 28px sans-serif";
+  ctx.fillText(text, 16, 42);
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  const plate = new THREE.Mesh(
+    new THREE.PlaneGeometry(2.4, 0.6),
+    new THREE.MeshBasicMaterial({ map: texture, transparent: true, toneMapped: false }),
+  );
+  return plate;
+}
+
 export function scenePipeline(materials) {
   const group = new THREE.Group();
   const names = ["Fetch", "Decode", "Issue", "Execute", "Write"];
+  const tones = [0xc9a15b, 0xd7d3cc, 0xb87333, 0x8ea0b5, 0xe8e2d8];
   const stages = names.map((name, i) => {
-    const mesh = box(2.2, 1.4, 1.6, materials.silicon, i * 3.2 - 6, 0, 0);
+    const metal = new THREE.MeshPhysicalMaterial({
+      color: tones[i],
+      metalness: 0.85,
+      roughness: 0.28,
+      clearcoat: 0.4,
+      emissive: 0xff7a1a,
+      emissiveIntensity: 0.08,
+    });
+    const mesh = box(2.2, 1.5, 1.8, metal, i * 3.4 - 6.8, 0, 0);
     mesh.name = name;
     group.add(mesh);
+    const plate = stageLabel(name);
+    plate.position.set(mesh.position.x, 1.35, 1.05);
+    group.add(plate);
     return mesh;
   });
   const token = new THREE.Mesh(new THREE.SphereGeometry(0.28, 16, 12), materials.accent);
   group.add(token);
+  const trail = [];
+  for (let i = 0; i < 6; i++) {
+    const bead = new THREE.Mesh(new THREE.SphereGeometry(0.1, 12, 8), materials.accent.clone());
+    bead.material.emissiveIntensity = 0.2 + i * 0.08;
+    trail.push(bead);
+    group.add(bead);
+  }
   const sim = createPipeline(
     [
       { op: "load", dst: 1, addr: 0 },
@@ -122,9 +160,14 @@ export function scenePipeline(materials) {
       }
       const occupied = last?.occupied?.[0];
       const index = occupied ? names.findIndex((name) => name.toLowerCase().startsWith(occupied.stage.slice(0, 3))) : 0;
-      const x = Math.max(0, index) * 3.2 - 6;
+      const x = Math.max(0, index) * 3.4 - 6.8;
       token.position.x += (x - token.position.x) * Math.min(1, dt * 4);
-      token.position.y = 1.2;
+      token.position.y = 1.35;
+      trail.forEach((bead, i) => {
+        bead.position.x = token.position.x - (i + 1) * 0.45;
+        bead.position.y = 1.35;
+        bead.position.z = 0.2;
+      });
     },
   };
 }
@@ -132,11 +175,29 @@ export function scenePipeline(materials) {
 export function sceneUltra(materials) {
   const specs = getSpecs();
   const group = new THREE.Group();
-  group.add(box(14, 1.2, 3, materials.frame, 0, 2.2, 0));
-  for (let i = 0; i < 10; i++) group.add(box(0.7, 1.6, 0.7, materials.accent, -6 + i * 1.15, 0.2, 1.2));
-  for (let i = 0; i < 23; i++) group.add(box(0.28, 2.4, 0.45, materials.copper, -6 + i * 0.52, -1.6, -0.4));
-  group.add(box(4, 1.2, 2, materials.silicon, -4, -3.4, 0.4));
-  group.add(box(3, 1.2, 2, materials.gold, 2, -3.4, 0.4));
+  group.add(box(15, 0.35, 6.5, materials.substrate, 0, -0.2, 0));
+  const lane = new THREE.MeshPhysicalMaterial({
+    color: 0xff7a1a,
+    metalness: 0.2,
+    roughness: 0.35,
+    emissive: 0xff7a1a,
+    emissiveIntensity: 0.55,
+  });
+  for (let i = 0; i < 10; i++) group.add(box(0.72, 1.7, 0.72, lane, -5.6 + i * 1.2, 1.1, 1.4));
+  for (let i = 0; i < 23; i++) group.add(box(0.22, 2.2, 0.4, materials.copper, -6 + i * 0.54, -0.4, -1.3));
+  const sram = new THREE.InstancedMesh(new THREE.BoxGeometry(0.16, 0.16, 0.16), materials.gold, 16 * 10);
+  const dummy = new THREE.Object3D();
+  let n = 0;
+  for (let y = 0; y < 10; y++) {
+    for (let x = 0; x < 16; x++) {
+      dummy.position.set(-4.2 + x * 0.22, 0.15, -0.2 + y * 0.22);
+      dummy.updateMatrix();
+      sram.setMatrixAt(n++, dummy.matrix);
+    }
+  }
+  group.add(sram);
+  group.add(box(4.2, 0.7, 1.6, materials.silicon, -4, -2.2, 0.6));
+  group.add(box(3.2, 0.7, 1.6, materials.frame, 2.2, -2.2, 0.6));
   const text = specs.soc.c1_ultra_frontend_width?.value || "10-wide decode";
   return {
     group,
@@ -150,24 +211,31 @@ export function sceneUltra(materials) {
 export function sceneCache(materials, points) {
   const group = new THREE.Group();
   const levels = [
-    { name: "L1", y: 3.2, w: 3 },
-    { name: "L2", y: 1.2, w: 5 },
-    { name: "L3", y: -0.8, w: 7 },
-    { name: "SLC", y: -2.8, w: 9 },
+    { name: "L1", y: 3.2, w: 3.2, mat: materials.gold },
+    { name: "L2", y: 1.1, w: 5.2, mat: materials.copper },
+    { name: "L3", y: -1, w: 7.4, mat: materials.frame },
+    { name: "SLC", y: -3.1, w: 9.6, mat: materials.silicon },
   ];
-  for (const level of levels) group.add(box(level.w, 0.35, 2.2, materials.silicon, 0, level.y, 0));
-  const packet = new THREE.Mesh(new THREE.SphereGeometry(0.22, 14, 10), materials.accent);
-  group.add(packet);
+  for (const level of levels) group.add(box(level.w, 0.45, 2.4, level.mat, 0, level.y, 0));
+  const trail = [];
+  for (let i = 0; i < 8; i++) {
+    const packet = new THREE.Mesh(new THREE.SphereGeometry(0.16 + i * 0.01, 16, 12), materials.accent.clone());
+    packet.material.emissiveIntensity = 0.3 + i * 0.08;
+    trail.push(packet);
+    group.add(packet);
+  }
   return {
     group,
     note: "The packet falls through L1, L2, L3, and SLC. Its pause uses the measured pointer-chase ns/load when that sweep has finished. The rises are not named L1.",
     update(dt, data) {
       const ns = data?.points?.[data.points.length - 1]?.nsPerLoad || 8;
       const speed = 1.2 / Math.max(1, ns / 8);
-      packet.userData.t = (packet.userData.t || 0) + dt * speed;
-      const u = (packet.userData.t % 4) / 4;
-      packet.position.y = 3.2 - u * 6;
-      packet.position.x = Math.sin(packet.userData.t * 3) * 0.4;
+      const t = (group.userData.t = (group.userData.t || 0) + dt * speed);
+      trail.forEach((packet, i) => {
+        const u = ((t - i * 0.12) % 4) / 4;
+        packet.position.y = 3.2 - u * 6.2;
+        packet.position.x = Math.sin(t * 3 + i) * 0.35;
+      });
     },
   };
 }

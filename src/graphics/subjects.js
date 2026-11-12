@@ -1,7 +1,8 @@
 import * as THREE from "three";
+import { boardPlacements, BOARD_MM, cameraModules } from "./board-layout.js";
 import { floorplan, getSpecs, npuCounts, parseDieMm, parsePackageMm } from "../specs.js";
 
-const CORNER_MM = 9;
+const CORNER_MM = 10;
 
 function roundedRect(w, h, r) {
   const radius = Math.min(r, w / 2 - 0.2, h / 2 - 0.2);
@@ -24,10 +25,10 @@ function slab(w, h, depth, radius, material) {
   const geo = new THREE.ExtrudeGeometry(roundedRect(w, h, radius), {
     depth,
     bevelEnabled: true,
-    bevelThickness: Math.min(1.1, depth * 0.35),
-    bevelSize: Math.min(1.15, depth * 0.35),
-    bevelSegments: 3,
-    curveSegments: 12,
+    bevelThickness: Math.min(1.15, depth * 0.28),
+    bevelSize: Math.min(1.2, depth * 0.28),
+    bevelSegments: 5,
+    curveSegments: 20,
   });
   geo.translate(0, 0, -depth / 2);
   geo.computeVertexNormals();
@@ -48,19 +49,32 @@ function box(w, h, d, material, x, y, z) {
 
 function oledTexture() {
   const canvas = document.createElement("canvas");
-  canvas.width = 640;
-  canvas.height = 1380;
+  canvas.width = 720;
+  canvas.height = 1560;
   const ctx = canvas.getContext("2d");
-  ctx.fillStyle = "#050506";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = "#ff7a1a";
-  ctx.fillRect(48, 78, 86, 8);
-  ctx.fillStyle = "#f4efe8";
-  ctx.font = "700 92px sans-serif";
-  ctx.fillText("17T Pro", 48, 250);
-  ctx.font = "400 36px sans-serif";
-  ctx.fillStyle = "#c8beb2";
-  ctx.fillText("2772 × 1280 · 144 Hz", 48, 320);
+  const sky = ctx.createLinearGradient(0, 0, 720, 1560);
+  sky.addColorStop(0, "#1b3a6b");
+  sky.addColorStop(0.45, "#6a3a28");
+  sky.addColorStop(1, "#1a120e");
+  ctx.fillStyle = sky;
+  ctx.fillRect(0, 0, 720, 1560);
+  ctx.fillStyle = "rgba(255,255,255,0.92)";
+  ctx.font = "600 28px sans-serif";
+  ctx.fillText("9:41", 48, 84);
+  ctx.font = "700 132px sans-serif";
+  ctx.fillText("09:41", 48, 280);
+  ctx.font = "500 36px sans-serif";
+  ctx.fillStyle = "rgba(255,255,255,0.78)";
+  ctx.fillText("Thursday, 12 November", 48, 340);
+  const icons = ["#ff7a1a", "#3d8bfd", "#34c759", "#ffd60a", "#bf5af2", "#64d2ff"];
+  icons.forEach((color, i) => {
+    const x = 56 + (i % 4) * 160;
+    const y = 1120 + Math.floor(i / 4) * 160;
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.roundRect(x, y, 112, 112, 28);
+    ctx.fill();
+  });
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.anisotropy = 8;
@@ -124,11 +138,16 @@ function dieTexture() {
 
 function lens(materials, radius, x, y, z) {
   const group = new THREE.Group();
-  const ring = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, 0.7, 28), materials.frame);
-  ring.rotation.x = Math.PI / 2;
-  const glass = new THREE.Mesh(new THREE.CircleGeometry(radius * 0.72, 24), materials.lens);
-  glass.position.z = 0.38;
-  group.add(ring, glass);
+  const barrel = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius * 0.92, 1.4, 32), materials.frame);
+  barrel.rotation.x = Math.PI / 2;
+  const glass = new THREE.Mesh(new THREE.CircleGeometry(radius * 0.78, 32), materials.lens);
+  glass.position.z = 0.72;
+  const pupil = new THREE.Mesh(
+    new THREE.CircleGeometry(radius * 0.34, 24),
+    new THREE.MeshStandardMaterial({ color: 0x071018, emissive: 0x1a4a7a, emissiveIntensity: 0.45, roughness: 0.2 }),
+  );
+  pupil.position.z = 0.78;
+  group.add(barrel, glass, pupil);
   group.position.set(x, y, z);
   return group;
 }
@@ -146,28 +165,35 @@ export function buildPhone(materials, explode = 0) {
   const body = slab(W, H, T, CORNER_MM, materials.frame);
   group.add(body);
 
-  const glass = slab(W - 3.2, H - 3.2, 0.55, CORNER_MM - 1.2, materials.glass);
-  glass.position.z = T / 2 + 0.15 + e * 28;
+  const rear = slab(W - 2.2, H - 2.2, 0.45, CORNER_MM - 0.5, materials.rear);
+  rear.position.z = -T / 2 - 0.05 - e * 16;
+  group.add(rear);
+
+  const glass = slab(W - 3.2, H - 3.2, 0.4, CORNER_MM - 1, materials.glass);
+  glass.position.z = T / 2 + 0.08 + e * 26;
   group.add(glass);
 
-  const screen = new THREE.Mesh(new THREE.PlaneGeometry(W - 7, H - 12), materials.screen);
-  screen.position.z = T / 2 - 0.15 + e * 16;
+  const screen = new THREE.Mesh(new THREE.PlaneGeometry(W - 8, H - 14), materials.screen);
+  screen.position.z = T / 2 + 1.4 + e * 12;
   group.add(screen);
 
-  const island = slab(30, 38, 2.1, 6, materials.frame);
-  island.position.set(-W * 0.18, H * 0.28, -T / 2 - 0.7 - e * 22);
+  const island = slab(34, 42, 2.6, 8, materials.frame);
+  island.position.set(-W * 0.15, H * 0.27, -T / 2 - 1.6 - e * 28);
   group.add(island);
-  const iz = island.position.z - 1.15;
-  group.add(lens(materials, 5.2, -W * 0.18 - 6, H * 0.28 + 6, iz));
-  group.add(lens(materials, 4.2, -W * 0.18 + 7, H * 0.28 + 7, iz));
-  group.add(lens(materials, 3.4, -W * 0.18, H * 0.28 - 8, iz));
+  const iz = island.position.z - 1.4;
+  group.add(lens(materials, 6.1, -W * 0.15 - 7, H * 0.27 + 8, iz));
+  group.add(lens(materials, 4.6, -W * 0.15 + 8, H * 0.27 + 8, iz));
+  group.add(lens(materials, 3.8, -W * 0.15 + 0.5, H * 0.27 - 9, iz));
 
-  const buttonMat = materials.frame;
-  group.add(box(1.3, 16, 2.2, buttonMat, W / 2 + 0.2, 18, 0));
-  group.add(box(1.3, 10, 2.2, buttonMat, W / 2 + 0.2, -8, 0));
-  const port = new THREE.Mesh(new THREE.CapsuleGeometry(1.3, 6, 4, 12), materials.lens);
+  const power = new THREE.Mesh(new THREE.CapsuleGeometry(0.75, 15, 6, 12), materials.frame);
+  power.position.set(W / 2 + 0.2, 24, 0);
+  group.add(power);
+  const volume = new THREE.Mesh(new THREE.CapsuleGeometry(0.75, 10, 6, 12), materials.frame);
+  volume.position.set(W / 2 + 0.2, -4, 0);
+  group.add(volume);
+  const port = new THREE.Mesh(new THREE.CapsuleGeometry(1.2, 8, 6, 16), materials.lens);
   port.rotation.z = Math.PI / 2;
-  port.position.set(0, -H / 2 + 0.4, 0);
+  port.position.set(0, -H / 2 + 0.2, 0);
   group.add(port);
 
   if (e > 0.02) {
@@ -175,34 +201,66 @@ export function buildPhone(materials, explode = 0) {
     board.scale.setScalar(0.72);
     board.position.set(0, 8, e * 46);
     group.add(board);
+    for (const cam of cameraModules()) {
+      const y = H / 2 - cam.fromTop;
+      group.add(box(cam.w, cam.h, cam.d, materials.frame, cam.dx, y, -T / 2 - 4 - e * 20));
+      const plate = partLabel(cam.label);
+      plate.position.set(cam.dx, y, -T / 2 - 8 - e * 20);
+      group.add(plate);
+    }
     const cells = (W - 16) / 2;
     group.add(box(cells - 1, H * 0.42, 3.1, materials.battery, -cells / 2, -H * 0.16, e * 34));
     group.add(box(cells - 1, H * 0.42, 3.1, materials.battery, cells / 2, -H * 0.16, e * 34));
     group.add(box(W - 14, H * 0.55, 0.45, materials.copper, 0, 4, e * 40));
-    const rear = slab(W - 1.2, H - 1.2, 0.7, CORNER_MM - 0.4, materials.rear);
-    rear.position.z = -T / 2 - e * 18;
-    group.add(rear);
   }
   return group;
 }
 
+function partLabel(text) {
+  const canvas = document.createElement("canvas");
+  canvas.width = 512;
+  canvas.height = 96;
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle = "rgba(12, 11, 10, 0.86)";
+  ctx.fillRect(0, 0, 512, 96);
+  ctx.fillStyle = "#f4efe8";
+  ctx.font = "600 40px sans-serif";
+  ctx.fillText(text, 16, 62);
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  const plate = new THREE.Mesh(
+    new THREE.PlaneGeometry(Math.max(6, text.length * 0.72), 1.5),
+    new THREE.MeshBasicMaterial({ map: texture, transparent: true, toneMapped: false }),
+  );
+  plate.name = `label-${text}`;
+  return plate;
+}
+
 export function buildBoard(materials) {
-  const specs = getSpecs();
   const group = new THREE.Group();
   group.name = "board";
-  const board = box(62, 78, 1.1, materials.pcb, 0, 0, 0);
+  const board = box(BOARD_MM.width, BOARD_MM.height, 0.9, materials.pcb, 0, 0, 0);
+  board.name = "compeq";
   group.add(board);
-  const pkg = parsePackageMm(specs);
-  if (pkg) {
-    const pack = buildPackage(materials);
-    pack.scale.setScalar(0.85);
-    pack.position.set(0, 10, 1.4);
-    group.add(pack);
+  const silk = partLabel("COMPEQ  1-P20-EV");
+  silk.position.set(0, -BOARD_MM.height / 2 + 3.2, 0.55);
+  group.add(silk);
+  for (const part of boardPlacements()) {
+    const mesh = box(
+      part.w,
+      part.h,
+      part.d,
+      materials[part.tone] || materials.silicon,
+      part.x,
+      part.y,
+      0.45 + part.d / 2,
+    );
+    mesh.name = part.id;
+    group.add(mesh);
+    const plate = partLabel(part.label);
+    plate.position.set(part.x, part.y + part.h / 2 + 1.1, 1.6 + part.d);
+    group.add(plate);
   }
-  group.add(box(14, 10, 1.2, materials.silicon, -16, -18, 1.2));
-  group.add(box(18, 14, 1.4, materials.frame, 16, -8, 1.3));
-  group.add(box(12, 12, 1.1, materials.frame, -18, 16, 1.2));
-  group.add(box(22, 4, 1.3, materials.copper, 0, -34, 1.1));
   return group;
 }
 

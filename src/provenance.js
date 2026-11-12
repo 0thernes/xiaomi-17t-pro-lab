@@ -19,7 +19,8 @@ export function provCited(entry) {
   if (!entry || entry.status === "unknown" || entry.value == null) {
     return el("span", { class: "prov" }, [badge("unknown", "UNKNOWN")]);
   }
-  const confirmed = entry.status === "confirmed";
+  const status = String(entry.status || "");
+  const confirmed = status === "confirmed" || (status.startsWith("confirmed") && !status.includes("unconfirmed"));
   const node = el("span", { class: "prov" }, [
     badge(confirmed ? "cited" : "unconfirmed", confirmed ? "CITED" : "UNCONFIRMED"),
   ]);

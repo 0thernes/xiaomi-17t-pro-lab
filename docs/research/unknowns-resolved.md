@@ -210,3 +210,54 @@ Status rules used: **confirmed** means an official vendor document, a primary me
 | Wikimedia Commons, MediaTek ICs category | https://commons.wikimedia.org/wiki/Category:MediaTek_integrated_circuits | CC-licensed per file, but **no Dimensity 9500 die shot exists there** | Only freely licensed option; nothing usable for D9500 |
 
 There is no public iFixit, JerryRigEverything, PBK, or TechInsights teardown of the 17T Pro itself (searched 2026-11-12). The Xiaomi repair manual is the best phone-internals reference available.
+
+---
+
+## Pass 2 (2026-11-12, America/Los_Angeles)
+
+Pre-pass-2 copy: `/tmp/specs.before-pass2.json`. Evidence crops and source files: `/workspace/xiaomi-lab/evidence-pass2/` (reference only; FCC photos are Sporton/Xiaomi exhibits, kernel files are GPL).
+
+### Two primary sources that pass 1 missed
+1. **FCC internal photos** for FCC ID 2AFZZPTC0G (Sporton Kunshan report EP5D2207, 7 PDFs, 127 pages, two pre-production samples). Chip markings are legible: https://fccid.io/2AFZZPTC0G
+2. **Xiaomi's own kernel source for this phone**: codename `warhol`, branch `bsp-warhol-w-oss` of MiCode/MTK_kernel_device_modules. It includes `warhol.dts`, `warhol.config`, the panel driver, and the wireless-charging driver: https://github.com/MiCode/MTK_kernel_device_modules/tree/bsp-warhol-w-oss
+
+### Resolved in pass 2
+| Field | Result | Status | Sources |
+|---|---|---|---|
+| DRAM vendor/part | **SK hynix H58GG6AV9H X094** (96 Gbit = 12 GB, 496-ball, 9.6 Gb/s "LPDDR5T"-class LPDDR5X, 4ch×16), date 541A, on 2 samples | confirmed | FCC pt.3/pt.4; puris.net/archives/11615 |
+| UFS part | **SK hynix HN8T271EJK X152**, 512 GB UFS 4.1, 153-ball | confirmed (part) | FCC pt.3; rlitl.com id=4057 |
+| UFS lanes | **2 lanes (single device)**. MediaTek's "4-lane UFS 4.1" means two 2-lane controllers / dual UFS (vivo X300 Pro). The 17T Pro has one package, and the measured 3.02 GB/s is under the 2-lane ceiling. Host gear HS-G5. MCQ supported by the driver (not disabled in DT). HPB not enabled in warhol.config; Xiaomi WB/FBO/EUA/Swap-SLC/FFU are. | unconfirmed (strong inference) | FCC; mediatek.com/zh-cn/dimensity-9500; elecfans 7047795; mt6993.dts; ufs-mediatek.c; warhol.config |
+| PMIC | **MT6661BP/DP/FP/GP + MT6667AP/CP** (SPMI), **MT6379** charger/gauge/TCPC, **MT6681** audio. Not MT6363/MT6373. | confirmed | FCC pt.2 p.17, pt.3; mt6993.dts, warhol.dts |
+| Memory width | 64-bit (fitted DRAM is 4×x16) → 76.8 GB/s derived | confirmed (width) | puris; FCC |
+| PoP in this phone | LPDDR5X stacked on SoC confirmed on retail-design samples | confirmed | FCC |
+| Reverse wireless | Hardware and driver support confirmed (NU1671 `wls_revchg_support`, reverse boost 6.8 V). The 5 W figure is still FAQ-only. | confirmed (feature) | xiaomi_warhol_mt6993_wlschg.dtsi; nuvolta_1671.c; FAQ |
+| Cooling area | **5500 mm² total heat-dissipation area** (MediaTek/Xiaomi CN launch text). VC-only area is not published. Resolves #17. | confirmed | eet-china.com/mp/a502033.html; huaweicentral; jiuphone |
+| iPhone 18 Pro Max WLE | **8059** vs 17T Pro **6209** (UL median, same source). iPhone wins by about 30%. | confirmed | benchmarks.ul.com (both pages) |
+| WebGPU on G1 Ultra | Expected yes (Chrome 121+, Android 12+, ARM GPUs). No per-GPU report. | unconfirmed | gpuweb Implementation-Status |
+| TEE/boot components | TF-A, pKVM (MediaTek pkvm modules), Google Trusty (FF-A), MediaTek ISE Trusty, Microtrust uTOS, Xiaomi MiTEE (cores 4–6) | confirmed present in DT | xiaomi_mt6993_common.dts, xiaomi_warhol_mt6993_mitee.dtsi |
+| NPU precisions | MDLA supports INT4/8/16, FP16, BF16 and mixed precision, plus BitNet 1.58-bit. FP8 is not listed. The precision behind "100 TOPS" is still unstated. | confirmed (support list) | mediatek.com/technology/ai |
+
+New sections added to specs.json: **`parts`** (29 entries), **`versions`**, **`issues`** (I1–I12), and **`supply_chain`**. New conflicts: **#21** (4-lane marketing vs this phone) and **#22** (placeholder PMU names in the DT). Conflicts #16, #18, #19 and #20 have pass-2 resolutions noted.
+
+### Still open after pass 2 (and where I looked)
+| Item | Where searched |
+|---|---|
+| C1-Ultra/Premium ROB size and pipeline depth | Arm TRM and telemetry spec 109820 (only says a commit ROB exists), Chips and Cheese (C1/C2 articles), Geekerwan D9500 video transcript, LLVM C1-Ultra model (320 copied from V3) |
+| GPU max clock (official) | MediaTek/Arm pages; kernel gpufreq_mt6993.c/.h (OPP table lives in GPUEB firmware; PLL range 750–1900 MHz); DT opp table (260 MHz placeholder). 1716 MHz is aggregator plus Kurnal only. |
+| NPU TOPS precision, MAC dimensions, FP8/INT4 throughput | MediaTek product, AI and infographic pages; Android Authority; kernel source (no APU tables) |
+| C1-Pro L1 size | Arm C1-Pro TRM r1p3 (32 or 64 KB configurable); MediaTek CN page (only the C1-Ultra L1 doubling); DT has no cache-size properties |
+| Battery cathode | Xiaomi FAQ/specs, IT之家 金沙江 article, MediaTek launch post, FCC photos (no cell label visible), kernel battery DT |
+| Rear-glass grade | mi.com global/HK/UK FAQ (GG7i listed under display only), launch posts, spare-part listing 5600260P12U00 |
+| NAND layer count | SK hynix newsroom (321-layer UFS 4.1 exists) but nothing ties it to HN8T271EJK |
+| Final assembly EMS/factory | FCC (applicant only), Chinese ODM reporting (BYD/Foxconn/Huaqin/Longcheer mentioned for other models), no 17T Pro source |
+| Display DDIC, OLED emitter code | Panel driver p12u_42_02_0a (DSC cmd, 4 lanes, 144 Hz) names no DDIC; CSOT/IT之家 say only "latest emitter material" |
+| N3P BEOL metals / HKMG | TSMC, WikiChip, TechInsights public summaries: not public |
+| Transistor count | No new primary source; ~30 B (TechInsights/MediaTek) stays, with Kurnal's 27.3 B as an estimate (#19) |
+| PWM | Unchanged. Notebookcheck's 3.84 kHz measurement is confirmed; Xiaomi markets DC dimming (#18) |
+| 16 GB / 256 GB / 1 TB SKU memory parts | FCC samples were both 12G+512G |
+| No public teardown | JerryRig, PBK, 微机分 WekiHome, iFixit, TechInsights all searched; none for 17T Pro. 雷科技's "扒光了小米17T Pro" page timed out. |
+
+### Honest notes
+- The PMIC is MT6661/MT6667, not the MT6363/MT6373 I had guessed earlier. The old note was a wrong lead and has been replaced.
+- My first instinct that "UFS 4.x is always 2-lane, so 4-lane is impossible" was wrong. MediaTek really does support 4 lanes, through two controllers. What decides it for this phone is the single fitted UFS package.
+- The FCC samples are EV-build boards ("1-P20-EV"). Retail boards could use second-source memory, especially in other SKUs.
