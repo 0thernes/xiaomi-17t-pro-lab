@@ -2,10 +2,21 @@ import { el, note, panel } from "../dom.js";
 import { provCited } from "../provenance.js";
 import { siliconNearestNeighbor } from "../sim/device-math.js";
 import { getSpecs } from "../specs.js";
-import { buildDie, buildFinfet, buildLattice, buildPhone, makeMaterials, mountView } from "../graphics/view.js";
+import {
+  buildBoard,
+  buildDie,
+  buildFinfet,
+  buildLattice,
+  buildPackage,
+  buildPhone,
+  makeMaterials,
+  mountView,
+} from "../graphics/view.js";
 
 const SCALES = [
   { id: "phone", label: "Phone", mm: 162.2 },
+  { id: "board", label: "Board", mm: 78 },
+  { id: "package", label: "Package", mm: 16.4 },
   { id: "die", label: "Die", mm: 12.92 },
   { id: "finfet", label: "FinFET", mm: 48e-6 },
   { id: "lattice", label: "Lattice", mm: 0.5431020511e-6 },
@@ -31,14 +42,16 @@ export async function mount(main, { cap }) {
     if (!view) return;
     view.clear();
     const builders = {
-      phone: () => buildPhone(materials, 0.55),
+      phone: () => buildPhone(materials, 0),
+      board: () => buildBoard(materials),
+      package: () => buildPackage(materials),
       die: () => buildDie(materials),
       finfet: () => buildFinfet(materials),
       lattice: () => buildLattice(materials),
     };
-    view.root.add(builders[id]());
-    const distance = { phone: 420, die: 90, finfet: 22, lattice: 14 }[id];
-    view.look(distance, target());
+    const subject = builders[id]();
+    view.root.add(subject);
+    view.frame(subject, 0.88);
     const scale = SCALES.find((item) => item.id === id);
     caption.textContent = `${scale.label}. Characteristic length ${scale.mm} mm. Die and package numbers are cited; the arrangement is a reconstruction.`;
     for (const button of rail.querySelectorAll("button")) {
@@ -80,19 +93,6 @@ export async function mount(main, { cap }) {
   return {
     dispose() {
       view?.dispose();
-    },
-  };
-}
-
-function target() {
-  return {
-    x: 0,
-    y: 0,
-    z: 0,
-    copy(other) {
-      this.x = other?.x || 0;
-      this.y = other?.y || 0;
-      this.z = other?.z || 0;
     },
   };
 }

@@ -21,6 +21,8 @@ Rebuild after v0.1 was rejected. The verified solvers stay. The shell, the model
 ### Changed
 
 - iPhone Geekbench 6.7 stays on its own row. It is Notebookcheck, not the PhoneArena table, and it is not divided into the Xiaomi score.
+- The phone body is an extruded rounded slab (9 mm plan radius, reconstructed), with transmission glass, a camera plateau, side buttons, and a USB-C port. The hero starts assembled and fills the stage. Tiers above medium add the vendored three.js SSAO pass.
+- Open findings are tracked as GitHub issues, not as pull requests: [#2](https://github.com/0thernes/xiaomi-17t-pro-lab/issues/2), [#3](https://github.com/0thernes/xiaomi-17t-pro-lab/issues/3), [#4](https://github.com/0thernes/xiaomi-17t-pro-lab/issues/4).
 
 ## [0.1.0] - 2026-11-12
 

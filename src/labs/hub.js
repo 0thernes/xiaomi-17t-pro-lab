@@ -32,8 +32,9 @@ export async function mount(main, { cap }) {
   const materials = makeMaterials(cap.tier);
   try {
     view = await mountView(canvas, cap);
-    view.root.add(buildPhone(materials, 0.45));
-    view.look(420);
+    const phone = buildPhone(materials, 0);
+    view.root.add(phone);
+    view.frame(phone, 0.92);
     applyMetalPlate(materials).catch(() => {});
   } catch (error) {
     stage.append(note(`WebGL unavailable (${error.message}). The numbers below still come from specs.json.`));
@@ -44,13 +45,15 @@ export async function mount(main, { cap }) {
     min: "0",
     max: "1",
     step: "0.01",
-    value: "0.45",
+    value: "0",
     "aria-label": "Explode the phone",
   });
   explode.addEventListener("input", () => {
     if (!view) return;
     view.clear();
-    view.root.add(buildPhone(materials, Number(explode.value)));
+    const phone = buildPhone(materials, Number(explode.value));
+    view.root.add(phone);
+    view.frame(phone, 0.9);
   });
   const timer = window.setInterval(() => {
     if (view) frameReadout.textContent = `${view.frameMs.toFixed(1)} ms`;
