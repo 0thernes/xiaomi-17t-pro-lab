@@ -1,0 +1,16 @@
+name: Change
+description: A lab change that still obeys the citation rules
+labels: []
+body:
+  - type: textarea
+    attributes:
+      label: What should change
+      description: Which route, and whether the new number is measured, cited, or computed. Unknown stays unknown.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Source
+      description: Link the specs.json leaf or the external source. Do not paste an unsourced figure.
+    validations:
+      required: false

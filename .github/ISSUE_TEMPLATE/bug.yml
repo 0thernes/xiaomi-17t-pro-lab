@@ -1,0 +1,22 @@
+name: Bug
+description: A broken measurement, a wrong figure, or a page that fails
+labels: []
+body:
+  - type: textarea
+    attributes:
+      label: What happened
+      description: What you did, what you expected, and what the page showed. Include the provenance badge on any number that looks wrong.
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Route
+      placeholder: "#/cpu"
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Browser and device
+      placeholder: "Chrome 131 on Pixel, or desktop"
+    validations:
+      required: true

@@ -1,0 +1,6 @@
+vendor/
+docs/research/
+docs/screenshots/
+src/sim/kernels.wasm
+uploads/
+package-lock.json
