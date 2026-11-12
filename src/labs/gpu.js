@@ -21,9 +21,9 @@ export async function mount(main, { cap }) {
     el("p", { class: "lede" }, [
       "A square matrix product runs on WebGPU when this browser has it, otherwise on WebGL2. The tile renderer bins and shades in JavaScript on every visit. The 1716 MHz clock is published and unconfirmed.",
     ]),
+    explore.node,
     status,
     panel("Matmul", [resultHost]),
-    explore.node,
     panel("Published clock, still unconfirmed", [
       kv(
         "Clock",

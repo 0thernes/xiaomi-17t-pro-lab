@@ -25,9 +25,9 @@ function slab(w, h, depth, radius, material) {
   const geo = new THREE.ExtrudeGeometry(roundedRect(w, h, radius), {
     depth,
     bevelEnabled: true,
-    bevelThickness: Math.min(1.15, depth * 0.28),
-    bevelSize: Math.min(1.2, depth * 0.28),
-    bevelSegments: 5,
+    bevelThickness: Math.min(0.28, depth * 0.12),
+    bevelSize: Math.min(0.35, depth * 0.12),
+    bevelSegments: 3,
     curveSegments: 20,
   });
   geo.translate(0, 0, -depth / 2);
@@ -136,17 +136,54 @@ function dieTexture() {
   return tex;
 }
 
-function lens(materials, radius, x, y, z) {
-  const group = new THREE.Group();
-  const barrel = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius * 0.92, 1.4, 32), materials.frame);
-  barrel.rotation.x = Math.PI / 2;
-  const glass = new THREE.Mesh(new THREE.CircleGeometry(radius * 0.78, 32), materials.lens);
-  glass.position.z = 0.72;
-  const pupil = new THREE.Mesh(
-    new THREE.CircleGeometry(radius * 0.34, 24),
-    new THREE.MeshStandardMaterial({ color: 0x071018, emissive: 0x1a4a7a, emissiveIntensity: 0.45, roughness: 0.2 }),
+function wordmark(text, w, h) {
+  const canvas = document.createElement("canvas");
+  canvas.width = 640;
+  canvas.height = 160;
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, 640, 160);
+  ctx.fillStyle = "rgba(255,255,255,0.88)";
+  ctx.font = "500 78px sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(text, 320, 80);
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  const mesh = new THREE.Mesh(
+    new THREE.PlaneGeometry(w, h),
+    new THREE.MeshBasicMaterial({ map: texture, transparent: true, depthWrite: false, toneMapped: false }),
   );
-  pupil.position.z = 0.78;
+  mesh.rotation.y = Math.PI;
+  return mesh;
+}
+
+function lens(materials, radius, x, y, z, flash = false) {
+  const group = new THREE.Group();
+  const barrel = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius * 0.94, 1.5, 40), materials.frame);
+  barrel.rotation.x = Math.PI / 2;
+  const glassMat = flash
+    ? new THREE.MeshStandardMaterial({
+        color: 0xfff4d2,
+        emissive: 0xffe1a8,
+        emissiveIntensity: 0.85,
+        roughness: 0.25,
+        side: THREE.DoubleSide,
+      })
+    : materials.lens.clone();
+  glassMat.side = THREE.DoubleSide;
+  const glass = new THREE.Mesh(new THREE.CircleGeometry(radius * 0.78, 36), glassMat);
+  glass.position.z = -0.82;
+  const pupil = new THREE.Mesh(
+    new THREE.CircleGeometry(radius * (flash ? 0.28 : 0.36), 28),
+    new THREE.MeshStandardMaterial({
+      color: flash ? 0xfff8e8 : 0x061018,
+      emissive: flash ? 0xfff1c2 : 0x3a6ea5,
+      emissiveIntensity: flash ? 1 : 0.7,
+      roughness: 0.18,
+      side: THREE.DoubleSide,
+    }),
+  );
+  pupil.position.z = -0.9;
   group.add(barrel, glass, pupil);
   group.position.set(x, y, z);
   return group;
@@ -165,8 +202,8 @@ export function buildPhone(materials, explode = 0) {
   const body = slab(W, H, T, CORNER_MM, materials.frame);
   group.add(body);
 
-  const rear = slab(W - 2.2, H - 2.2, 0.45, CORNER_MM - 0.5, materials.rear);
-  rear.position.z = -T / 2 - 0.05 - e * 16;
+  const rear = slab(W - 1.4, H - 1.4, 0.55, CORNER_MM - 0.4, materials.rear);
+  rear.position.z = -T / 2 - 0.62 - e * 18;
   group.add(rear);
 
   const glass = slab(W - 3.2, H - 3.2, 0.4, CORNER_MM - 1, materials.glass);
@@ -177,13 +214,26 @@ export function buildPhone(materials, explode = 0) {
   screen.position.z = T / 2 + 1.4 + e * 12;
   group.add(screen);
 
-  const island = slab(34, 42, 2.6, 8, materials.frame);
-  island.position.set(-W * 0.15, H * 0.27, -T / 2 - 1.6 - e * 28);
-  group.add(island);
-  const iz = island.position.z - 1.4;
-  group.add(lens(materials, 6.1, -W * 0.15 - 7, H * 0.27 + 8, iz));
-  group.add(lens(materials, 4.6, -W * 0.15 + 8, H * 0.27 + 8, iz));
-  group.add(lens(materials, 3.8, -W * 0.15 + 0.5, H * 0.27 - 9, iz));
+  const plateau = new THREE.Group();
+  plateau.position.set(-W * 0.18, H * 0.28, -T / 2 - 1.2 - e * 28);
+  const island = slab(38, 38, 2.5, 9, materials.frame);
+  plateau.add(island);
+  const iz = -1.45;
+  plateau.add(lens(materials, 6.4, -8, 8, iz));
+  plateau.add(lens(materials, 6.1, 8, 8, iz));
+  plateau.add(lens(materials, 5.8, -8, -8, iz));
+  plateau.add(lens(materials, 2.3, 8.2, -8.2, iz, true));
+  const pill = new THREE.Mesh(new THREE.CapsuleGeometry(1.15, 5.2, 8, 16), materials.gold);
+  pill.position.set(24, 2, -0.2);
+  plateau.add(pill);
+  group.add(plateau);
+  const leica = wordmark("LEICA", 16, 2.6);
+  leica.position.set(-W * 0.18, H * 0.28 - 26, -T / 2 - 1.05 - e * 20);
+  group.add(leica);
+  const brand = wordmark("XIAOMI", 20, 2.8);
+  brand.rotation.z = Math.PI / 2;
+  brand.position.set(6, -8, -T / 2 - 1.0 - e * 14);
+  group.add(brand);
 
   const power = new THREE.Mesh(new THREE.CapsuleGeometry(0.75, 15, 6, 12), materials.frame);
   power.position.set(W / 2 + 0.2, 24, 0);
@@ -202,10 +252,9 @@ export function buildPhone(materials, explode = 0) {
     board.position.set(0, 8, e * 46);
     group.add(board);
     for (const cam of cameraModules()) {
-      const y = H / 2 - cam.fromTop;
-      group.add(box(cam.w, cam.h, cam.d, materials.frame, cam.dx, y, -T / 2 - 4 - e * 20));
       const plate = partLabel(cam.label);
-      plate.position.set(cam.dx, y, -T / 2 - 8 - e * 20);
+      plate.rotation.y = Math.PI;
+      plate.position.set(cam.dx - 8, H / 2 - cam.fromTop - 36, -T / 2 - 6 - e * 30);
       group.add(plate);
     }
     const cells = (W - 16) / 2;

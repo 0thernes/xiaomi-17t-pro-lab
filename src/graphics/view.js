@@ -4,7 +4,8 @@ import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
 import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
 import { ShaderPass } from "three/addons/postprocessing/ShaderPass.js";
 import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
-import { SSAOPass } from "three/addons/postprocessing/SSAOPass.js";
+import { SAOPass } from "three/addons/postprocessing/SAOPass.js";
+import { SMAAPass } from "three/addons/postprocessing/SMAAPass.js";
 import {
   buildBars,
   buildBoard,
@@ -41,7 +42,7 @@ const GRADE = {
 };
 
 export async function mountView(canvas, cap) {
-  const { renderer, backend } = await createRenderer(canvas, cap);
+  const { renderer, backend } = createRenderer(canvas, cap);
   renderer.setPixelRatio(cap.pixelRatio || 1);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.AgXToneMapping;
@@ -57,7 +58,7 @@ export async function mountView(canvas, cap) {
   const camera = new THREE.PerspectiveCamera(32, 1, 0.05, 4000);
   camera.position.set(18, 12, 46);
 
-  const key = new THREE.DirectionalLight(0xfff3e4, cap.tier === "low" ? 2.4 : 3.1);
+  const key = new THREE.DirectionalLight(0xfff3e4, cap.tier === "low" ? 2.6 : 4.4);
   key.position.set(30, 48, 36);
   key.castShadow = shadows;
   if (shadows) {
@@ -71,8 +72,8 @@ export async function mountView(canvas, cap) {
     key.shadow.camera.bottom = -140;
   }
   scene.add(key);
-  const rim = new THREE.DirectionalLight(0xff7a2a, 0.85);
-  rim.position.set(-28, 16, -18);
+  const rim = new THREE.DirectionalLight(0xffd7ea, 2.6);
+  rim.position.set(-18, 36, -48);
   scene.add(rim);
   const cool = new THREE.DirectionalLight(0x9ecbff, 0.45);
   cool.position.set(-10, 8, 30);
@@ -95,12 +96,7 @@ export async function mountView(canvas, cap) {
   floor.position.y = -86;
   floor.receiveShadow = true;
   scene.add(floor);
-  let composer =
-    cap.tier === "low"
-      ? null
-      : renderer.isWebGPURenderer
-        ? await makeNodeComposer(renderer, scene, camera, cap)
-        : makeComposer(renderer, scene, camera, cap);
+  let composer = cap.tier === "low" ? null : makeComposer(renderer, scene, camera, cap);
   let droppedComposer = false;
   const root = new THREE.Group();
   scene.add(root);
@@ -170,12 +166,16 @@ export async function mountView(canvas, cap) {
     const bounds = new THREE.Box3().setFromObject(object);
     const size = bounds.getSize(new THREE.Vector3());
     const center = bounds.getCenter(new THREE.Vector3());
+    const sphere = bounds.getBoundingSphere(new THREE.Sphere());
+    const radius = Math.max(sphere.radius, size.y * 0.5, 1);
     const vFov = THREE.MathUtils.degToRad(camera.fov);
-    const aspect = Math.max(0.4, camera.aspect || 1);
-    const distY = size.y / 2 / Math.tan(vFov / 2);
-    const distX = size.x / 2 / (Math.tan(vFov / 2) * aspect);
-    const distZ = size.z / 2 / Math.tan(vFov / 2);
-    orbit.set((Math.max(distX, distY, distZ) * 1.35) / fill, center);
+    const aspect = Math.max(0.45, camera.aspect || 1);
+    const hFov = 2 * Math.atan(Math.tan(vFov / 2) * aspect);
+    const dist = (radius / Math.min(Math.sin(vFov / 2), Math.sin(hFov / 2))) * 1.12;
+    camera.near = Math.max(0.2, dist * 0.02);
+    camera.far = dist + radius * 8;
+    camera.updateProjectionMatrix();
+    orbit.set(dist / Math.min(fill, 0.92), sphere.center);
   }
 
   return {
@@ -271,64 +271,15 @@ function studioBackdrop() {
   return texture;
 }
 
-async function createRenderer(canvas, cap) {
+function createRenderer(canvas, cap) {
   const options = {
     canvas,
-    antialias: cap.tier !== "low",
+    antialias: cap.tier === "low",
     alpha: false,
     powerPreference: "high-performance",
     preserveDrawingBuffer: true,
   };
-  if (cap.tier !== "low" && navigator.gpu) {
-    try {
-      const adapter = await navigator.gpu.requestAdapter();
-      if (adapter) {
-        const webgpu = await import("three/webgpu");
-        const gpu = new webgpu.WebGPURenderer(options);
-        await gpu.init();
-        if (gpu.backend?.isWebGPUBackend) return { renderer: gpu, backend: "webgpu" };
-        gpu.dispose?.();
-      }
-    } catch (error) {
-      console.warn("WebGPU renderer fell back to WebGL2", error);
-    }
-  }
   return { renderer: new THREE.WebGLRenderer(options), backend: "webgl2" };
-}
-
-async function makeNodeComposer(renderer, scene, camera, cap) {
-  const tsl = await import("three/tsl");
-  const { bloom } = await import("three/addons/tsl/display/BloomNode.js");
-  const { smaa } = await import("three/addons/tsl/display/SMAANode.js");
-  const { RenderPipeline } = await import("three/webgpu");
-  const scenePass = tsl.pass(scene, camera);
-  scenePass.setMRT(tsl.mrt({ output: tsl.output, emissive: tsl.emissive }));
-  const color = scenePass.getTextureNode("output");
-  const glow = bloom(scenePass.getTextureNode("emissive"), 0.4, 0.3, 0.25);
-  let image = color.add(glow);
-  if (cap.tier === "ultra") {
-    try {
-      const { ao } = await import("three/addons/tsl/display/GTAONode.js");
-      const prePass = tsl.pass(scene, camera);
-      prePass.setMRT(tsl.mrt({ output: tsl.normalView }));
-      const occlusion = ao(prePass.getTextureNode("depth"), prePass.getTextureNode(), camera);
-      const shade = occlusion.getTextureNode().sample(tsl.screenUV).r;
-      image = color.mul(tsl.mix(tsl.float(0.72), tsl.float(1), shade)).add(glow);
-    } catch (error) {
-      console.warn("GTAO disabled", error);
-    }
-  }
-  const pipeline = new RenderPipeline(renderer);
-  pipeline.outputNode = smaa(image);
-  try {
-    pipeline.render();
-    renderer.setRenderTarget(null);
-  } catch (error) {
-    console.warn("Node post stack disabled", error);
-    renderer.setRenderTarget(null);
-    return null;
-  }
-  return pipeline;
 }
 
 function makeComposer(renderer, scene, camera, cap) {
@@ -345,11 +296,18 @@ function makeComposer(renderer, scene, camera, cap) {
   // With an empty read buffer that product is black, which is what the live
   // page showed on every high tier.
   composer.addPass(new RenderPass(scene, camera));
-  // SSAOPass multiplies occlusion onto the beauty pass. On this phone it was
-  // driving the front face to black, so the WebGL fallback leaves it off.
-  // Real WebGPU adapters use the TSL GTAO node instead.
-  const bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), 0.16, 0.35, 0.94);
+  if (cap.tier === "high" || cap.tier === "ultra") {
+    const sao = new SAOPass(scene, camera, new THREE.Vector2(512, 512));
+    sao.params.saoIntensity = 0.08;
+    sao.params.saoScale = 8;
+    sao.params.saoKernelRadius = 24;
+    sao.params.saoBias = 0.5;
+    sao.params.saoBlurRadius = 6;
+    composer.addPass(sao);
+  }
+  const bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), 0.22, 0.42, 0.86);
   composer.addPass(bloom);
+  composer.addPass(new SMAAPass());
   composer.addPass(new ShaderPass(GRADE));
   composer.addPass(new OutputPass());
   return composer;
@@ -383,7 +341,7 @@ function studioScene() {
 }
 
 function attachOrbit(canvas, camera, reduced) {
-  const state = { theta: 0.62, phi: 1.12, radius: 48, auto: false, target: new THREE.Vector3() };
+  const state = { theta: 0.48, phi: 0.78, radius: 48, auto: false, target: new THREE.Vector3() };
   let drag = null;
   function apply() {
     const { theta, phi, radius, target } = state;
@@ -426,6 +384,11 @@ function attachOrbit(canvas, camera, reduced) {
       state.theta += d;
       apply();
     },
+    pose(theta, phi) {
+      if (theta != null) state.theta = theta;
+      if (phi != null) state.phi = Math.min(1.45, Math.max(0.35, phi));
+      apply();
+    },
     set(radius, target) {
       state.radius = radius;
       state.target.copy(target);
@@ -443,7 +406,7 @@ function attachOrbit(canvas, camera, reduced) {
 export function makeMaterials(tier) {
   const rich = tier !== "low";
   const frame = new THREE.MeshPhysicalMaterial({
-    color: 0xc5c9ce,
+    color: 0xdfe3e8,
     metalness: rich ? 1 : 0.55,
     roughness: 0.32,
     clearcoat: rich ? 0.35 : 0,
@@ -490,11 +453,11 @@ export function makeMaterials(tier) {
   const gold = new THREE.MeshStandardMaterial({ color: 0xe2c56a, metalness: rich ? 0.9 : 0.4, roughness: 0.22 });
   const battery = new THREE.MeshStandardMaterial({ color: 0x232824, roughness: 0.7, metalness: 0.15 });
   const rear = new THREE.MeshPhysicalMaterial({
-    color: 0x14161c,
+    color: 0x8a558f,
     metalness: 0.08,
-    roughness: 0.28,
-    clearcoat: rich ? 1 : 0.2,
-    clearcoatRoughness: 0.18,
+    roughness: 0.34,
+    clearcoat: rich ? 0.62 : 0.2,
+    clearcoatRoughness: 0.38,
   });
   const lens = new THREE.MeshPhysicalMaterial({
     color: 0x0a1020,

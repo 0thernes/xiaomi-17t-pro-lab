@@ -328,7 +328,7 @@ h2 {
 
 .stage {
   position: relative;
-  height: min(78vh, 920px);
+  height: min(86vh, 1040px);
   min-height: 320px;
   border-radius: var(--radius);
   overflow: hidden;

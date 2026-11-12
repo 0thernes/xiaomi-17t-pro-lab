@@ -44,7 +44,7 @@ export async function mountExplore(cap, engine, levels) {
     view.root.add(built.group);
     current = built;
     if (!previous) {
-      view.frame(built.group, 0.82);
+      view.frame(built.group, 0.9);
       return;
     }
     flying = true;
@@ -60,7 +60,7 @@ export async function mountExplore(cap, engine, levels) {
       }
       view.root.remove(previous.group);
       flying = false;
-      view.frame(built.group, 0.82);
+      view.frame(built.group, 0.9);
     };
     requestAnimationFrame(step);
   }
