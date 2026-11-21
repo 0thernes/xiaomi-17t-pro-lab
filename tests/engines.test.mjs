@@ -51,7 +51,7 @@ describe("version", () => {
   it("matches package.json and VERSION", () => {
     const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"));
     const file = readFileSync(new URL("../VERSION", import.meta.url), "utf8").trim();
-    assert.equal(VERSION, "0.2.0");
+    assert.equal(VERSION, "1.0.0");
     assert.equal(pkg.version, VERSION);
     assert.equal(file, VERSION);
   });

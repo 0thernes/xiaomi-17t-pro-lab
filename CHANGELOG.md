@@ -2,6 +2,32 @@
 
 All notable changes to this project are documented here. The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project uses [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0] - 2026-11-21
+
+Major visual, ergonomics, physics, and operational workload overhaul.
+
+### Added
+
+- **Precision Instrument UI/UX & Typography**: Replaced `Unbounded` and muddy brown palettes with vendored variable fonts (`Space Grotesk`, `Inter`, `JetBrains Mono`), aerospace obsidian graphite surfaces, custom tactile sliders with live fill progress, KPI readout grids, scale-exponent left rail (`10⁻¹ m → 10⁻¹⁵ m`), and cross-origin timer status pill.
+- **Dedicated Memory & Storage Lab (`#/memory`)**: Live 3D MT6993Z PoP + SK hynix H58GG6AV9H LPDDR5X-9600 (76.8 GB/s) & HN8T271EJK UFS 4.1 (3,021.5 MB/s) showcase, live browser STREAM Triad + 16 MB copy benchmark, log-log CS Roofline plot, and interactive LLM memory-wall decode calculator.
+- **"Mad Scientist" EUV Lithography Lab (`#/litho`)**: Live 3D 13.5 nm reflective optical column + Sn LPP plasma source, 2×2 transfer-matrix 40-pair Mo/Si Bragg multilayer reflectivity spectrum, defocus-aware Abbe aerial image with Conventional/Annular/Dipole illuminators, and live 2D Poisson EUV photon shot-noise & 3σ Line-Edge Roughness resist simulator.
+- **Atomic, FinFET/GAA, Tunneling & Dirac e⁻/e⁺ Lab (`#/transistor`)**: 3D FinFET vs N2 GAA & WKB tunneling / Dirac field switcher, finite-difference Schrödinger eigenstates `|ψ₁..₃|²`, WKB oxide gate-leakage cliff, Kronig–Penney crystal bands, Varshni/Sze thermal carrier density `n_i(T)`, and relativistic Dirac electron-positron dispersion (`2mₑc² = 1.022 MeV`).
+- **Operational Real-Time Workloads (`#/work/*`)**:
+  - Gaming PBR stress arena with live 60-frame frametime oscilloscope (100–4,000 instances).
+  - Neuralese live weight-hacked TinyStories-8M (editable prompt, streaming generation, live 16-head Layer-7 attention heatmap, Top-6 softmax probability bars, MLP/Attention gain, layer ablation, and weight perturbation sliders).
+  - Glitchling 272-neuron 14-region foraging arena with click-to-drop snacks, live 4-flaw injection toggles, and live neural firing raster.
+  - Tsotchke scientific differential computing (live 3D RK4 Lorenz attractor + DOPRI54 stiff Robertson / Van der Pol) and exact complex statevector quantum contextuality engine (Bell CHSH `S = 2√2`, 3-qubit GHZ Mermin-3 `⟨M⟩ = 4.0`, Mermin–Peres 3×3 magic square).
+  - GigaChad mobile sovereign browser shell with live 60 Hz 5-caste stigmergic swarm cortex and hardware/sandbox profiler.
+- **Searchable Forensic Specs & Visual Versus**: Instant search & category filtering on `#/specs`; multi-metric normalized benchmark bar chart and cleaned labels on `#/compare`; 8-step Powers-of-Ten zoom (`#/zoom`) down to subatomic quantum scale.
+- **New Unit Tests (`tests/v1-engines.test.mjs`)**: Verifies Bragg transfer-matrix reflectivity, EUV photon ratio, WKB tunneling, Dirac hyperbola, intrinsic silicon carriers, CS Roofline bounds, Bell CHSH `2√2`, GHZ Mermin-3 `4.0`, and Bloch purity.
+
+### Fixed
+
+- Removed broken `SAOPass` post-processing halo and muddy brown studio backdrop from `src/graphics/view.js`, replacing them with an obsidian calibration reticle turntable, 4-point optical softbox PMREM, selective UnrealBloom, and SMAA under ACES Filmic tone mapping.
+- Replaced fake iOS lockscreen texture with a live HyperOS 3 Dimensity 9500 hardware telemetry OLED display and multi-element Leica Summilux triple-camera optics (including rectangular 5× periscope telephoto).
+- Upgraded CPU/GPU/NPU 3D processor worlds with animated copper bus wave-packets, RTUv2 ray-tracing beams, and non-clipping callout labels.
+- Formatted `data/specs.json` cleanly so `npm run lint` passes with zero warnings.
+
 ## [0.2.0] - 2026-11-12
 
 ### Changed
@@ -44,5 +70,6 @@ First public lab slice for the Xiaomi 17T Pro and Dimensity 9500.
 
 - Phone hub, zoom taxonomy, CPU chase, GPU matmul, NPU-concepts matmul, lithography, transistor solvers, head-to-head, provenance badges, tests, and CI.
 
+[1.0.0]: https://github.com/0thernes/xiaomi-17t-pro-lab/releases/tag/v1.0.0
 [0.2.0]: https://github.com/0thernes/xiaomi-17t-pro-lab/releases/tag/v0.2.0
 [0.1.0]: https://github.com/0thernes/xiaomi-17t-pro-lab/releases/tag/v0.1.0

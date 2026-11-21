@@ -4,6 +4,7 @@ import { createPipeline } from "../sim/pipeline.js";
 import { rasterizeTiles } from "../sim/tiler.js";
 import { fillUnit, matmulQuantized, mulberry32, quantizeSymmetricInt8 } from "../sim/quant.js";
 import { floorplan, getSpecs, npuCounts, parseDieMm, parsePackageMm } from "../specs.js";
+import { buildDie, buildFinfet, buildPackage, buildQuantumField } from "./subjects.js";
 
 const box = (w, h, d, material, x, y, z) => {
   const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), material);
@@ -13,168 +14,39 @@ const box = (w, h, d, material, x, y, z) => {
   return mesh;
 };
 
-function bars(values, material, scale) {
-  const group = new THREE.Group();
-  const max = Math.max(...values, 1e-6);
-  values.forEach((value, i) => {
-    const h = 0.15 + (value / max) * scale;
-    group.add(box(0.35, h, 0.35, material, (i - values.length / 2) * 0.42, h / 2, 0));
-  });
-  return group;
-}
-
-/** PoP as published. TSV and hybrid bonding are context, not a claim for this phone. */
-export function scenePackage(materials) {
-  const specs = getSpecs();
-  const pkg = parsePackageMm(specs);
-  const die = parseDieMm(specs);
-  const group = new THREE.Group();
-  const w = pkg?.widthMm || 16.4;
-  const h = pkg?.heightMm || 14;
-  const thick = pkg?.thickMm || 0.455;
-  group.add(box(w, h, Math.max(thick, 0.35), materials.substrate, 0, 0, 0));
-  const pitch = 0.35;
-  const cols = Math.min(28, Math.floor((w - 0.6) / pitch));
-  const rows = Math.min(24, Math.floor((h - 0.6) / pitch));
-  const balls = new THREE.InstancedMesh(new THREE.SphereGeometry(0.12, 8, 6), materials.gold, cols * rows);
-  const dummy = new THREE.Object3D();
-  let n = 0;
-  for (let j = 0; j < rows; j++) {
-    for (let i = 0; i < cols; i++) {
-      dummy.position.set(-w / 2 + 0.5 + i * pitch, -h / 2 + 0.5 + j * pitch, -thick / 2 - 0.12);
-      dummy.updateMatrix();
-      balls.setMatrixAt(n++, dummy.matrix);
-    }
-  }
-  balls.count = n;
-  group.add(balls);
-  if (die) group.add(box(die.widthMm * 0.92, die.heightMm * 0.92, 0.2, materials.die, 0, 0, thick / 2 + 0.2));
-  group.add(box(w * 0.82, h * 0.78, 0.28, materials.accent, 0, 0, thick / 2 + 0.55));
-  const note =
-    "PoP DRAM over the SoC, flip-chip balls at the cited 0.35 mm pitch. InFO is not evidenced. TSVs and hybrid bonding are not claimed for this phone.";
-  return { group, note, update() {} };
-}
-
-export function sceneFloor(materials) {
-  const plan = floorplan();
-  const die = parseDieMm();
-  const group = new THREE.Group();
-  if (!plan || !die) return { group, note: "Die size is missing.", update() {} };
-  group.add(box(die.widthMm, die.heightMm, 0.18, materials.die, 0, 0, 0));
-  const colors = { cpu: 0xc4552a, gpu: 0x3d6ea8, npu: 0x7a5aaa };
-  for (const block of plan.blocks) {
-    group.add(
-      box(
-        block.widthMm * 0.94,
-        block.heightMm * 0.88,
-        0.16,
-        new THREE.MeshStandardMaterial({
-          color: colors[block.id],
-          roughness: 0.45,
-          metalness: 0.3,
-          map: materials.die.map,
-        }),
-        block.xMm + block.widthMm / 2 - die.widthMm / 2,
-        block.yMm + block.heightMm / 2 - die.heightMm / 2,
-        0.16,
-      ),
-    );
-  }
-  for (let i = -4; i <= 4; i++) {
-    group.add(box(die.widthMm * 0.9, 0.08, 0.04, materials.gold, 0, i * (die.heightMm / 10), 0.28));
-  }
-  return {
-    group,
-    note: "Block areas are Kurnal’s. Positions preserve those areas and are not a trace of the copyrighted die photo. The gold straps are a reconstructed power grid, not a published mesh.",
-    update() {},
-  };
-}
-
-function stageLabel(text) {
+function callout(text, width = 4.6) {
   const canvas = document.createElement("canvas");
-  canvas.width = 256;
-  canvas.height = 64;
+  canvas.width = 1024;
+  canvas.height = 112;
   const ctx = canvas.getContext("2d");
-  ctx.fillStyle = "rgba(12, 11, 10, 0.8)";
-  ctx.fillRect(0, 0, 256, 64);
-  ctx.fillStyle = "#f4efe8";
-  ctx.font = "600 28px sans-serif";
-  ctx.fillText(text, 16, 42);
+  ctx.fillStyle = "rgba(8, 12, 20, 0.9)";
+  ctx.strokeStyle = "rgba(56, 212, 242, 0.58)";
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.roundRect(6, 6, 1012, 100, 18);
+  ctx.fill();
+  ctx.stroke();
+  let size = 38;
+  ctx.font = `600 ${size}px monospace`;
+  while (size > 18 && ctx.measureText(text).width > 940) {
+    size -= 2;
+    ctx.font = `600 ${size}px monospace`;
+  }
+  ctx.fillStyle = "#eef4ff";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(text, 512, 56);
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
-  const plate = new THREE.Mesh(
-    new THREE.PlaneGeometry(2.4, 0.6),
-    new THREE.MeshBasicMaterial({ map: texture, transparent: true, toneMapped: false }),
+  return new THREE.Mesh(
+    new THREE.PlaneGeometry(width, width * (112 / 1024)),
+    new THREE.MeshBasicMaterial({ map: texture, transparent: true, toneMapped: false, side: THREE.DoubleSide }),
   );
-  return plate;
-}
-
-export function scenePipeline(materials) {
-  const group = new THREE.Group();
-  const names = ["Fetch", "Decode", "Issue", "Execute", "Write"];
-  const tones = [0xc9a15b, 0xd7d3cc, 0xb87333, 0x8ea0b5, 0xe8e2d8];
-  const stages = names.map((name, i) => {
-    const metal = new THREE.MeshPhysicalMaterial({
-      color: tones[i],
-      metalness: 0.85,
-      roughness: 0.28,
-      clearcoat: 0.4,
-      emissive: 0xff7a1a,
-      emissiveIntensity: 0.08,
-    });
-    const mesh = box(2.2, 1.5, 1.8, metal, i * 3.4 - 6.8, 0, 0);
-    mesh.name = name;
-    group.add(mesh);
-    const plate = stageLabel(name);
-    plate.position.set(mesh.position.x, 1.35, 1.05);
-    group.add(plate);
-    return mesh;
-  });
-  const token = new THREE.Mesh(new THREE.SphereGeometry(0.28, 16, 12), materials.accent);
-  group.add(token);
-  const trail = [];
-  for (let i = 0; i < 6; i++) {
-    const bead = new THREE.Mesh(new THREE.SphereGeometry(0.1, 12, 8), materials.accent.clone());
-    bead.material.emissiveIntensity = 0.2 + i * 0.08;
-    trail.push(bead);
-    group.add(bead);
-  }
-  const sim = createPipeline(
-    [
-      { op: "load", dst: 1, addr: 0 },
-      { op: "add", dst: 2, a: 1, b: 1 },
-      { op: "add", dst: 3, a: 2, b: 1 },
-    ],
-    { loadLatency: 3 },
-  );
-  let acc = 0;
-  let last = null;
-  return {
-    group,
-    note: "Five-stage in-order model. A dependent load stalls. C1-Ultra’s cited decode is 10 MOPs/cycle and 23 issue ports. This animation is not that microarchitecture.",
-    update(dt) {
-      acc += dt;
-      if (acc > 0.35) {
-        acc = 0;
-        last = sim.tick();
-      }
-      const occupied = last?.occupied?.[0];
-      const index = occupied ? names.findIndex((name) => name.toLowerCase().startsWith(occupied.stage.slice(0, 3))) : 0;
-      const x = Math.max(0, index) * 3.4 - 6.8;
-      token.position.x += (x - token.position.x) * Math.min(1, dt * 4);
-      token.position.y = 1.35;
-      trail.forEach((bead, i) => {
-        bead.position.x = token.position.x - (i + 1) * 0.45;
-        bead.position.y = 1.35;
-        bead.position.z = 0.2;
-      });
-    },
-  };
 }
 
 function sramGrid(material, cols, rows, pitch, origin) {
   const mesh = new THREE.InstancedMesh(
-    new THREE.BoxGeometry(pitch * 0.72, pitch * 0.22, pitch * 0.72),
+    new THREE.BoxGeometry(pitch * 0.76, pitch * 0.28, pitch * 0.76),
     material,
     cols * rows,
   );
@@ -191,215 +63,421 @@ function sramGrid(material, cols, rows, pitch, origin) {
   return mesh;
 }
 
-function callout(text) {
-  const canvas = document.createElement("canvas");
-  canvas.width = 512;
-  canvas.height = 96;
-  const ctx = canvas.getContext("2d");
-  ctx.fillStyle = "rgba(12,11,10,0.8)";
-  ctx.fillRect(0, 0, 512, 96);
-  ctx.fillStyle = "#f4efe8";
-  ctx.font = "600 36px sans-serif";
-  ctx.fillText(text, 16, 60);
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.colorSpace = THREE.SRGBColorSpace;
-  return new THREE.Mesh(
-    new THREE.PlaneGeometry(3.4, 0.64),
-    new THREE.MeshBasicMaterial({ map: texture, transparent: true, toneMapped: false }),
-  );
+/** Elevated bus rail with animated glowing wave-packets. */
+function busLine(start, end, material, count = 5) {
+  const group = new THREE.Group();
+  const dir = new THREE.Vector3().subVectors(end, start);
+  const len = dir.length();
+  const rail = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, len, 8), material);
+  rail.position.copy(start).add(end).multiplyScalar(0.5);
+  rail.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.clone().normalize());
+  group.add(rail);
+  const packets = [];
+  const geo = new THREE.SphereGeometry(0.13, 12, 10);
+  for (let i = 0; i < count; i++) {
+    const p = new THREE.Mesh(geo, material);
+    packets.push(p);
+    group.add(p);
+  }
+  return {
+    group,
+    update(t, speed = 0.55) {
+      for (let i = 0; i < packets.length; i++) {
+        const u = (t * speed + i / packets.length) % 1;
+        packets[i].position.lerpVectors(start, end, u);
+      }
+    },
+  };
 }
 
-export function sceneUltra(materials) {
-  const specs = getSpecs();
+export function scenePackage(materials) {
   const group = new THREE.Group();
-  group.add(box(18, 0.28, 10, materials.substrate, 0, -0.4, 0));
-  const laneMat = new THREE.MeshPhysicalMaterial({
-    color: 0xff7a1a,
-    metalness: 0.25,
-    roughness: 0.32,
-    emissive: 0xff7a1a,
-    emissiveIntensity: 0.65,
+  const pkg = buildPackage(materials);
+  pkg.rotation.x = -Math.PI / 2;
+  group.add(pkg);
+  const note =
+    "MT6993Z HB-MUFPOP (16.40 × 14.00 × 0.455 mm, 0.35 mm pitch) with stacked SK hynix H58GG6AV9H 12 GB LPDDR5X-9600 (4×16-bit PoP).";
+  return {
+    group,
+    note,
+    update(dt) {
+      group.rotation.y += dt * 0.14;
+    },
+  };
+}
+
+export function sceneFloor(materials) {
+  const group = buildDie(materials);
+  const b1 = busLine(
+    new THREE.Vector3(-4.2, 2.2, 0.55),
+    new THREE.Vector3(4.2, 2.2, 0.55),
+    materials.cyan || materials.accent,
+    6,
+  );
+  const b2 = busLine(new THREE.Vector3(-4.2, -1.8, 0.55), new THREE.Vector3(4.2, -1.8, 0.55), materials.accent, 6);
+  const b3 = busLine(
+    new THREE.Vector3(0, -5.2, 0.55),
+    new THREE.Vector3(0, 5.2, 0.55),
+    materials.violet || materials.gold,
+    6,
+  );
+  group.add(b1.group, b2.group, b3.group);
+  return {
+    group,
+    note: "Dimensity 9500 (10.88 × 12.92 = 140.57 mm², ~30B transistors). Block areas match Kurnal's decap report; live packets trace coherent DSU/L3/SLC fabric buses.",
+    update() {
+      const t = performance.now() * 0.001;
+      b1.update(t, 0.5);
+      b2.update(t, 0.72);
+      b3.update(t, 0.44);
+    },
+  };
+}
+
+export function scenePipeline(materials) {
+  const group = new THREE.Group();
+  group.add(box(18.5, 0.3, 6.2, materials.substrate, 0, -1.1, 0));
+  const names = ["Fetch (L1I)", "Decode (10w)", "Rename / OoO", "Issue (23p)", "Execute / WB"];
+  const mats = [
+    materials.cyan || materials.silicon,
+    materials.accent,
+    materials.violet || materials.copper,
+    materials.gold,
+    materials.silicon,
+  ];
+  const stages = names.map((name, i) => {
+    const x = i * 3.5 - 7.0;
+    const base = box(2.5, 1.5, 2.4, mats[i], x, -0.2, 0);
+    const cap = box(2.6, 0.16, 2.5, materials.frame, x, 0.65, 0);
+    const tag = callout(name, 2.8);
+    tag.position.set(x, 1.65, 0);
+    group.add(base, cap, tag);
+    return base;
   });
-  for (let i = 0; i < 10; i++) group.add(box(0.7, 1.8, 0.7, laneMat, -5.4 + i * 1.15, 1.2, 2.4));
-  for (let i = 0; i < 23; i++) group.add(box(0.18, 2.4, 0.36, materials.copper, -6.2 + i * 0.55, -0.2, -2.6));
-  group.add(sramGrid(materials.gold, 28, 14, 0.22, { x: -3.1, y: 0.15, z: -1.2 }));
-  const metal = [23, 32, 48, 70, 96];
-  metal.forEach((pitch, i) => {
-    group.add(
-      box(0.15 + pitch / 80, 0.12, 3.2, i === 0 ? materials.gold : materials.copper, 8.2, -1.2 + i * 0.28, 1.2),
-    );
-  });
-  const finMat = materials.silicon.clone();
-  const fins = new THREE.InstancedMesh(new THREE.BoxGeometry(0.12, 0.9, 2.2), finMat, 8);
-  const dummy = new THREE.Object3D();
-  for (let i = 0; i < 8; i++) {
-    dummy.position.set(-8.2 + i * 0.28, 0.5, 2.2);
-    dummy.updateMatrix();
-    fins.setMatrixAt(i, dummy.matrix);
-  }
-  group.add(fins);
-  const gate = box(2.4, 0.22, 0.35, materials.frame, -7.2, 1.15, 2.2);
-  group.add(gate);
-  const packets = [];
-  for (let i = 0; i < 8; i++) {
-    const bead = new THREE.Mesh(new THREE.SphereGeometry(0.16, 14, 10), materials.accent.clone());
-    bead.material.emissiveIntensity = 0.4 + i * 0.08;
-    packets.push(bead);
-    group.add(bead);
-  }
-  const metalLabel = callout("23 nm metal, scaled");
-  metalLabel.position.set(8.2, 0.8, 3.1);
-  const finLabel = callout("48 nm gate pitch");
-  finLabel.position.set(-7.2, 1.9, 3.4);
-  group.add(metalLabel, finLabel);
+
+  const bus = busLine(
+    new THREE.Vector3(-7.0, 0.9, 0),
+    new THREE.Vector3(7.0, 0.9, 0),
+    materials.cyan || materials.accent,
+    9,
+  );
+  group.add(bus.group);
+
   const sim = createPipeline(
     [
       { op: "load", dst: 1, addr: 0 },
       { op: "add", dst: 2, a: 1, b: 1 },
+      { op: "add", dst: 3, a: 2, b: 1 },
     ],
     { loadLatency: 3 },
   );
   let acc = 0;
-  const text = specs.soc.c1_ultra_frontend_width?.value || "10-wide decode";
+  let last = null;
   return {
     group,
-    note: `C1-Ultra reconstruction. Cited: ${text}. L1I ${specs.soc.l1i_kb_c1_ultra.value} KB, L1D ${specs.soc.l1d_kb_c1_ultra.value} KB. Ten lanes are the decode width. Twenty-three copper posts are the issue ports. The SRAM field, the 23 nm metal stack, and the 48 nm fins are scaled drawings, not a die photo. Packets follow a live in-order pipeline.`,
+    note: "Live 5-stage pipeline simulation (stalls on load-use hazards) contextualizing Arm C1-Ultra's cited 10 MOP/cycle decode, 20 µOP/cycle dispatch, ~2K in-flight window, and 23 issue ports.",
     update(dt) {
       acc += dt;
-      if (acc > 0.28) {
+      if (acc > 0.35) {
         acc = 0;
-        sim.tick();
+        last = sim.tick();
       }
       const t = performance.now() * 0.001;
-      packets.forEach((bead, i) => {
-        const u = (t * 0.35 + i / packets.length) % 1;
-        bead.position.set(-5.4 + u * 10.2, 2.3, 2.4);
+      bus.update(t, last?.stalls ? 0.25 : 0.65);
+      stages.forEach((mesh, idx) => {
+        mesh.position.y = -0.2 + Math.sin(t * 3 + idx) * 0.06;
       });
     },
   };
 }
 
-export function sceneCache(materials, points) {
+export function sceneUltra(materials) {
+  const specs = getSpecs();
   const group = new THREE.Group();
-  const levels = [
-    { name: "L1", y: 3.2, w: 3.2, mat: materials.gold },
-    { name: "L2", y: 1.1, w: 5.2, mat: materials.copper },
-    { name: "L3", y: -1, w: 7.4, mat: materials.frame },
-    { name: "SLC", y: -3.1, w: 9.6, mat: materials.silicon },
-  ];
-  for (const level of levels) group.add(box(level.w, 0.45, 2.4, level.mat, 0, level.y, 0));
-  const trail = [];
-  for (let i = 0; i < 8; i++) {
-    const packet = new THREE.Mesh(new THREE.SphereGeometry(0.16 + i * 0.01, 16, 12), materials.accent.clone());
-    packet.material.emissiveIntensity = 0.3 + i * 0.08;
-    trail.push(packet);
-    group.add(packet);
+  // Silicon substrate deck with copper perimeter ring
+  group.add(box(20, 0.36, 12, materials.substrate, 0, -0.5, 0));
+  group.add(box(20.2, 0.12, 12.2, materials.pcb, 0, -0.72, 0));
+
+  // 10-wide Decode front-end pipelines (glowing orange)
+  const lanes = [];
+  for (let i = 0; i < 10; i++) {
+    const lane = box(0.72, 1.85, 0.9, materials.accent, -5.8 + i * 1.28, 0.62, 3.2);
+    lanes.push(lane);
+    group.add(lane);
   }
+  // 23-port Execution Array (copper + cyan FP/ASIMD + violet SME2)
+  for (let i = 0; i < 23; i++) {
+    const isFp = i >= 11 && i < 17;
+    const isLs = i >= 17;
+    const mat = isFp
+      ? materials.cyan || materials.accent
+      : isLs
+        ? materials.violet || materials.gold
+        : materials.copper;
+    group.add(box(0.28, 2.2, 0.48, mat, -7.2 + i * 0.65, 0.8, -3.4));
+  }
+  // 64 KB L1I + 128 KB L1D + 2 MB L2 banked 6T SRAM array
+  group.add(sramGrid(materials.gold, 32, 16, 0.26, { x: -4.1, y: 0.05, z: -1.8 }));
+
+  // Shared 512-bit SME2 matrix engine tile
+  group.add(box(3.2, 1.1, 3.6, materials.violet || materials.silicon, 7.6, 0.25, -1.6));
+  const smeLabel = callout("SME2 512b", 3.0);
+  smeLabel.position.set(7.6, 1.85, -1.6);
+  group.add(smeLabel);
+
+  // Scaled 48 nm FinFET edge + 23 nm BEOL stack
+  for (let i = 0; i < 6; i++) {
+    group.add(box(0.14, 1.1, 2.6, materials.silicon, -8.6 + i * 0.3, 0.35, 3.0));
+  }
+  group.add(box(2.1, 0.25, 0.45, materials.copper, -7.85, 1.05, 3.0));
+
+  // Live micro-op wave-packets streaming from 10-wide Decode -> SRAM -> 23 Issue Ports
+  const b1 = busLine(new THREE.Vector3(-5.8, 1.8, 3.2), new THREE.Vector3(5.8, 1.8, 3.2), materials.accent, 8);
+  const b2 = busLine(
+    new THREE.Vector3(-4.0, 0.6, 2.5),
+    new THREE.Vector3(-4.0, 0.6, -3.0),
+    materials.cyan || materials.accent,
+    5,
+  );
+  const b3 = busLine(
+    new THREE.Vector3(4.0, 0.6, 2.5),
+    new THREE.Vector3(4.0, 0.6, -3.0),
+    materials.cyan || materials.accent,
+    5,
+  );
+  group.add(b1.group, b2.group, b3.group);
+
+  const topTag = callout("C1-Ultra · 10-Wide Decode · 23 Issue Ports · L1 64/128 KB", 9.6);
+  topTag.position.set(0, 3.4, -3.4);
+  group.add(topTag);
+
+  const text = specs.soc.c1_ultra_frontend_width?.value || "10 MOPs/cycle decode";
   return {
     group,
-    note: "The packet falls through L1, L2, L3, and SLC. Its pause uses the measured pointer-chase ns/load when that sweep has finished. The rises are not named L1.",
-    update(dt, data) {
-      const ns = data?.points?.[data.points.length - 1]?.nsPerLoad || 8;
-      const speed = 1.2 / Math.max(1, ns / 8);
-      const t = (group.userData.t = (group.userData.t || 0) + dt * speed);
-      trail.forEach((packet, i) => {
-        const u = ((t - i * 0.12) % 4) / 4;
-        packet.position.y = 3.2 - u * 6.2;
-        packet.position.x = Math.sin(t * 3 + i) * 0.35;
+    note: `Arm C1-Ultra reconstruction (3.259 mm², 4.21 GHz). Cited: ${text}; L1I 64 KB / L1D 128 KB / L2 2 MB; SVE2 128b + shared SME2 512b. Live packets pulse decode→issue traffic.`,
+    update() {
+      const t = performance.now() * 0.001;
+      b1.update(t, 0.55);
+      b2.update(t, 0.8);
+      b3.update(t + 0.35, 0.8);
+      lanes.forEach((l, i) => {
+        l.scale.y = 0.82 + 0.28 * Math.sin(t * 4.5 + i * 0.7);
       });
+    },
+  };
+}
+
+export function sceneCache(materials) {
+  const group = new THREE.Group();
+  const levels = [
+    { name: "L1D · 128 KB (C1-Ultra)", y: 3.6, w: 4.2, d: 2.6, mat: materials.cyan || materials.gold },
+    { name: "L2 · 2 MB Private", y: 1.4, w: 6.4, d: 3.2, mat: materials.accent },
+    { name: "L3 · 16 MB Shared DSU", y: -0.9, w: 9.0, d: 4.0, mat: materials.violet || materials.frame },
+    { name: "SLC · 10 MB System Cache", y: -3.2, w: 11.4, d: 4.6, mat: materials.copper },
+    { name: "LPDDR5X-9600 · 76.8 GB/s", y: -5.4, w: 13.6, d: 5.2, mat: materials.silicon },
+  ];
+  for (const lv of levels) {
+    group.add(box(lv.w, 0.55, lv.d, lv.mat, 0, lv.y, 0));
+    const tag = callout(lv.name, 4.8);
+    tag.position.set(lv.w / 2 + 2.8, lv.y, 0);
+    group.add(tag);
+  }
+  const bus = busLine(
+    new THREE.Vector3(0, 3.8, 0),
+    new THREE.Vector3(0, -5.4, 0),
+    materials.cyan || materials.accent,
+    10,
+  );
+  group.add(bus.group);
+
+  return {
+    group,
+    note: "Dimensity 9500 memory hierarchy from L1D (128 KB) down to 16 MB L3, 10 MB SLC, and 76.8 GB/s SK hynix LPDDR5X-9600. Packet velocity adapts live to your measured pointer-chase ns/load.",
+    update(dt, data) {
+      const ns = data?.points?.[data.points.length - 1]?.nsPerLoad || 12;
+      const speed = Math.max(0.2, Math.min(1.4, 6 / Math.max(2, ns)));
+      const t = (group.userData.t = (group.userData.t || 0) + dt * speed);
+      bus.update(t, 1);
     },
   };
 }
 
 export function sceneSram(materials) {
   const group = new THREE.Group();
+  group.add(box(14, 0.25, 8, materials.substrate, 0, -1.2, 0));
+  group.add(sramGrid(materials.silicon, 24, 12, 0.42, { x: -4.8, y: -0.95, z: -2.4 }));
+  // Hero 6T SRAM bitcell elevated above array
   const cell = new THREE.Group();
-  for (let i = 0; i < 6; i++)
-    cell.add(box(0.35, 0.7, 0.25, i < 4 ? materials.silicon : materials.copper, (i - 2.5) * 0.55, 0, 0));
-  cell.add(box(3.4, 0.08, 0.08, materials.gold, 0, 0.55, 0));
-  cell.add(box(3.4, 0.08, 0.08, materials.gold, 0, -0.55, 0));
-  const mesh = new THREE.InstancedMesh(new THREE.BoxGeometry(3.6, 1.6, 0.4), materials.frame, 16);
-  const dummy = new THREE.Object3D();
-  for (let i = 0; i < 16; i++) {
-    dummy.position.set((i % 4) * 4 - 6, Math.floor(i / 4) * 2 - 3, -0.6);
-    dummy.updateMatrix();
-    mesh.setMatrixAt(i, dummy.matrix);
+  cell.position.set(0, 1.4, 0);
+  for (let i = 0; i < 6; i++) {
+    const isPass = i === 0 || i === 5;
+    cell.add(
+      box(0.55, 1.15, 0.45, isPass ? materials.accent : materials.cyan || materials.silicon, (i - 2.5) * 0.9, 0, 0),
+    );
   }
-  group.add(mesh, cell);
+  cell.add(box(5.8, 0.12, 0.14, materials.gold, 0, 0.95, 0)); // Wordline WL
+  cell.add(box(5.8, 0.12, 0.14, materials.copper, 0, -0.95, 0.5)); // BL / BLB
+  cell.add(box(5.8, 0.12, 0.14, materials.copper, 0, -0.95, -0.5));
+  const tag = callout("6T SRAM Bitcell · WL / BL / Cross-Coupled Inverters", 8.2);
+  tag.position.set(0, 3.2, 0);
+  group.add(cell, tag);
   return {
     group,
-    note: "Textbook 6T SRAM: four logic transistors and two pass devices, plus bitlines. Cell height in tracks for N3P is not published. This is not a MediaTek bitcell.",
-    update(dt) {
-      cell.position.y = Math.sin(performance.now() * 0.004) * 0.15;
+    note: "6T SRAM array (2 pull-up PMOS, 2 pull-down NMOS, 2 pass gates). Used across L1/L2/L3/SLC and NPU 7 MiB L1 / 4 MiB L2 buffers.",
+    update() {
+      cell.position.y = 1.4 + Math.sin(performance.now() * 0.003) * 0.16;
     },
   };
 }
 
 export function sceneFinfet(materials) {
-  const specs = getSpecs();
-  const pitch = specs.soc.process_n3e_cpp_nm.value;
-  const group = new THREE.Group();
-  const u = 0.09;
-  const fins = new THREE.InstancedMesh(new THREE.CapsuleGeometry(pitch * u * 0.07, 5.5, 4, 8), materials.silicon, 6);
-  const dummy = new THREE.Object3D();
-  for (let i = 0; i < 6; i++) {
-    dummy.position.set((i - 2.5) * pitch * u, 0, 0);
-    dummy.updateMatrix();
-    fins.setMatrixAt(i, dummy.matrix);
-  }
-  group.add(fins);
-  group.add(box(pitch * u * 6.4, 0.9, 2.8, materials.copper, 0, 2.2, 0));
-  group.add(box(1.2, 0.35, 2.2, materials.gold, 0, 2.8, 0));
+  const group = buildFinfet(materials);
+  // Side-by-side TSMC N2 3-ribbon GAA Nanosheet comparison
   const gaa = new THREE.Group();
-  for (let i = 0; i < 3; i++) gaa.add(box(4.2, 0.18, 1.1, materials.accent, 0, i * 0.45, 0));
-  gaa.position.set(8, 0, 0);
+  gaa.position.set(13.5, 0, 0);
+  gaa.add(box(5.8, 1.4, 8.6, materials.substrate, 0, -2.1, 0));
+  for (let i = 0; i < 3; i++) {
+    gaa.add(box(4.6, 0.34, 6.8, materials.violet || materials.accent, 0, -0.4 + i * 0.92, 0));
+    gaa.add(box(4.9, 0.54, 2.3, materials.hfo2 || materials.cyan, 0, -0.4 + i * 0.92, 0));
+  }
+  gaa.add(box(5.2, 3.3, 1.8, materials.copper, 0, 0.65, 0));
+  const gaaTag = callout("TSMC N2 GAA Nanosheet (Contrast Only)", 6.4);
+  gaaTag.position.set(0, 4.4, 0);
+  gaa.add(gaaTag);
   group.add(gaa);
+
   return {
     group,
-    note: `N3P FinFET. Gate pitch ${pitch} nm is the cited N3E rule N3P keeps. Fin count and fin pitch are unpublished, so the six fins are a drawing. The sheets on the right are TSMC N2 GAA, a comparison, not this die.`,
-    update() {},
+    note: "Left: Dimensity 9500 TSMC N3P FinFET (48 nm CPP, 23 nm M0, tri-gate wrap + HfO₂ high-k dielectric + live channel electron drift). Right: TSMC N2 3-ribbon GAA nanosheet contrast.",
+    update(dt) {
+      group.traverse((obj) => {
+        if (obj.userData.drift) {
+          obj.position.z += dt * obj.userData.drift.speed;
+          if (obj.position.z > 3.5) obj.position.z = -3.5;
+        }
+      });
+    },
   };
 }
 
 export function sceneBeol(materials) {
   const group = new THREE.Group();
-  const pitches = [23, 28, 36, 48, 64, 80, 100, 130];
+  const pitches = [23, 28, 36, 48, 64, 84, 110, 150];
   pitches.forEach((pitch, i) => {
-    const w = 1.2 + i * 0.55;
-    group.add(box(w * 3.2, 0.12, w, i === 0 ? materials.gold : materials.copper, 0, i * 0.55, 0));
+    const horizontal = i % 2 === 0;
+    const count = Math.max(3, 10 - i);
+    for (let k = 0; k < count; k++) {
+      const offset = (k - (count - 1) / 2) * (0.42 + i * 0.16);
+      const bar = box(
+        horizontal ? 8.5 : 0.16 + i * 0.06,
+        0.16 + i * 0.03,
+        horizontal ? 0.16 + i * 0.06 : 8.5,
+        i === 0 ? materials.gold : i < 4 ? materials.copper : materials.frame,
+        horizontal ? 0 : offset,
+        i * 0.62 - 2.0,
+        horizontal ? offset : 0,
+      );
+      group.add(bar);
+    }
   });
+  const tag = callout("BEOL Copper Interconnect Stack · M0 23 nm → Global Power", 8.8);
+  tag.position.set(0, 3.6, 0);
+  group.add(tag);
   return {
     group,
-    note: "Only the 23 nm minimum metal pitch is cited. The taller layers use wider pitches as a reconstruction of a typical BEOL, not a TSMC N3P deck. Dielectrics between the sheets are not a published stack.",
-    update() {},
+    note: "Orthogonal BEOL metal routing stack anchored on N3E/N3P's cited 23 nm M0 minimum pitch scaling upward to thicker low-resistance global power distribution layers.",
+    update(dt) {
+      group.rotation.y += dt * 0.18;
+    },
   };
 }
 
+/** 3D ASML NXE 0.33 NA EUV Lithography Column + Sn Plasma + Bragg Mirrors + Wafer. */
 export function sceneLitho(materials) {
-  const image = aerialImage({ na: 0.33, pitchNm: 40, sigma: 0.5, n: 64, periods: 2 });
-  const group = bars(Array.from(image.intensity), materials.accent, 3.2);
+  const group = new THREE.Group();
+  // 1. Sn droplet plasma source (13.5 nm = 91.84 eV)
+  const plasma = new THREE.Mesh(new THREE.SphereGeometry(0.65, 20, 16), materials.cyan || materials.accent);
+  plasma.position.set(-6.2, 3.6, 0);
+  group.add(plasma);
+  const collector = new THREE.Mesh(
+    new THREE.SphereGeometry(1.7, 24, 16, 0, Math.PI * 2, 0, Math.PI * 0.45),
+    materials.gold,
+  );
+  collector.rotation.z = -Math.PI * 0.65;
+  collector.position.set(-6.7, 4.1, 0);
+  group.add(collector);
+
+  // 2. Reflective photomask reticle (4x magnification)
+  const reticle = box(3.6, 0.2, 3.6, materials.die, 0, 4.4, 0);
+  group.add(reticle);
+
+  // 3. Mo/Si 40-pair Bragg multilayer projection optics mirrors
+  const m1 = new THREE.Mesh(new THREE.CylinderGeometry(1.4, 1.4, 0.25, 36), materials.frame);
+  m1.position.set(2.4, 1.8, 0);
+  m1.rotation.z = 0.55;
+  const m2 = new THREE.Mesh(new THREE.CylinderGeometry(1.8, 1.8, 0.25, 36), materials.frame);
+  m2.position.set(-1.4, -0.4, 0);
+  m2.rotation.z = -0.42;
+  group.add(m1, m2);
+
+  // 4. 300 mm Silicon Wafer & Live 3D Abbe Aerial Image Intensity Profile
+  const wafer = new THREE.Mesh(new THREE.CylinderGeometry(5.2, 5.2, 0.22, 48), materials.silicon);
+  wafer.position.set(0, -3.2, 0);
+  group.add(wafer);
+
+  const image = aerialImage({ na: 0.33, pitchNm: 40, sigma: 0.5, n: 64, periods: 3 });
+  for (let i = 0; i < image.intensity.length; i++) {
+    const h = 0.1 + image.intensity[i] * 1.4;
+    group.add(box(0.09, h, 2.6, materials.accent, -3.2 + (i / 63) * 6.4, -3.0 + h / 2, 0));
+  }
+
+  // Live 13.5 nm EUV photon beam paths bouncing through reflective vacuum optics
+  const b1 = busLine(
+    new THREE.Vector3(-6.2, 3.6, 0),
+    new THREE.Vector3(0, 4.3, 0),
+    materials.cyan || materials.accent,
+    6,
+  );
+  const b2 = busLine(
+    new THREE.Vector3(0, 4.3, 0),
+    new THREE.Vector3(2.4, 1.8, 0),
+    materials.violet || materials.cyan,
+    5,
+  );
+  const b3 = busLine(
+    new THREE.Vector3(2.4, 1.8, 0),
+    new THREE.Vector3(-1.4, -0.4, 0),
+    materials.violet || materials.cyan,
+    5,
+  );
+  const b4 = busLine(new THREE.Vector3(-1.4, -0.4, 0), new THREE.Vector3(0, -2.9, 0), materials.accent, 5);
+  group.add(b1.group, b2.group, b3.group, b4.group);
+
+  const tag = callout("EUV 13.5 nm · Sn LPP → Mo/Si Bragg → 0.33 NA Wafer", 9.0);
+  tag.position.set(0, 5.8, 0);
+  group.add(tag);
+
   return {
     group,
-    note: `Live Abbe aerial image at NA 0.33, pitch 40 nm. Contrast ${image.contrast.toFixed(3)}. High-NA 0.55 is not claimed for N3P. Bar height is the computed intensity.`,
-    update(dt) {
-      group.rotation.y += dt * 0.2;
+    note: `Live 13.5 nm EUV reflective optical train (NA 0.33) projecting Abbe aerial image (contrast ${image.contrast.toFixed(3)}) onto resist wafer. Open the EUV Litho tab for Bragg reflectivity, defocus, and photon shot noise.`,
+    update() {
+      const t = performance.now() * 0.001;
+      b1.update(t, 0.9);
+      b2.update(t, 0.9);
+      b3.update(t, 0.9);
+      b4.update(t, 0.9);
+      plasma.scale.setScalar(0.92 + 0.15 * Math.sin(t * 14));
     },
   };
 }
 
 export function sceneWave(materials) {
-  const n = 48;
-  const values = [];
-  for (let i = 0; i < n; i++) {
-    const x = (i + 1) / (n + 1);
-    values.push(Math.sin(2 * Math.PI * x) ** 2);
-  }
-  const group = bars(values, materials.silicon, 2.8);
+  const group = buildQuantumField(materials);
   return {
     group,
-    note: "Probability density of the n=2 infinite well, analytic sin². It is textbook confinement in a fin-scale well, not a 9500 device wavefunction.",
-    update(dt) {
-      group.rotation.y += dt * 0.25;
+    note: "Complex quantum wavefunction ψ(x,t) tunneling through an ultra-thin oxide barrier alongside counter-rotating relativistic Dirac e⁻ / e⁺ trajectories.",
+    update() {
+      group.userData.animateQuantum?.(performance.now() * 0.001);
     },
   };
 }
@@ -407,39 +485,43 @@ export function sceneWave(materials) {
 export function sceneTiler(materials) {
   const shaded = rasterizeTiles(
     [
-      { x0: 2, y0: 2, x1: 26, y1: 4, x2: 6, y2: 24, r: 255, g: 122, b: 26 },
-      { x0: 10, y0: 8, x1: 28, y1: 28, x2: 16, y2: 6, r: 80, g: 140, b: 220 },
+      { x0: 2, y0: 2, x1: 28, y1: 5, x2: 6, y2: 26, r: 255, g: 105, b: 0 },
+      { x0: 10, y0: 8, x1: 30, y1: 30, x2: 16, y2: 4, r: 56, g: 212, b: 242 },
     ],
     { width: 32, height: 32, tileSize: 8 },
   );
+  const group = new THREE.Group();
+  group.add(box(7.2, 0.25, 7.2, materials.substrate, 0, -0.35, 0));
   const tiles = shaded.tilesX * shaded.tilesY;
-  const geo = new THREE.BoxGeometry(0.9, 0.3, 0.9);
-  const mat = new THREE.MeshStandardMaterial({
-    color: 0x223044,
-    emissive: 0xff7a1a,
-    emissiveIntensity: 0.2,
-    roughness: 0.4,
-  });
-  const mesh = new THREE.InstancedMesh(geo, mat, tiles);
-  const dummy = new THREE.Object3D();
-  const heights = [];
+  const cells = [];
   for (let i = 0; i < tiles; i++) {
     const x = i % shaded.tilesX;
     const y = Math.floor(i / shaded.tilesX);
     const count = shaded.bins[i].length;
-    heights.push(count);
-    dummy.position.set(x - 1.5, count * 0.35, y - 1.5);
-    dummy.scale.set(1, 0.4 + count, 1);
-    dummy.updateMatrix();
-    mesh.setMatrixAt(i, dummy.matrix);
+    const h = 0.22 + count * 0.95;
+    const m = box(
+      1.25,
+      h,
+      1.25,
+      count >= 2 ? materials.accent : count === 1 ? materials.cyan || materials.gold : materials.silicon,
+      (x - 1.5) * 1.48,
+      h / 2 - 0.15,
+      (y - 1.5) * 1.48,
+    );
+    cells.push({ m, count });
+    group.add(m);
   }
-  const group = new THREE.Group();
-  group.add(mesh);
+  const tag = callout(`TBDR Live Tile Binning · ${shaded.touched} Bins · ${shaded.shaded} px`, 7.2);
+  tag.position.set(0, 3.2, 0);
+  group.add(tag);
   return {
     group,
-    note: `Live binning. ${shaded.touched} tiles touched, ${shaded.shaded} pixels shaded. Tile height is the triangle count in that bin. This is not Mali’s tiler.`,
-    update(dt) {
-      mesh.material.emissiveIntensity = 0.25 + 0.55 * (0.5 + 0.5 * Math.sin(performance.now() * 0.004));
+    note: `Live Deferred Vertex Shading & Tile-Based Deferred Rendering binner (${shaded.touched} active tiles, ${shaded.shaded} shaded pixels). Column height = triangle depth per tile.`,
+    update() {
+      const t = performance.now() * 0.003;
+      cells.forEach(({ m, count }, idx) => {
+        if (count > 0) m.position.y = (0.22 + count * 0.95) / 2 - 0.15 + Math.sin(t + idx) * 0.07;
+      });
     },
   };
 }
@@ -447,49 +529,73 @@ export function sceneTiler(materials) {
 export function sceneGpuCore(materials) {
   const shaded = rasterizeTiles(
     [
-      { x0: 2, y0: 2, x1: 30, y1: 6, x2: 8, y2: 28, r: 255, g: 122, b: 26 },
-      { x0: 12, y0: 10, x1: 30, y1: 30, x2: 18, y2: 4, r: 90, g: 150, b: 230 },
+      { x0: 2, y0: 2, x1: 30, y1: 6, x2: 8, y2: 28, r: 255, g: 105, b: 0 },
+      { x0: 12, y0: 10, x1: 30, y1: 30, x2: 18, y2: 4, r: 56, g: 212, b: 242 },
     ],
     { width: 32, height: 32, tileSize: 8 },
   );
   const group = new THREE.Group();
-  group.add(box(9.2, 0.2, 4.2, materials.substrate, 0, -0.3, 0));
+  group.add(box(15.2, 0.34, 10.6, materials.substrate, 0, -0.45, 0));
+  group.add(box(15.5, 0.14, 10.9, materials.pcb, 0, -0.68, 0));
+
+  // 12 Mali-G1 Ultra MC12 Shader Cores (3x4 array, 1.55 mm² each) + RTUv2 ray-tracing engines
+  const cores = [];
   for (let i = 0; i < 12; i++) {
-    const core = box(1.35, 0.7, 1.15, materials.silicon, (i % 4) * 1.7 - 2.55, 0.35, Math.floor(i / 4) * 1.35 - 1.2);
-    group.add(core);
+    const cx = (i % 4) * 2.5 - 3.75;
+    const cz = Math.floor(i / 4) * 2.1 - 2.6;
+    const core = box(2.05, 0.85, 1.65, materials.silicon, cx, 0.15, cz);
+    const rtu = box(1.85, 0.16, 0.32, materials.cyan || materials.accent, cx, 0.65, cz + 0.48);
+    const alu = box(1.85, 0.16, 0.65, materials.copper, cx, 0.65, cz - 0.25);
+    cores.push({ core, rtu });
+    group.add(core, rtu, alu);
   }
+
+  // 2 MiB L2 Cache Fabric Bar across rear
+  group.add(box(10.6, 0.55, 1.2, materials.gold, 0, 0.05, -4.3));
+  const l2Tag = callout("2 MiB GPU L2 + CSF", 4.6);
+  l2Tag.position.set(0, 1.25, -4.3);
+  group.add(l2Tag);
+
+  // Live RTUv2 ray-tracing beams + TBDR elevated tile-binning grid in front
+  const ray1 = busLine(
+    new THREE.Vector3(-4.2, 1.2, -2.5),
+    new THREE.Vector3(3.8, 1.4, 3.2),
+    materials.cyan || materials.accent,
+    6,
+  );
+  const ray2 = busLine(new THREE.Vector3(4.0, 1.2, -2.0), new THREE.Vector3(-3.6, 1.3, 3.4), materials.accent, 6);
+  group.add(ray1.group, ray2.group);
+
   const tiles = shaded.tilesX * shaded.tilesY;
-  const tileMat = new THREE.MeshStandardMaterial({
-    color: 0xffffff,
-    emissive: 0xff7a1a,
-    roughness: 0.35,
-    metalness: 0.15,
-  });
-  const mesh = new THREE.InstancedMesh(new THREE.BoxGeometry(0.42, 0.2, 0.42), tileMat, tiles);
-  const dummy = new THREE.Object3D();
-  const color = new THREE.Color();
   for (let i = 0; i < tiles; i++) {
     const x = i % shaded.tilesX;
     const y = Math.floor(i / shaded.tilesX);
     const count = shaded.bins[i].length;
-    dummy.position.set(x * 0.5 - 0.75, 0.2 + count * 0.22, y * 0.5 + 2.3);
-    dummy.scale.set(1, 0.4 + count * 1.4, 1);
-    dummy.updateMatrix();
-    mesh.setMatrixAt(i, dummy.matrix);
-    color.set(count ? 0xff7a1a : 0x243044);
-    mesh.setColorAt(i, color);
+    const h = 0.18 + count * 0.42;
+    group.add(
+      box(
+        0.56,
+        h,
+        0.56,
+        count ? materials.accent : materials.silicon,
+        (x - 1.5) * 0.72,
+        h / 2 - 0.18,
+        2.85 + (y - 1.5) * 0.72,
+      ),
+    );
   }
-  group.add(mesh);
-  group.add(box(6.4, 0.28, 0.7, materials.gold, 0, 0.1, -2.3));
-  const label = callout("Live tile bins");
-  label.position.set(0, 1.6, 4.3);
-  group.add(label);
+
+  const topTag = callout("Arm Mali-G1 Ultra MC12 · 12 Shader Cores · RTUv2 · 24.23 mm²", 10.6);
+  topTag.position.set(0, 2.9, -4.3);
+  group.add(topTag);
+
   return {
     group,
-    note: `Twelve shader cores, the cited MC12 count, and a 2 MiB L2 bar. The tiles are this lab’s binner: ${shaded.touched} bins touched, ${shaded.shaded} pixels shaded. Lit tiles are the ones that received a triangle. This is not a Mali floorplan. GPU block area is 24.23 mm².`,
-    update(dt) {
-      const pulse = 0.35 + 0.65 * (0.5 + 0.5 * Math.sin(performance.now() * 0.004));
-      mesh.material.emissiveIntensity = pulse;
+    note: `12 Mali-G1 Ultra shader cores (1.55 mm² each, 256 FP32 ops/core/clk), 2 MiB L2, RTUv2 ray-tracing beams, and live TBDR tile bins (${shaded.touched} touched, ${shaded.shaded} px shaded).`,
+    update() {
+      const t = performance.now() * 0.001;
+      ray1.update(t, 0.85);
+      ray2.update(t + 0.4, 0.78);
     },
   };
 }
@@ -505,35 +611,60 @@ export function sceneNpu(materials) {
   const C = matmulQuantized(aq.q, aq.scale, bq.q, bq.scale, n);
   let max = 1e-6;
   for (const v of C) max = Math.max(max, Math.abs(v));
+
   const group = new THREE.Group();
-  group.add(box(n + 1.2, 0.16, n + 1.2, materials.substrate, 0, -0.2, 0));
+  group.add(box(17.2, 0.32, 11.4, materials.substrate, 0, -0.45, 0));
+  group.add(box(17.5, 0.14, 11.7, materials.pcb, 0, -0.68, 0));
+
+  // 8x8 Live INT8 Systolic MAC Tensor Array (right side)
   const cells = [];
   for (let y = 0; y < n; y++) {
     for (let x = 0; x < n; x++) {
       const mag = Math.abs(C[y * n + x]) / max;
-      const mesh = box(0.62, 0.18 + mag * 1.6, 0.62, materials.accent, x - n / 2 + 0.5, mag * 0.45, y - n / 2 + 0.5);
-      mesh.material = materials.accent.clone();
+      const h = 0.24 + mag * 1.95;
+      const mat = (x + y) % 2 === 0 ? materials.accent.clone() : (materials.violet || materials.accent).clone();
+      const mesh = box(0.68, h, 0.68, mat, 2.2 + (x - n / 2 + 0.5) * 0.85, h / 2 - 0.2, (y - n / 2 + 0.5) * 0.85);
       mesh.userData.mag = mag;
       cells.push(mesh);
       group.add(mesh);
     }
   }
-  group.add(sramGrid(materials.gold, 18, 8, 0.28, { x: -6.6, y: 0.2, z: -1.1 }));
+
+  // 4x MDLA Deep Learning Accelerators (1.811 mm² each) + 2x MVPU + 7 MiB L1 / 4 MiB L2 SRAM
   for (let i = 0; i < (counts.mdla || 4); i++) {
-    group.add(box(1.5, 0.55, 1.1, materials.silicon, -6.4, 0.5, 2.2 + i * 1.25));
+    group.add(box(2.4, 0.85, 1.35, materials.silicon, -5.8, 0.15, -3.2 + i * 1.85));
+    group.add(box(2.2, 0.16, 1.15, materials.cyan || materials.gold, -5.8, 0.65, -3.2 + i * 1.85));
   }
-  const label = callout("INT8 MAC");
-  label.position.set(0, 2.2, n / 2 + 0.4);
-  group.add(label);
+  for (let i = 0; i < (counts.mvpu || 2); i++) {
+    group.add(box(1.5, 0.72, 1.8, materials.copper, -3.2, 0.1, -2.4 + i * 3.2));
+  }
+  group.add(sramGrid(materials.gold, 16, 12, 0.28, { x: -4.4, y: -0.18, z: 2.2 }));
+
+  const b1 = busLine(
+    new THREE.Vector3(-4.6, 0.7, -1.0),
+    new THREE.Vector3(5.6, 0.7, -1.0),
+    materials.cyan || materials.accent,
+    7,
+  );
+  const b2 = busLine(new THREE.Vector3(-4.6, 0.7, 1.2), new THREE.Vector3(5.6, 0.7, 1.2), materials.accent, 7);
+  group.add(b1.group, b2.group);
+
+  const topTag = callout(`NPU 990 · ${counts.mdla}× MDLA + ${counts.mvpu}× MVPU + CIM · Live INT8 Array`, 10.6);
+  topTag.position.set(0, 3.3, -4.6);
+  group.add(topTag);
+
   return {
     group,
-    note: `${counts.mdla} MDLA and ${counts.mvpu} MVPU are cited. Column height and the sweeping glow are a live INT8 matmul in this page. It does not run on NPU 990. The SRAM block is a drawing. CIM cell geometry is unpublished.`,
+    note: `${counts.mdla} MDLA + ${counts.mvpu} MVPU + 4 MiB L2 + CIM Super Efficient NPU (12.60 mm²). Column heights & sweeping wave show a live INT8 systolic product computed in JS/WASM (not dispatched to NPU 990).`,
     update() {
-      const sweep = (performance.now() * 0.0012) % n;
+      const t = performance.now() * 0.001;
+      const sweep = (t * 2.2) % n;
+      b1.update(t, 0.85);
+      b2.update(t + 0.5, 0.85);
       cells.forEach((cell, i) => {
         const col = i % n;
         const near = 1 - Math.min(1, Math.abs(col - sweep) / 2.2);
-        cell.material.emissiveIntensity = 0.12 + cell.userData.mag * (0.35 + near * 1.1);
+        cell.material.emissiveIntensity = 0.22 + cell.userData.mag * (0.45 + near * 1.2);
       });
     },
   };
@@ -548,7 +679,7 @@ const CPU_SCENE = {
   cpu_l6_uarch: "ultra",
   cpu_l7_frontend: "pipeline",
   cpu_l8_fu: "pipeline",
-  cpu_l9_sme2: "pipeline",
+  cpu_l9_sme2: "ultra",
   cpu_l10_cache: "cache",
   cpu_l11_mmu: "cache",
   cpu_l12_circuit: "sram",

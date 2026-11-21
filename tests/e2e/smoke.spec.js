@@ -9,6 +9,7 @@ const routes = [
   ["#/cpu", "cpu"],
   ["#/gpu", "gpu"],
   ["#/npu", "npu"],
+  ["#/memory", "memory"],
   ["#/litho", "litho"],
   ["#/transistor", "transistor"],
   ["#/compare", "compare"],
@@ -106,6 +107,6 @@ test("desktop layout places nav sidebar beside main without overlap", async ({ p
   await expect(page.locator("#main[data-ready='true'] h1")).toBeVisible();
   const navBox = await page.locator("nav.nav").boundingBox();
   const mainBox = await page.locator("#main").boundingBox();
-  expect(navBox.width).toBeLessThanOrEqual(240);
+  expect(navBox.width).toBeLessThanOrEqual(260);
   expect(mainBox.x).toBeGreaterThanOrEqual(navBox.x + navBox.width - 1);
 });

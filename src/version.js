@@ -1,2 +1,2 @@
-/** Single version string. Keep package.json, VERSION, and CHANGELOG in step. */
-export const VERSION = "0.2.0";
+/** Matches package.json and VERSION. Checked in tests. */
+export const VERSION = "1.0.0";

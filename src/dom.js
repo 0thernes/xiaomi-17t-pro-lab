@@ -21,9 +21,12 @@ export function append(node, children) {
   return node;
 }
 
-export function panel(title, children, extra) {
+export function panel(title, children, extra, kicker) {
+  const headLeft = kicker
+    ? el("div", {}, [el("span", { class: "panel-kicker" }, [kicker]), el("h2", {}, [title])])
+    : el("h2", {}, [title]);
   return el("section", { class: "panel" }, [
-    el("div", { class: "panel-head" }, [el("h2", {}, [title]), extra || null]),
+    el("div", { class: "panel-head" }, [headLeft, extra || null]),
     ...[].concat(children || []),
   ]);
 }
@@ -38,4 +41,46 @@ export function kv(label, value) {
     el("div", { class: "kv-label" }, [label]),
     el("div", { class: "kv-value" }, [valueNode]),
   ]);
+}
+
+export function readout(label, value, unit = "", { tone = "", sub = "" } = {}) {
+  const valEl = el("div", { class: "readout-value" }, [
+    value instanceof Node ? value : String(value),
+    unit ? el("small", {}, [unit]) : null,
+  ]);
+  return el("div", { class: `readout-card${tone ? ` ${tone}` : ""}` }, [
+    el("span", { class: "readout-label" }, [label]),
+    valEl,
+    sub ? el("span", { class: "readout-sub" }, [sub]) : null,
+  ]);
+}
+
+export function readoutGrid(cards) {
+  return el("div", { class: "readout-grid" }, cards);
+}
+
+/** Tactile range slider with live orange track fill and tabular output chip. */
+export function rangeControl(label, min, max, step, value, formatOut = (v) => String(v)) {
+  const input = el("input", {
+    type: "range",
+    min: String(min),
+    max: String(max),
+    step: String(step),
+    value: String(value),
+    "aria-label": label,
+  });
+  const output = el("output", {}, [formatOut(value)]);
+  const sync = () => {
+    const pct = ((Number(input.value) - min) / Math.max(1e-12, max - min)) * 100;
+    input.style.setProperty("--fill", `${Math.max(0, Math.min(100, pct))}%`);
+    output.textContent = formatOut(Number(input.value));
+  };
+  sync();
+  input.addEventListener("input", sync);
+  return {
+    node: el("label", { class: "slider" }, [el("span", {}, [label]), output, input]),
+    input,
+    output,
+    sync,
+  };
 }

@@ -1,10 +1,8 @@
 /**
- * GPT-Neo forward pass for roneneldan/TinyStories-8M.
+ * GPT-Neo forward pass for roneneldan/TinyStories-8M with Neuralese-style live
+ * weight hacking hooks, per-layer attention telemetry, and top-k probability readout.
  * Architecture from the model's config.json: 8 layers, d=256, 16 heads,
  * gelu_new, alternating global/local attention, window 256.
- * The matvec layout matches Hugging Face Linear weights stored as [out, in].
- * This is the lab's own loop. Neuralese (MIT) is the browser project that
- * established this weight layout for the same checkpoint.
  *
  * The run is JavaScript on the CPU thread. It is not the NPU 990.
  */
@@ -93,8 +91,14 @@ export function createStream(weights) {
   const keys = Array.from({ length: layers }, () => []);
   const values = Array.from({ length: layers }, () => []);
   let pos = 0;
+  let lastTelemetry = null;
 
-  function step(token) {
+  function step(token, hacks = null) {
+    const mlpGain = hacks?.mlpGain ?? 1;
+    const attnGain = hacks?.attnGain ?? 1;
+    const ablateLayer = hacks?.ablateLayer ?? -1;
+    const noiseAmp = hacks?.noiseAmp ?? 0;
+
     const x = new Float32Array(d);
     const tokenBase = token * d;
     const posBase = Math.min(pos, TINY_STORIES.maxPos - 1) * d;
@@ -108,6 +112,10 @@ export function createStream(weights) {
     const ffHidden = new Float32Array(ff);
     const ffOut = new Float32Array(d);
 
+    const layerNorms = new Float32Array(layers);
+    const headEntropy = new Float32Array(layers * heads);
+    let lastLayerAttn = null;
+
     for (let layer = 0; layer < layers; layer++) {
       const P = weights.layers[layer];
       layerNorm(x, P.ln1w, P.ln1b, h);
@@ -119,6 +127,8 @@ export function createStream(weights) {
       const length = keys[layer].length;
       const start = P.local ? Math.max(0, length - window) : 0;
       ctx.fill(0);
+      if (layer === layers - 1) lastLayerAttn = Array.from({ length: heads }, () => new Float32Array(length));
+
       for (let head = 0; head < heads; head++) {
         const offset = head * headDim;
         let maxScore = -Infinity;
@@ -136,22 +146,36 @@ export function createStream(weights) {
           scores[s] = Math.exp(scores[s] - maxScore);
           sum += scores[s];
         }
+        let ent = 0;
         for (let s = start; s < length; s++) {
           const weight = scores[s] / sum;
+          if (weight > 1e-8) ent -= weight * Math.log2(weight);
+          if (lastLayerAttn) lastLayerAttn[head][s] = weight;
           const value = values[layer][s];
           for (let j = 0; j < headDim; j++) ctx[offset + j] += weight * value[offset + j];
         }
+        headEntropy[layer * heads + head] = ent;
       }
-      matvec(P.o, ctx, attnOut, d, d, P.ob);
-      for (let i = 0; i < d; i++) x[i] += attnOut[i];
-      layerNorm(x, P.ln2w, P.ln2b, h);
-      matvec(P.fc, h, ffHidden, ff, d, P.fcb);
-      for (let i = 0; i < ff; i++) ffHidden[i] = geluNew(ffHidden[i]);
-      matvec(P.proj, ffHidden, ffOut, d, ff, P.projb);
-      for (let i = 0; i < d; i++) x[i] += ffOut[i];
+
+      if (layer !== ablateLayer) {
+        matvec(P.o, ctx, attnOut, d, d, P.ob);
+        for (let i = 0; i < d; i++) x[i] += attnOut[i] * attnGain;
+        layerNorm(x, P.ln2w, P.ln2b, h);
+        matvec(P.fc, h, ffHidden, ff, d, P.fcb);
+        for (let i = 0; i < ff; i++) ffHidden[i] = geluNew(ffHidden[i]);
+        matvec(P.proj, ffHidden, ffOut, d, ff, P.projb);
+        for (let i = 0; i < d; i++) {
+          const jitter = noiseAmp > 0 ? (Math.sin((layer * 31 + pos * 17 + i) * 12.9898) * 43758.5453) % 1 : 0;
+          x[i] += ffOut[i] * mlpGain + jitter * noiseAmp;
+        }
+      }
+      let norm2 = 0;
+      for (let i = 0; i < d; i++) norm2 += x[i] * x[i];
+      layerNorms[layer] = Math.sqrt(norm2);
     }
     layerNorm(x, weights.lnfW, weights.lnfB, h);
     pos += 1;
+    lastTelemetry = { pos, layerNorms, headEntropy, lastLayerAttn };
     return h;
   }
 
@@ -172,7 +196,43 @@ export function createStream(weights) {
     return best;
   }
 
-  return { step, argmax };
+  /** Top-K next-token probability distribution (softmax at temperature). */
+  function topK(hidden, k = 8, temperature = 1) {
+    const { vocab } = TINY_STORIES;
+    const wte = weights.wte;
+    const invT = 1 / Math.max(0.05, temperature);
+    const logits = new Float32Array(vocab);
+    let maxL = -Infinity;
+    for (let i = 0; i < vocab; i++) {
+      let sum = 0;
+      const row = i * d;
+      for (let j = 0; j < d; j++) sum += wte[row + j] * hidden[j];
+      const v = sum * invT;
+      logits[i] = v;
+      if (v > maxL) maxL = v;
+    }
+    let expSum = 0;
+    for (let i = 0; i < vocab; i++) expSum += Math.exp(logits[i] - maxL);
+    const best = [];
+    for (let i = 0; i < vocab; i++) {
+      const l = logits[i];
+      if (best.length < k || l > best[best.length - 1].logit) {
+        best.push({ id: i, logit: l, prob: Math.exp(l - maxL) / expSum });
+        best.sort((a, b) => b.logit - a.logit);
+        if (best.length > k) best.pop();
+      }
+    }
+    return best;
+  }
+
+  return {
+    step,
+    argmax,
+    topK,
+    get telemetry() {
+      return lastTelemetry;
+    },
+  };
 }
 
 /** Greedy continuation. `promptIds` are consumed first; their last hidden state predicts the next token. */

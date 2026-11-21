@@ -19,6 +19,12 @@ The postprocessing and environment helpers under `vendor/three/examples/jsm/` ar
 
 The file is the official minified build so a phone does not parse the multi-megabyte unminified source. It is not authored code of this lab. Modifications to p5 itself would need to follow the LGPL; this repo does not modify it.
 
+## Space Grotesk, Inter, JetBrains Mono (Variable Fonts)
+
+- Path: `vendor/fonts/space-grotesk-*.woff2`, `inter-*.woff2`, `jetbrains-mono-*.woff2`
+- License: SIL Open Font License 1.1 (`SPACE-GROTESK-OFL.txt`, `INTER-OFL.txt`, `JETBRAINS-MONO-OFL.txt`)
+- Distributed via Fontsource
+
 ## Unbounded, Source Sans 3, IBM Plex Mono
 
 - Path: `vendor/fonts/unbounded-*.woff2`, `source-sans-3-*.woff2`, `ibm-plex-mono-latin-400-normal.woff2`

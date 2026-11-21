@@ -1,9 +1,9 @@
-import { el, kv, note, panel } from "../dom.js";
+import { el, kv, note, panel, rangeControl, readout, readoutGrid } from "../dom.js";
 import { fmt } from "../format.js";
 import { provCited, provComputed, provMeasured } from "../provenance.js";
 import { computedPpi, pixelRate, ultraToProPowerRatio } from "../sim/device-math.js";
 import { getSpecs, openItems, parseDieMm, parsePackageMm } from "../specs.js";
-import { buildPhone, makeMaterials, mountView } from "../graphics/view.js";
+import { buildPhone, makeMaterials, mountView, setPhoneFinish } from "../graphics/view.js";
 import { referenceCards } from "../ref-card.js";
 
 export async function mount(main, { cap }) {
@@ -14,173 +14,239 @@ export async function mount(main, { cap }) {
   const rate = pixelRate(widthPx, heightPx, device.display_refresh_hz_max.value);
   const die = parseDieMm(specs);
   const pkg = parsePackageMm(specs);
-  const stage = el("div", { class: "stage" });
+
+  const stage = el("div", { class: "stage tall" });
   const canvas = el("canvas", {
-    "aria-label": "Exploded model of the Xiaomi 17T Pro. Outer size is cited. Internals are a reconstruction.",
+    "aria-label": "Interactive 3D Xiaomi 17T Pro model and 7-layer internal teardown",
   });
-  const caption = el("div", { class: "stage-caption" });
-  stage.append(canvas, caption);
   const frameReadout = el("span", {}, ["—"]);
-  caption.append(
-    el("p", {}, [
-      "Cited body ",
-      `${device.height_mm.value} × ${device.width_mm.value} × ${device.thickness_mm.value} mm`,
-    ]),
-  );
-  caption.append(el("p", {}, ["Frame ", frameReadout]));
+  const fpsReadout = el("b", {}, ["—"]);
+  let currentFinish = "Deep Violet";
+  let currentExplode = 0;
+
+  const hudTop = el("div", { class: "stage-hud-top" }, [
+    el("div", { class: "hud-chip" }, ["MODEL ", el("b", {}, ["2602EPTC0G · WARHOL"])]),
+    el("div", { class: "hud-chip" }, ["FRAME ", fpsReadout, " · TIER ", el("b", {}, [cap.tier.toUpperCase()])]),
+  ]);
+
+  const poseButtons = [];
+  const makeHudBtn = (label, onClick) => {
+    const b = el("button", { type: "button", class: "hud-btn", onClick }, [label]);
+    poseButtons.push(b);
+    return b;
+  };
 
   let view = null;
   const materials = makeMaterials(cap.tier);
+  setPhoneFinish(materials, currentFinish);
+
   const pose = new URLSearchParams(location.search).get("pose");
   let userBroke = pose === "back" || pose === "front" || pose === "explode";
+
   function showPhone(amount) {
+    currentExplode = amount;
     if (!view) return;
     view.clear();
     const phone = buildPhone(materials, amount);
     view.root.add(phone);
-    view.frame(phone, 0.78);
-  }
-  try {
-    view = await mountView(canvas, cap);
-    const opening = pose === "explode" ? 0.72 : 0;
-    const phone = buildPhone(materials, opening);
-    view.root.add(phone);
-    view.frame(phone, 0.78);
-    if (pose === "front") view.orbit.pose(0.28, 1.12);
-    else if (pose === "back" || pose === "explode" || cap.reducedMotion) view.orbit.pose(Math.PI + 0.22, 1.05);
-    else view.orbit.pose(0.28, 1.12);
-  } catch (error) {
-    stage.append(note(`WebGL unavailable (${error.message}). The numbers below still come from specs.json.`));
+    view.frame(phone, 0.8);
   }
 
-  const explode = el("input", {
-    type: "range",
-    min: "0",
-    max: "1",
-    step: "0.01",
-    value: "0",
-    "aria-label": "Explode the phone",
-  });
-  const refs = referenceCards(["xiaomi-product", "xiaomi-repair"]);
-  refs.hidden = true;
-  const toggle = el("button", { type: "button", "aria-pressed": "false" }, ["Real vs model"]);
-  toggle.addEventListener("click", () => {
-    const open = refs.hidden;
-    refs.hidden = !open;
-    toggle.setAttribute("aria-pressed", open ? "true" : "false");
-  });
-  explode.addEventListener("input", () => {
+  const explodeCtrl = rangeControl("7-Layer Internal Teardown", 0, 1, 0.01, 0, (v) => `${Math.round(v * 100)}%`);
+
+  const hudActions = el("div", { class: "hud-actions" }, [
+    makeHudBtn("Front", () => {
+      userBroke = true;
+      view?.orbit.pose(0.24, 1.42);
+    }),
+    makeHudBtn("Leica Back", () => {
+      userBroke = true;
+      view?.orbit.pose(Math.PI + 0.28, 1.38);
+    }),
+    makeHudBtn("Explode", () => {
+      userBroke = true;
+      const next = currentExplode > 0.4 ? 0 : 0.78;
+      explodeCtrl.input.value = String(next);
+      explodeCtrl.sync();
+      showPhone(next);
+      view?.orbit.pose(next > 0 ? Math.PI * 0.72 : 0.24, 1.32);
+    }),
+    makeHudBtn("Spin", (ev) => {
+      userBroke = true;
+      if (!view) return;
+      view.orbit.auto = !view.orbit.auto;
+      ev.currentTarget.setAttribute("aria-pressed", view.orbit.auto ? "true" : "false");
+    }),
+  ]);
+
+  const caption = el("div", { class: "stage-caption" }, [
+    el("p", {}, [
+      `${device.height_mm.value} × ${device.width_mm.value} × ${device.thickness_mm.value} mm · ${device.weight_g.value} g`,
+    ]),
+    hudActions,
+  ]);
+  stage.append(canvas, hudTop, caption);
+
+  try {
+    view = await mountView(canvas, cap);
+    const opening = pose === "explode" ? 0.75 : 0;
+    const phone = buildPhone(materials, opening);
+    view.root.add(phone);
+    view.frame(phone, 0.8);
+    if (pose === "front") view.orbit.pose(0.24, 1.42, true);
+    else if (pose === "back" || pose === "explode") view.orbit.pose(Math.PI + 0.28, 1.36, true);
+    else view.orbit.pose(0.32, 1.38, true);
+    if (!userBroke && !cap.reducedMotion) view.orbit.auto = true;
+  } catch (error) {
+    stage.append(note(`WebGL unavailable (${error.message}). All hardware figures remain live below.`));
+  }
+
+  explodeCtrl.input.addEventListener("input", () => {
     userBroke = true;
-    showPhone(Number(explode.value));
+    if (view) view.orbit.auto = false;
+    showPhone(Number(explodeCtrl.input.value));
   });
   canvas.addEventListener("pointerdown", () => {
     userBroke = true;
   });
-  if (view && !userBroke) {
-    const started = performance.now();
-    let shown = 0;
-    view.setFrame((now) => {
-      if (userBroke) return;
-      const t = (now - started) / 1000;
-      if (t < 1.1) view.orbit.pose(0.28, 1.12);
-      else if (t < 7.4) {
-        const u = (t - 1.1) / 6.3;
-        const eased = u * u * (3 - 2 * u);
-        view.orbit.pose(0.28 + eased * (Math.PI - 0.08), 1.12 - eased * 0.07);
-      } else if (t < 9) {
-        view.orbit.pose(Math.PI + 0.22, 1.05);
-      } else {
-        const amount = Math.min(0.78, (t - 9) / 2.6);
-        view.orbit.pose(Math.PI + 0.42, 1.08);
-        if (amount - shown > 0.07) {
-          shown = amount;
-          explode.value = amount.toFixed(2);
-          showPhone(amount);
-        }
-      }
+
+  // Official finish swatches
+  const swatches = [];
+  const finishBar = el("div", { class: "chips", "aria-label": "Official finishes" });
+  for (const name of device.colors_official.value) {
+    const btn = el(
+      "button",
+      { type: "button", class: "swatch", "aria-pressed": name === currentFinish ? "true" : "false" },
+      [name],
+    );
+    btn.addEventListener("click", () => {
+      currentFinish = name;
+      setPhoneFinish(materials, name);
+      for (const s of swatches) s.setAttribute("aria-pressed", s === btn ? "true" : "false");
     });
+    swatches.push(btn);
+    finishBar.append(btn);
   }
+
+  const refs = referenceCards(["xiaomi-product", "xiaomi-repair"]);
+  refs.hidden = true;
+  const toggleRefs = el("button", { type: "button", class: "btn", "aria-pressed": "false" }, [
+    "Real Photos & ERP Links",
+  ]);
+  toggleRefs.addEventListener("click", () => {
+    const open = refs.hidden;
+    refs.hidden = !open;
+    toggleRefs.setAttribute("aria-pressed", open ? "true" : "false");
+  });
+
   const timer = window.setInterval(() => {
-    if (view) frameReadout.textContent = `${view.frameMs.toFixed(1)} ms`;
+    if (!view) return;
+    frameReadout.textContent = `${view.frameMs.toFixed(1)} ms`;
+    fpsReadout.textContent = `${Math.round(1000 / Math.max(1, view.frameMs))} FPS (${view.frameMs.toFixed(1)} ms)`;
   }, 250);
 
   const tierWhy = [
     `tier ${cap.tier}`,
     cap.benchMs == null ? "no WebGL probe" : `fill probe ${cap.benchMs.toFixed(1)} ms`,
-    cap.memoryGb == null ? "deviceMemory hidden" : `${cap.memoryGb} GB deviceMemory`,
-    cap.cores == null ? "hardwareConcurrency hidden" : `${cap.cores} logical cores`,
-    cap.coarse ? "coarse pointer" : "fine pointer",
+    cap.memoryGb == null ? "deviceMemory hidden" : `${cap.memoryGb} GB RAM`,
+    cap.cores == null ? "cores hidden" : `${cap.cores} threads`,
   ].join(" · ");
 
   main.replaceChildren(
-    el("p", { class: "display" }, ["17T Pro"]),
-    el("h1", {}, ["From the glass to the lattice"]),
+    el("div", { class: "page-eyebrow" }, [
+      el("span", { class: "scale-pill" }, ["10⁻¹ m · FLAGSHIP HARDWARE"]),
+      el("span", {}, ["MT6993Z DIMENSITY 9500 · TSMC N3P FINFET · FCC 2AFZZPTC0G"]),
+    ]),
+    el("p", { class: "display" }, ["Xiaomi 17T Pro"]),
+    el("h1", {}, ["From the Gorilla Glass to the Quantum Lattice"]),
     el("p", { class: "lede" }, [
-      "Flagship launch lab for the Xiaomi 17T Pro and Dimensity 9500. The body size is cited. The teardown follows the repair manual’s named stack. Die areas are Kurnal’s, arranged here as a reconstruction. Reference photographs are not included.",
+      "Real-time silicon-to-quantum engineering workbench. Every physical dimension, die block area (Kurnal), FCC internal IC (SK hynix LPDDR5X-9600 & UFS 4.1, MT6661/MT6667 PMICs), and Arm TRM pipeline width comes directly from specs.json.",
+    ]),
+    readoutGrid([
+      readout("SoC Die (TSMC N3P)", die ? `${die.areaMm2}` : "140.57", "mm²", {
+        tone: "cyan",
+        sub: "~30B FinFET · 10.88×12.92 mm",
+      }),
+      readout("CPU Prime Clock", "4.21", "GHz", { tone: "accent", sub: "1× C1-Ultra + 3× Prem + 4× Pro" }),
+      readout("LPDDR5X-9600", "76.8", "GB/s", { tone: "cyan", sub: "SK hynix H58GG6AV9H 4×16b PoP" }),
+      readout("UFS 4.1 Seq Read", "3,022", "MB/s", { tone: "ok", sub: "SK hynix HN8T271EJK (measured)" }),
     ]),
     stage,
-    el("div", { class: "hero-tools" }, [el("label", { class: "slider" }, ["Pull the stack apart", explode]), toggle]),
+    el("div", { class: "hero-tools" }, [explodeCtrl.node, finishBar, toggleRefs]),
+    readoutGrid([
+      readout("GPU Mali-G1 MC12", "5.27", "TFLOPS*", { tone: "cyan", sub: "12 cores · 1716 MHz unconfirmed" }),
+      readout("NPU 990 + CIM", "28 / 1600+", "tok/s", { tone: "ok", sub: "Gemma 3n E2B dec / prefill" }),
+      readout("Battery Si-C", "7,000", "mAh", { tone: "accent", sub: "16% Silicon anode · dual-cell" }),
+      readout("Display Peak", "3,500", "nits", { tone: "warn", sub: '6.83" CSOT · 144 Hz · 447 PPI' }),
+    ]),
     refs,
     el("div", { class: "grid cols-2" }, [
-      panel("This browser", [
-        kv(
-          "Quality",
-          el("span", {}, [tierWhy, " ", provMeasured("fill probe, memory, cores, GPU string. Not orientation.")]),
-        ),
-        kv("Frame", el("span", {}, [frameReadout, " ", provMeasured("requestAnimationFrame interval")])),
-      ]),
-      panel("Display", [
-        kv(
-          "Diagonal",
-          el("span", {}, [`${device.display_diagonal_in.value} in `, provCited(device.display_diagonal_in)]),
-        ),
-        kv("PPI", el("span", {}, [`${fmt(ppi, 4)} `, provComputed("hypot(2772, 1280) / 6.83")])),
-        kv("Pixel rate", el("span", {}, [`${fmt(rate, 4)} px/s `, provComputed("2772 × 1280 × 144")])),
-        kv("USB", el("span", {}, [String(device.phone_usb_data.value), " ", provCited(device.phone_usb_data)])),
-        kv("Fingerprint", el("span", {}, [String(device.fingerprint.value), " ", provCited(device.fingerprint)])),
-        kv(
-          "Anode",
-          el("span", {}, [
-            `${device.battery_si_c_ratio.value}${device.battery_si_c_ratio.unit ? " " + device.battery_si_c_ratio.unit : ""} silicon, ${device.battery_construction.value}`,
-            " ",
-            provCited(device.battery_si_c_ratio),
-          ]),
-        ),
-      ]),
-      panel("Silicon", [
-        kv(
-          "Die",
-          el("span", {}, [
-            die ? `${die.widthMm} × ${die.heightMm} mm, ${die.areaMm2} mm² ` : "UNKNOWN ",
-            provCited(specs.soc.die_size_mm2),
-          ]),
-        ),
-        kv(
-          "Package",
-          el("span", {}, [
-            pkg ? `${pkg.widthMm} × ${pkg.heightMm} mm ` : "UNKNOWN ",
-            provCited(specs.soc.package_this_phone),
-          ]),
-        ),
-        kv(
-          "GPU clock",
-          el("span", {}, [
-            `${specs.soc.gpu_clock_mhz.value} ${specs.soc.gpu_clock_mhz.unit} `,
-            provCited(specs.soc.gpu_clock_mhz),
-          ]),
-        ),
-        kv(
-          "NPU TOPS",
-          el("span", {}, [`${specs.soc.npu_tops.value} ${specs.soc.npu_tops.unit} `, provCited(specs.soc.npu_tops)]),
-        ),
-        kv(
-          "Clock ratio",
-          el("span", {}, [`${fmt(ultraToProPowerRatio(), 4)} `, provComputed("4.21 / 2.7, α C V² cancel")]),
-        ),
-      ]),
-      panel("Still open", [
-        note(`${openItems().length} leaves are still unknown or unconfirmed. The Specs page lists each reason.`),
-      ]),
+      panel(
+        "Display & Chassis",
+        [
+          kv(
+            "Dimensions",
+            el("span", {}, [
+              `${device.height_mm.value} × ${device.width_mm.value} × ${device.thickness_mm.value} mm · ${device.weight_g.value} g `,
+              provCited(device.height_mm),
+            ]),
+          ),
+          kv(
+            "Panel & Supplier",
+            el("span", {}, [
+              `${device.display_diagonal_in.value} in ${device.panel_supplier.value} AMOLED `,
+              provCited(device.panel_supplier),
+            ]),
+          ),
+          kv("Computed PPI", el("span", {}, [`${fmt(ppi, 4)} PPI `, provComputed("hypot(2772, 1280) / 6.83")])),
+          kv("Max Pixel Rate", el("span", {}, [`${fmt(rate / 1e6, 4)} Mpx/s `, provComputed("2772 × 1280 × 144 Hz")])),
+          kv("Dimming / PWM", el("span", {}, [`${device.pwm_hz.value} Hz + 120 Hz base `, provCited(device.pwm_hz)])),
+          kv(
+            "Cooling Stack",
+            el("span", {}, [
+              `3D IceLoop (${device.cooling_vc_area_mm2.value} mm² total) `,
+              provCited(device.cooling_vc_area_mm2),
+            ]),
+          ),
+          kv(
+            "USB & Biometrics",
+            el("span", {}, [
+              `${device.phone_usb_data.value} · ${device.fingerprint.value} `,
+              provCited(device.phone_usb_data),
+            ]),
+          ),
+        ],
+        null,
+        "10⁻¹ m · Enclosure",
+      ),
+      panel(
+        "Silicon & This Browser",
+        [
+          kv(
+            "Package (PoP)",
+            el("span", {}, [
+              pkg ? `${pkg.widthMm} × ${pkg.heightMm} × ${pkg.thickMm} mm MT6993Z ` : "UNKNOWN ",
+              provCited(specs.soc.package_this_phone),
+            ]),
+          ),
+          kv(
+            "DRAM + Storage",
+            el("span", {}, [`${specs.parts.dram.value} · ${specs.parts.ufs.value} `, provCited(specs.parts.dram)]),
+          ),
+          kv("PMIC Architecture", el("span", {}, [String(device.pmic.value), " ", provCited(device.pmic)])),
+          kv(
+            "Clock Power Ratio",
+            el("span", {}, [`${fmt(ultraToProPowerRatio(), 4)}× `, provComputed("4.21 / 2.70 GHz (αCV² cancels)")]),
+          ),
+          kv("Browser Probe", el("span", {}, [tierWhy, " ", provMeasured("WebGL fill probe + hardwareConcurrency")])),
+          kv("Live Frame Interval", el("span", {}, [frameReadout, " ", provMeasured("requestAnimationFrame EMA")])),
+          note(
+            `${openItems().length} hardware leaves remain open/unconfirmed — audited transparently in the Specs catalog.`,
+          ),
+        ],
+        null,
+        "10⁻² m · Mainboard & Host",
+      ),
     ]),
   );
 

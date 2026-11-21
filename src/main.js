@@ -14,6 +14,7 @@ const loaders = {
   cpu: () => import("./labs/cpu.js"),
   gpu: () => import("./labs/gpu.js"),
   npu: () => import("./labs/npu.js"),
+  memory: () => import("./labs/memory.js"),
   litho: () => import("./labs/litho.js"),
   transistor: () => import("./labs/transistor.js"),
   compare: () => import("./labs/compare.js"),
@@ -31,7 +32,7 @@ async function show() {
   shell.setActive(route.id);
   const main = shell.main;
   main.dataset.ready = "false";
-  main.replaceChildren(el("p", { class: "status", role: "status" }, ["Loading this view…"]));
+  main.replaceChildren(el("p", { class: "status", role: "status" }, ["Initializing live instrumentation…"]));
   const cap = { ...(await capability) };
   const forcedTier = new URLSearchParams(location.search).get("tier");
   if (forcedTier === "low" || forcedTier === "medium" || forcedTier === "high" || forcedTier === "ultra") {
@@ -49,7 +50,7 @@ async function show() {
     main.replaceChildren(
       el("h1", {}, ["This view failed"]),
       el("p", { class: "error" }, [error instanceof Error ? error.message : String(error)]),
-      el("p", { class: "note" }, ["The failure is on this page. Other routes are separate modules."]),
+      el("p", { class: "note" }, ["The failure is isolated to this route. Other modules remain live."]),
     );
   }
   main.dataset.ready = "true";
