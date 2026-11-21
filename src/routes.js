@@ -5,6 +5,7 @@ export const ROUTES = [
   { id: "gpu", hash: "#/gpu", label: "GPU", scale: "24.2 mm²", group: "Dimensity 9500" },
   { id: "npu", hash: "#/npu", label: "NPU 990", scale: "12.6 mm²", group: "Dimensity 9500" },
   { id: "memory", hash: "#/memory", label: "RAM & UFS", scale: "76.8 GB/s", group: "Dimensity 9500" },
+  { id: "thermal", hash: "#/thermal", label: "Thermal PDE", scale: "5500 mm²", group: "Dimensity 9500" },
   { id: "litho", hash: "#/litho", label: "EUV Litho", scale: "13.5 nm", group: "Silicon & Quantum" },
   { id: "transistor", hash: "#/transistor", label: "Atom & QED", scale: "10⁻¹⁰→10⁻¹⁵m", group: "Silicon & Quantum" },
   { id: "work", hash: "#/work", label: "Workloads", scale: "Live Run", group: "Operational Labs" },

@@ -10,6 +10,7 @@ const routes = [
   ["#/gpu", "gpu"],
   ["#/npu", "npu"],
   ["#/memory", "memory"],
+  ["#/thermal", "thermal"],
   ["#/litho", "litho"],
   ["#/transistor", "transistor"],
   ["#/compare", "compare"],
@@ -87,15 +88,29 @@ test("high tier hero is not a black canvas", async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
-test("memory, lithography, and transistor views are not black canvases", async ({ page }) => {
+test("memory, thermal, lithography, and transistor views are not black canvases", async ({ page }) => {
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
-  for (const hash of ["#/memory", "#/litho", "#/transistor"]) {
+  for (const hash of ["#/memory", "#/thermal", "#/litho", "#/transistor"]) {
     await page.goto(`/?tier=high${hash}`);
     await expect(page.locator("#main[data-ready='true'] canvas").first()).toBeVisible();
     await page.waitForTimeout(800);
     expect(await brightestCanvas(page)).toBeGreaterThan(12);
   }
+  expect(errors).toEqual([]);
+});
+
+test("Ctrl+K command palette opens and navigates to Thermal PDE", async ({ page }) => {
+  const errors = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto("/#/");
+  await expect(page.locator("#main[data-ready='true'] h1")).toBeVisible();
+  await page.click("#cmd-open");
+  await expect(page.locator("dialog.cmd-dialog")).toBeVisible();
+  await page.fill("input.cmd-input", "Thermal");
+  await page.keyboard.press("Enter");
+  await expect(page.locator("#main[data-ready='true'] h1")).toContainText("Thermal PDE");
   expect(errors).toEqual([]);
 });
 

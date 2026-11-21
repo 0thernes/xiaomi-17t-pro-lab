@@ -2,6 +2,22 @@
 
 All notable changes to this project are documented here. The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project uses [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2026-11-21
+
+Major custom GLSL shaders, interactive 3D raycast inspection, live PDE/TDSE/2D-FFT physics, and quantum circuit composer release.
+
+### Added
+
+- **Dedicated Thermal PDE & 3D IceLoop Lab (`#/thermal`)**: Real-time 2D explicit FDTD silicon heat solver (`∂T/∂t = α∇²T + q_dyn + q_leak(T) − hΔT`) running live across Kurnal's `140.57 mm²` Dimensity 9500 floorplan, mapped onto a custom GLSL FLIR Ironbow shader & toggleable 3D `5,500 mm²` IceLoop copper vapor chamber, with click-to-inject hotspots and 20-minute throttling vs `7,000 mAh` Si-C discharge curves.
+- **Custom WebGL2 GLSL Shaders & Microfacet PBR (`src/graphics/shaders.js`, `src/graphics/pbr-maps.js`)**: Physical optical thin-film interference shader on the silicon die, live FLIR Ironbow isothermal contour shader, volumetric quantum wave shader, and procedural brushed aluminum & frosted AG glass normal/roughness maps.
+- **Interactive 3D Raycast Component Inspector (`src/graphics/view.js`)**: Hover any 3D phone layer, Leica optic, FCC mainboard IC, Kurnal die block, or FinFET dielectric to lock on with a wireframe reticle & live spec HUD; click to smoothly fly the camera onto that component (`R` resets framing).
+- **Live 60 FPS Unitary Crank–Nicolson TDSE Quantum Tunneling (`src/sim/tdse.js`)**: Real complex wave-packet solver conserving probability norm `∫|ψ|²dx = 1.000000` to `< 1e-8`, supporting single HfO₂ gate barriers and Resonant Double-Barrier Diodes with phase-colored `arg(ψ)` rendering, plus live slider-driven 3D FinFET geometry rebuilding.
+- **Live 2D Fourier Optics EUV Mask-to-Wafer Simulator + OPC (`src/sim/litho-2d.js`)**: Separable 64×64 radix-2 2D FFT imaging of `6T SRAM`, `L-Bend Corner`, `Via0 Contacts`, and `48 nm Line/Space` layouts with interactive **OPC Hammerhead Serifs**, 2D pupil diffraction spectrum, Zernike defocus, and wafer resist IoU fidelity.
+- **Interactive 3D Quantum Bloch Sphere & Live Circuit Composer (`#/work/sci`)**: Real-time gate composer (`H, X, Y, Z, S, T, Ry, CNOT`, presets `|00⟩, |+0⟩, Bell |Φ⁺⟩, Magic T, GHZ-3`) driving a 3D Bloch sphere vector, complex amplitude phase wheels `|α|e^(iφ)`, purity `Tr(ρ²)`, and von Neumann entanglement entropy `S(ρ₀)`.
+- **Upgraded Operational Workloads (`#/work/*`)**: 6K instanced PBR stress arena with dynamic point lights & P50/P95/P99 frametime scope; Neuralese 1-click intervention presets + 8-layer residual norms + Shannon entropy/perplexity; Glitchling bioluminescent scent aura + scrolling metabolic homeostasis sparkline; GigaChad interactive 80-agent 2D stigmergic pheromone grid with click-to-drop task attractors & Guardian threat interception.
+- **Spotlight Command Palette (`Ctrl+K`) & Scientific WebAudio Sonifier (`src/shell.js`, `src/audio.js`)**: Instant keyboard/topbar search jumping to any lab, workload, or FCC component, plus opt-in WebAudio telemetry sonification.
+- **New Unit & E2E Tests (`tests/v2-engines.test.mjs`, `tests/e2e/smoke.spec.js`)**: Verifies Crank–Nicolson TDSE unitarity, 2D FDTD thermal cooling delta, 2D FFT lithography/OPC fidelity, Bloch/Bell entanglement entropy, `#/thermal` non-black canvas, and `Ctrl+K` navigation.
+
 ## [1.0.0] - 2026-11-21
 
 Major visual, ergonomics, physics, and operational workload overhaul.
@@ -70,6 +86,7 @@ First public lab slice for the Xiaomi 17T Pro and Dimensity 9500.
 
 - Phone hub, zoom taxonomy, CPU chase, GPU matmul, NPU-concepts matmul, lithography, transistor solvers, head-to-head, provenance badges, tests, and CI.
 
+[2.0.0]: https://github.com/0thernes/xiaomi-17t-pro-lab/releases/tag/v2.0.0
 [1.0.0]: https://github.com/0thernes/xiaomi-17t-pro-lab/releases/tag/v1.0.0
 [0.2.0]: https://github.com/0thernes/xiaomi-17t-pro-lab/releases/tag/v0.2.0
 [0.1.0]: https://github.com/0thernes/xiaomi-17t-pro-lab/releases/tag/v0.1.0

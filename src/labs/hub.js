@@ -6,7 +6,7 @@ import { getSpecs, openItems, parseDieMm, parsePackageMm } from "../specs.js";
 import { buildPhone, makeMaterials, mountView, setPhoneFinish } from "../graphics/view.js";
 import { referenceCards } from "../ref-card.js";
 
-export async function mount(main, { cap }) {
+export async function mount(main, { cap, audio }) {
   const specs = getSpecs();
   const device = specs.device;
   const [heightPx, widthPx] = device.display_resolution_px.value;
@@ -21,11 +21,12 @@ export async function mount(main, { cap }) {
   });
   const frameReadout = el("span", {}, ["—"]);
   const fpsReadout = el("b", {}, ["—"]);
+  const probeHud = el("div", { class: "probe-hud", hidden: true });
   let currentFinish = "Deep Violet";
   let currentExplode = 0;
 
   const hudTop = el("div", { class: "stage-hud-top" }, [
-    el("div", { class: "hud-chip" }, ["MODEL ", el("b", {}, ["2602EPTC0G · WARHOL"])]),
+    el("div", { class: "hud-chip" }, ["MODEL ", el("b", {}, ["2602EPTC0G · WARHOL · HOVER TO INSPECT"])]),
     el("div", { class: "hud-chip" }, ["FRAME ", fpsReadout, " · TIER ", el("b", {}, [cap.tier.toUpperCase()])]),
   ]);
 
@@ -77,26 +78,47 @@ export async function mount(main, { cap }) {
       view.orbit.auto = !view.orbit.auto;
       ev.currentTarget.setAttribute("aria-pressed", view.orbit.auto ? "true" : "false");
     }),
+    makeHudBtn("Thermal IR →", () => {
+      location.hash = "#/thermal";
+    }),
   ]);
 
   const caption = el("div", { class: "stage-caption" }, [
     el("p", {}, [
-      `${device.height_mm.value} × ${device.width_mm.value} × ${device.thickness_mm.value} mm · ${device.weight_g.value} g`,
+      `${device.height_mm.value} × ${device.width_mm.value} × ${device.thickness_mm.value} mm · ${device.weight_g.value} g · Click any part to focus (R resets)`,
     ]),
     hudActions,
   ]);
-  stage.append(canvas, hudTop, caption);
+  stage.append(canvas, hudTop, probeHud, caption);
 
   try {
     view = await mountView(canvas, cap);
     const opening = pose === "explode" ? 0.75 : 0;
     const phone = buildPhone(materials, opening);
     view.root.add(phone);
-    view.frame(phone, 0.8);
+    view.frame(phone, 0.84);
     if (pose === "front") view.orbit.pose(0.24, 1.42, true);
     else if (pose === "back" || pose === "explode") view.orbit.pose(Math.PI + 0.28, 1.36, true);
     else view.orbit.pose(0.32, 1.38, true);
     if (!userBroke && !cap.reducedMotion) view.orbit.auto = true;
+    view.enableProbe({
+      onHover(info) {
+        if (!info) {
+          probeHud.hidden = true;
+          return;
+        }
+        probeHud.hidden = false;
+        probeHud.replaceChildren(
+          el("span", { class: "probe-tag" }, [info.tag || "CITED"]),
+          el("strong", {}, [info.title]),
+          el("span", { class: "probe-detail" }, [info.detail]),
+        );
+      },
+      onSelect() {
+        userBroke = true;
+        audio?.sonify("probe", 0.55);
+      },
+    });
   } catch (error) {
     stage.append(note(`WebGL unavailable (${error.message}). All hardware figures remain live below.`));
   }

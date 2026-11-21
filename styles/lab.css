@@ -1353,3 +1353,193 @@ dialog p {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ---------- v2.0.0 3D Raycast Probe HUD, Live Readouts & Spotlight Palette ---------- */
+.chips.wrap {
+  flex-wrap: wrap;
+  overflow-x: visible;
+}
+.readout {
+  background: var(--s1);
+  padding: 12px 13px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.readout-unit {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--muted);
+  margin-left: 4px;
+}
+.v-cyan {
+  color: var(--cyan);
+}
+.v-accent {
+  color: var(--accent-hi);
+}
+.v-ok {
+  color: var(--ok);
+}
+.v-warn {
+  color: var(--unconfirmed);
+}
+.v-danger {
+  color: #fb7185;
+}
+
+.probe-hud {
+  position: absolute;
+  left: 14px;
+  bottom: 58px;
+  z-index: 4;
+  max-width: min(360px, calc(100% - 28px));
+  padding: 9px 13px;
+  border-radius: 10px;
+  background: rgba(8, 13, 22, 0.9);
+  border: 1px solid rgba(56, 212, 242, 0.52);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  pointer-events: none;
+}
+.probe-hud[hidden] {
+  display: none;
+}
+.probe-tag {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--cyan);
+}
+.probe-hud strong {
+  font-size: 0.84rem;
+  color: var(--ink);
+}
+.probe-detail {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+
+.top-cmd-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  padding: 0 11px;
+  border-radius: 8px;
+  background: rgba(16, 22, 33, 0.9);
+  border: 1px solid var(--line-strong);
+  color: var(--muted);
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+.top-cmd-btn:hover {
+  border-color: var(--cyan);
+  color: var(--ink);
+}
+.top-cmd-btn kbd {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  padding: 2px 5px;
+  border-radius: 4px;
+  background: var(--s2);
+  border: 1px solid var(--line);
+  color: var(--cyan);
+}
+@media (max-width: 640px) {
+  .top-cmd-btn kbd {
+    display: none;
+  }
+}
+
+.cmd-dialog {
+  width: min(620px, calc(100vw - 24px));
+  padding: 0;
+  border-radius: 14px;
+  border: 1px solid var(--line-strong);
+  background: #0c111b;
+  color: var(--ink);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.72);
+  overflow: hidden;
+}
+.cmd-dialog::backdrop {
+  background: rgba(3, 6, 12, 0.72);
+  backdrop-filter: blur(6px);
+}
+.cmd-head {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+}
+.cmd-input {
+  flex: 1 1 auto;
+  background: transparent;
+  border: 0;
+  color: var(--ink);
+  font-size: 0.95rem;
+  outline: none;
+}
+.cmd-list {
+  max-height: 58vh;
+  overflow-y: auto;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.cmd-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  padding: 9px 11px;
+  border-radius: 9px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+}
+.cmd-item:hover,
+.cmd-item.active {
+  background: rgba(56, 212, 242, 0.1);
+  border-color: rgba(56, 212, 242, 0.35);
+}
+.cmd-badge {
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  font-weight: 700;
+  padding: 3px 6px;
+  border-radius: 5px;
+  background: rgba(255, 105, 0, 0.16);
+  color: var(--accent-hi);
+  min-width: 44px;
+  text-align: center;
+}
+.cmd-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.cmd-copy strong {
+  font-size: 0.88rem;
+  color: var(--ink);
+}
+.cmd-copy small {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

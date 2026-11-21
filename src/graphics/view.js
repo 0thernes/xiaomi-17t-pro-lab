@@ -4,6 +4,8 @@ import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
 import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
 import { SMAAPass } from "three/addons/postprocessing/SMAAPass.js";
 import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
+import { agMaps, brushMaps } from "./pbr-maps.js";
+import { makeThinFilmDieMaterial } from "./shaders.js";
 import {
   buildBars,
   buildBoard,
@@ -14,6 +16,7 @@ import {
   buildPackage,
   buildPhone,
   buildQuantumField,
+  buildThermalDieStage,
   buildTilerMesh,
   dieTexture,
   oledTexture,
@@ -111,6 +114,95 @@ export async function mountView(canvas, cap) {
   let onFrame = null;
   let framed = null;
 
+  // Interactive 3D Raycast Probe (hover any inspectable part to highlight & click to focus)
+  const raycaster = new THREE.Raycaster();
+  const pointerNdc = new THREE.Vector2();
+  const probeBox = new THREE.BoxHelper(new THREE.Object3D(), 0x38d4f2);
+  probeBox.visible = false;
+  scene.add(probeBox);
+  let hoveredMesh = null;
+  let probeCallbacks = null;
+  let pointerMoved = 0;
+
+  function findInspectable(obj) {
+    let cur = obj;
+    while (cur && cur !== root) {
+      if (cur.userData && cur.userData.inspect) return cur;
+      cur = cur.parent;
+    }
+    return null;
+  }
+
+  function updateProbeHit(event) {
+    if (!probeCallbacks) return null;
+    const rect = canvas.getBoundingClientRect();
+    if (rect.width <= 0 || rect.height <= 0) return null;
+    pointerNdc.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    pointerNdc.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+    raycaster.setFromCamera(pointerNdc, camera);
+    const hits = raycaster.intersectObjects(root.children, true);
+    let target = null;
+    for (const h of hits) {
+      const insp = findInspectable(h.object);
+      if (insp) {
+        target = insp;
+        break;
+      }
+    }
+    if (target !== hoveredMesh) {
+      hoveredMesh = target;
+      if (target) {
+        probeBox.setFromObject(target);
+        probeBox.visible = true;
+        canvas.style.cursor = "crosshair";
+        probeCallbacks.onHover?.(target.userData.inspect, target);
+      } else {
+        probeBox.visible = false;
+        canvas.style.cursor = "";
+        probeCallbacks.onHover?.(null, null);
+      }
+    }
+    return target;
+  }
+
+  function onCanvasMove(ev) {
+    pointerMoved += Math.abs(ev.movementX || 0) + Math.abs(ev.movementY || 0);
+    if (ev.buttons === 0) updateProbeHit(ev);
+  }
+  function onCanvasDown() {
+    pointerMoved = 0;
+  }
+  function onCanvasClick(ev) {
+    if (!probeCallbacks || pointerMoved > 8) return;
+    const hit = updateProbeHit(ev);
+    if (!hit) return;
+    const box = new THREE.Box3().setFromObject(hit);
+    const sphere = box.getBoundingSphere(new THREE.Sphere());
+    const radius = Math.max(sphere.radius * 3.1, 4.5);
+    orbit.flyTo(radius, sphere.center);
+    probeCallbacks.onSelect?.(hit.userData.inspect, hit);
+  }
+  function onCanvasLeave() {
+    if (hoveredMesh) {
+      hoveredMesh = null;
+      probeBox.visible = false;
+      canvas.style.cursor = "";
+      probeCallbacks?.onHover?.(null, null);
+    }
+  }
+  function onKeyReset(ev) {
+    const tag = ev.target?.tagName;
+    if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+    if ((ev.key === "r" || ev.key === "R") && !ev.ctrlKey && !ev.metaKey && framed) {
+      fit(framed.object, framed.fill);
+    }
+  }
+  canvas.addEventListener("pointermove", onCanvasMove);
+  canvas.addEventListener("pointerdown", onCanvasDown);
+  canvas.addEventListener("click", onCanvasClick);
+  canvas.addEventListener("pointerleave", onCanvasLeave);
+  window.addEventListener("keydown", onKeyReset);
+
   function resize() {
     const w = Math.max(1, canvas.clientWidth);
     const h = Math.max(1, canvas.clientHeight);
@@ -129,9 +221,16 @@ export async function mountView(canvas, cap) {
     frame = requestAnimationFrame(loop);
     frameMs = frameMs * 0.82 + Math.min(100, now - last) * 0.18;
     last = now;
+    // Animate any ShaderMaterials with uTime uniform automatically
+    const sec = now * 0.001;
+    root.traverse((obj) => {
+      const m = obj.material;
+      if (m?.uniforms?.uTime) m.uniforms.uTime.value = sec;
+    });
     onFrame?.(now);
     if (!cap.reducedMotion && orbit.auto) orbit.spin(0.0022);
     orbit.tick();
+    if (probeBox.visible && hoveredMesh) probeBox.update();
     try {
       if (composer) composer.render();
       else renderer.render(scene, camera);
@@ -168,14 +267,14 @@ export async function mountView(canvas, cap) {
     const vFov = THREE.MathUtils.degToRad(camera.fov);
     const aspect = Math.max(0.45, camera.aspect || 1);
     const hFov = 2 * Math.atan(Math.tan(vFov / 2) * aspect);
-    const dist = (radius / Math.min(Math.sin(vFov / 2), Math.sin(hFov / 2))) * 1.08;
-    camera.near = Math.max(0.05, dist * 0.015);
-    camera.far = Math.max(800, dist + radius * 12);
+    const dist = (radius / Math.min(Math.sin(vFov / 2), Math.sin(hFov / 2))) * 0.96;
+    camera.near = Math.max(0.05, dist * 0.012);
+    camera.far = Math.max(800, dist + radius * 14);
     camera.updateProjectionMatrix();
-    floor.position.y = bounds.min.y - Math.max(1.2, size.y * 0.04);
-    const floorScale = Math.max(0.15, radius / 40);
+    floor.position.y = bounds.min.y - Math.max(1.0, size.y * 0.035);
+    const floorScale = Math.max(0.15, radius / 38);
     floor.scale.setScalar(floorScale);
-    orbit.set(dist / Math.min(fillRatio, 0.92), sphere.center);
+    orbit.set(dist / Math.min(fillRatio, 0.95), sphere.center);
   }
 
   return {
@@ -191,14 +290,19 @@ export async function mountView(canvas, cap) {
     setFrame(fn) {
       onFrame = fn;
     },
+    enableProbe(callbacks) {
+      probeCallbacks = callbacks;
+    },
     look(distance, target = new THREE.Vector3()) {
       orbit.set(distance, target);
     },
-    frame(object, fillRatio = 0.86) {
+    frame(object, fillRatio = 0.88) {
       framed = { object, fill: fillRatio };
       fit(object, fillRatio);
     },
     clear() {
+      hoveredMesh = null;
+      probeBox.visible = false;
       root.clear();
     },
     dispose() {
@@ -206,6 +310,13 @@ export async function mountView(canvas, cap) {
       cancelAnimationFrame(frame);
       observer.disconnect();
       orbit.dispose();
+      canvas.removeEventListener("pointermove", onCanvasMove);
+      canvas.removeEventListener("pointerdown", onCanvasDown);
+      canvas.removeEventListener("click", onCanvasClick);
+      canvas.removeEventListener("pointerleave", onCanvasLeave);
+      window.removeEventListener("keydown", onKeyReset);
+      probeBox.geometry?.dispose?.();
+      probeBox.material?.dispose?.();
       root.traverse((obj) => {
         obj.geometry?.dispose?.();
         const materials = obj.material ? [].concat(obj.material) : [];
@@ -384,6 +495,7 @@ function attachOrbit(canvas, camera) {
     targetRadius: 48,
     auto: false,
     target: new THREE.Vector3(),
+    goalTarget: new THREE.Vector3(),
   };
   let drag = null;
 
@@ -446,13 +558,22 @@ function attachOrbit(canvas, camera) {
     set(radius, target) {
       state.radius = state.targetRadius = radius;
       state.target.copy(target);
+      state.goalTarget.copy(target);
       apply();
     },
+    flyTo(radius, target, theta = null, phi = null) {
+      state.auto = false;
+      state.targetRadius = Math.min(900, Math.max(1.5, radius));
+      if (target) state.goalTarget.copy(target);
+      if (theta != null) state.targetTheta = theta;
+      if (phi != null) state.targetPhi = Math.min(1.5, Math.max(0.2, phi));
+    },
     tick() {
-      const k = 0.16;
+      const k = 0.14;
       state.theta += (state.targetTheta - state.theta) * k;
       state.phi += (state.targetPhi - state.phi) * k;
       state.radius += (state.targetRadius - state.radius) * k;
+      state.target.lerp(state.goalTarget, k);
       apply();
     },
     dispose() {
@@ -466,19 +587,26 @@ function attachOrbit(canvas, camera) {
 
 export function makeMaterials(tier) {
   const rich = tier !== "low";
+  const brush = rich ? brushMaps() : null;
+  const ag = rich ? agMaps() : null;
   const frame = new THREE.MeshPhysicalMaterial({
-    color: 0xcbd4e0,
+    color: 0xd0d9e6,
     metalness: rich ? 0.94 : 0.55,
     roughness: 0.24,
-    clearcoat: rich ? 0.45 : 0,
-    clearcoatRoughness: 0.28,
+    normalMap: brush?.normal || null,
+    normalScale: new THREE.Vector2(0.18, 0.18),
+    roughnessMap: brush?.rough || null,
+    clearcoat: rich ? 0.48 : 0,
+    clearcoatRoughness: 0.26,
     anisotropy: rich ? 0.85 : 0,
   });
   const deco = new THREE.MeshPhysicalMaterial({
     color: 0x161c26,
-    metalness: rich ? 0.85 : 0.45,
+    metalness: rich ? 0.86 : 0.45,
     roughness: 0.22,
-    clearcoat: rich ? 0.7 : 0.2,
+    normalMap: brush?.normal || null,
+    normalScale: new THREE.Vector2(0.12, 0.12),
+    clearcoat: rich ? 0.72 : 0.2,
     clearcoatRoughness: 0.16,
   });
   const glass = new THREE.MeshPhysicalMaterial({
@@ -515,6 +643,7 @@ export function makeMaterials(tier) {
     iridescenceThicknessMaximum: 480,
     clearcoat: rich ? 0.6 : 0,
   });
+  const dieShader = makeThinFilmDieMaterial(dieMap);
   const silicon = new THREE.MeshPhysicalMaterial({
     color: 0x334766,
     metalness: 0.78,
@@ -537,7 +666,10 @@ export function makeMaterials(tier) {
   const rear = new THREE.MeshPhysicalMaterial({
     color: 0x5c3c72,
     metalness: 0.12,
-    roughness: 0.3,
+    roughness: 0.32,
+    normalMap: ag?.normal || null,
+    normalScale: new THREE.Vector2(0.14, 0.14),
+    roughnessMap: ag?.rough || null,
     clearcoat: rich ? 0.72 : 0.25,
     clearcoatRoughness: 0.32,
   });
@@ -603,6 +735,7 @@ export function makeMaterials(tier) {
     lens,
     substrate,
     die,
+    dieShader,
     accent,
     cyan,
     violet,
@@ -647,6 +780,7 @@ export {
   buildPackage,
   buildPhone,
   buildQuantumField,
+  buildThermalDieStage,
   buildTilerMesh,
   setPhoneFinish,
 };

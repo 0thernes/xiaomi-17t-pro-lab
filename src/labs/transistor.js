@@ -18,15 +18,18 @@ import {
 import { doubleGateScaleLength, potentialDecay, shortChannelRatio } from "../sim/finfet.js";
 import { energyAtAlphaA, kronigPenneyRhs, scanBands } from "../sim/kronig.js";
 import { infiniteWellAnalyticEv } from "../sim/schrodinger.js";
+import { createWavePacketSim } from "../sim/tdse.js";
 
 const NIST = "https://physics.nist.gov/cuu/pdf/xray_2018.pdf";
 
-export async function mount(main, { cap }) {
+export async function mount(main, { cap, audio }) {
   // Interactive 3D Stage toggling between N3P FinFET vs N2 GAA and Quantum/Dirac Field
   const stage = el("div", { class: "stage compact" });
   const canvas = el("canvas", { "aria-label": "3D FinFET vs GAA and Quantum Electron-Positron Field" });
+  const probeHud = el("div", { class: "probe-hud", hidden: true });
   let view = null;
   let activeUpdater = null;
+  let active3dMode = "finfet";
   const materials = makeMaterials(cap.tier);
 
   const modeFinBtn = el("button", { type: "button", class: "hud-btn", "aria-pressed": "true" }, [
@@ -41,24 +44,43 @@ export async function mount(main, { cap }) {
       el("div", { class: "hud-chip" }, ["SCALE ", el("b", {}, ["48 nm FinFET → 0.543 nm Si → 2.43 pm λc"])]),
       el("div", { class: "hud-actions" }, [modeFinBtn, modeQBtn]),
     ]),
+    probeHud,
   );
 
-  function set3dMode(which) {
+  function set3dMode(which, finOpts = null) {
+    active3dMode = which;
     if (!view) return;
     view.clear();
-    const s = which === "quantum" ? sceneWave(materials) : sceneFinfet(materials);
+    const s = which === "quantum" ? sceneWave(materials) : sceneFinfet(materials, finOpts || {});
     view.root.add(s.group);
-    view.frame(s.group, 0.85);
+    view.frame(s.group, 0.88);
     activeUpdater = (dt) => s.update(dt);
     modeFinBtn.setAttribute("aria-pressed", which !== "quantum" ? "true" : "false");
     modeQBtn.setAttribute("aria-pressed", which === "quantum" ? "true" : "false");
   }
-  modeFinBtn.addEventListener("click", () => set3dMode("finfet"));
+  modeFinBtn.addEventListener("click", () => set3dMode("finfet", currentFinOpts()));
   modeQBtn.addEventListener("click", () => set3dMode("quantum"));
 
   try {
     view = await mountView(canvas, cap);
     set3dMode("finfet");
+    view.enableProbe({
+      onHover(info) {
+        if (!info) {
+          probeHud.hidden = true;
+          return;
+        }
+        probeHud.hidden = false;
+        probeHud.replaceChildren(
+          el("span", { class: "probe-tag" }, [info.tag || "INSPECT"]),
+          el("strong", {}, [info.title]),
+          el("span", { class: "probe-detail" }, [info.detail]),
+        );
+      },
+      onSelect() {
+        audio?.sonify("probe", 0.7);
+      },
+    });
     view.setFrame(() => activeUpdater?.(0.016));
   } catch (err) {
     stage.append(note(`3D stage unavailable: ${err.message}`));
@@ -81,6 +103,70 @@ export async function mount(main, { cap }) {
   );
   const momCtrl = rangeControl("Relativistic Momentum p·c (MeV)", 0, 2.5, 0.05, 0.75, (v) => `${v.toFixed(2)} MeV`);
 
+  function currentFinOpts() {
+    return {
+      tSi: Number(finCtrl.input.value),
+      tOx: Number(eotCtrl.input.value),
+      lg: Number(gateCtrl.input.value),
+    };
+  }
+
+  // Live 60 FPS Crank-Nicolson TDSE Wave-Packet Tunneling Engine
+  const tdse = createWavePacketSim({
+    barrierWidthNm: 0.85,
+    barrierHeightEv: 3.1,
+    energyEv: 2.35,
+    doubleBarrier: false,
+  });
+  const tdseEnergy = rangeControl("Electron Packet Energy E (eV)", 0.8, 4.5, 0.05, 2.35, (v) => `${v.toFixed(2)} eV`);
+  const tdsePlot = el("div", { class: "plot" });
+  const tdseStatus = el("p", { class: "status" }, ["Unitary Crank–Nicolson wave-packet live…"]);
+  const fireBtn = el("button", { type: "button", class: "primary" }, ["Fire Electron Packet"]);
+  const presetN3p = el("button", { type: "button", class: "swatch", "aria-pressed": "true" }, ["N3P 0.85 nm HfO₂"]);
+  const presetRtd = el("button", { type: "button", class: "swatch", "aria-pressed": "false" }, [
+    "Resonant Double-Barrier Diode",
+  ]);
+  const presetLeak = el("button", { type: "button", class: "swatch", "aria-pressed": "false" }, [
+    "0.40 nm Leakage Catastrophe",
+  ]);
+  const tdseBtns = [presetN3p, presetRtd, presetLeak];
+  const setTdsePreset = (btn, cfg) => {
+    for (const b of tdseBtns) b.setAttribute("aria-pressed", b === btn ? "true" : "false");
+    tdse.reconfigure(cfg);
+    audio?.sonify("quantum", 0.55);
+  };
+  presetN3p.addEventListener("click", () =>
+    setTdsePreset(presetN3p, {
+      barrierWidthNm: Number(eotCtrl.input.value),
+      barrierHeightEv: 3.1,
+      doubleBarrier: false,
+      energyEv: Number(tdseEnergy.input.value),
+    }),
+  );
+  presetRtd.addEventListener("click", () =>
+    setTdsePreset(presetRtd, {
+      barrierWidthNm: 0.75,
+      barrierHeightEv: 3.1,
+      doubleBarrier: true,
+      energyEv: Number(tdseEnergy.input.value),
+    }),
+  );
+  presetLeak.addEventListener("click", () =>
+    setTdsePreset(presetLeak, {
+      barrierWidthNm: 0.4,
+      barrierHeightEv: 2.6,
+      doubleBarrier: false,
+      energyEv: Number(tdseEnergy.input.value),
+    }),
+  );
+  fireBtn.addEventListener("click", () => {
+    tdse.launchPacket({ energyEv: Number(tdseEnergy.input.value) });
+    audio?.sonify("quantum", Number(tdseEnergy.input.value) / 4.5);
+  });
+  tdseEnergy.input.addEventListener("input", () => {
+    tdse.launchPacket({ energyEv: Number(tdseEnergy.input.value) });
+  });
+
   const wellHost = el("div");
   const wellPlot = el("div", { class: "plot" });
   const kpHost = el("div");
@@ -93,11 +179,11 @@ export async function mount(main, { cap }) {
   main.replaceChildren(
     el("div", { class: "page-eyebrow" }, [
       el("span", { class: "scale-pill" }, ["10⁻⁸ m → 10⁻¹⁵ m · QUANTUM & QED"]),
-      el("span", {}, ["SCHRÖDINGER · WKB TUNNELING · KRONIG–PENNEY · DIRAC e⁻ / e⁺"]),
+      el("span", {}, ["LIVE TDSE WAVE-PACKET · SCHRÖDINGER · WKB TUNNELING · KRONIG–PENNEY · DIRAC e⁻ / e⁺"]),
     ]),
     el("h1", {}, ["Transistor, Atomic Lattice, Electrons & Positrons"]),
     el("p", { class: "lede" }, [
-      "TSMC N3P is a FinFET process (GAA nanosheets are TSMC N2 contrast only). Below, four live numerical physics engines solve finite-difference Schrödinger confinement, WKB gate-oxide tunneling leakage, Kronig–Penney silicon bandgaps, thermal carrier runaway, and relativistic Dirac electron-positron dispersion.",
+      "TSMC N3P is a FinFET process (GAA nanosheets are TSMC N2 contrast only). Watch a real unitary Crank–Nicolson electron wave-packet scatter and tunnel through an HfO₂ gate oxide barrier in real time, sculpt the 3D N3P FinFET with live electrostatic sliders, and explore Kronig–Penney silicon bands and Dirac e⁻/e⁺ dispersion.",
     ]),
     readoutGrid([
       readout("Si Lattice a", "0.54310", "nm", {
@@ -112,6 +198,17 @@ export async function mount(main, { cap }) {
       readout("Process Node", "TSMC N3P", "FinFET", { tone: "cyan", sub: "48 nm CPP · 23 nm M0" }),
     ]),
     stage,
+    panel(
+      "Live 60 FPS Time-Dependent Schrödinger Equation (TDSE) Wave-Packet Tunneling",
+      [
+        el("div", { class: "chips" }, [fireBtn, presetN3p, presetRtd, presetLeak]),
+        tdseEnergy.node,
+        tdsePlot,
+        tdseStatus,
+      ],
+      null,
+      "EXACT UNITARY CRANK–NICOLSON · PHASE COLORED ψ(x,t)",
+    ),
     el("div", { class: "grid cols-2" }, [
       panel(
         "1D Quantum Well Eigenstates & WKB Tunneling",
@@ -151,6 +248,86 @@ export async function mount(main, { cap }) {
         "QED E = ±√(p²c² + mₑ²c⁴)",
       ),
     ]),
+  );
+
+  const tdseSketch = await mountSketch(
+    tdsePlot,
+    (p) => {
+      p.background("#06090f");
+      tdse.step(3);
+      const m = tdse.metrics();
+      // Auto-relaunch after packet finishes scattering so the lab stays continuously alive
+      if (m.timeFs > 11.5) tdse.launchPacket({ energyEv: Number(tdseEnergy.input.value) });
+      const padL = 32;
+      const padR = 14;
+      const padT = 22;
+      const padB = 22;
+      const w = p.width - padL - padR;
+      const h = p.height - padT - padB;
+      const base = padT + h;
+      const xOf = (nm) => padL + (nm / tdse.lengthNm) * w;
+
+      // Draw HfO2 potential barrier(s) V(x)
+      p.noStroke();
+      for (let i = 0; i < tdse.n - 1; i++) {
+        if (tdse.V[i] > 0.05) {
+          const x0 = xOf(tdse.x[i]);
+          const x1 = xOf(tdse.x[i + 1]);
+          const bh = Math.min(h * 0.85, (tdse.V[i] / 4.5) * h * 0.8);
+          p.fill("rgba(56, 212, 242, 0.18)");
+          p.rect(x0, base - bh, Math.max(1.5, x1 - x0), bh);
+          p.fill("#38d4f2");
+          p.rect(x0, base - bh, Math.max(1.5, x1 - x0), 2);
+        }
+      }
+
+      // Draw phase-colored probability density bars |psi(x,t)|^2 (hue = arg(psi))
+      const scaleY = (h * 0.78) / Math.max(0.65, m.maxProb * 1.15);
+      p.colorMode(p.HSB, 360, 100, 100, 1);
+      for (let i = 1; i < tdse.n - 1; i++) {
+        const re = tdse.psiR[i];
+        const im = tdse.psiI[i];
+        const prob = re * re + im * im;
+        if (prob < 1e-4) continue;
+        const hue = ((Math.atan2(im, re) / (Math.PI * 2)) * 360 + 360) % 360;
+        const px = xOf(tdse.x[i]);
+        const barH = Math.min(h * 0.92, prob * scaleY);
+        p.stroke(hue, 82, 95, 0.62);
+        p.strokeWeight(Math.max(1.5, w / tdse.n + 0.5));
+        p.line(px, base, px, base - barH);
+      }
+      p.colorMode(p.RGB, 255, 255, 255, 1);
+
+      // Crisp white/cyan envelope curve |psi|^2
+      p.noFill();
+      p.stroke("#f2f7ff");
+      p.strokeWeight(1.8);
+      p.beginShape();
+      for (let i = 0; i < tdse.n; i++) {
+        const prob = tdse.psiR[i] ** 2 + tdse.psiI[i] ** 2;
+        p.vertex(xOf(tdse.x[i]), base - Math.min(h * 0.92, prob * scaleY));
+      }
+      p.endShape();
+
+      // Axis labels & live norm readout
+      p.noStroke();
+      p.fill("#9fb0c8");
+      p.textSize(9.5);
+      p.text(
+        `t = ${m.timeFs.toFixed(2)} fs  ·  Reflected R = ${(m.reflected * 100).toFixed(1)}%  ·  Tunneled T = ${(m.transmitted * 100).toFixed(1)}%  ·  ∫|ψ|²dx = ${m.norm.toFixed(6)}`,
+        padL,
+        14,
+      );
+      p.fill("#6f819c");
+      p.text("0 nm (Channel)", padL, p.height - 6);
+      p.text("HfO₂ Barrier", xOf(m.barrierStart) - 10, p.height - 6);
+      p.textAlign(p.RIGHT);
+      p.text(`${tdse.lengthNm} nm (Gate)`, padL + w, p.height - 6);
+      p.textAlign(p.LEFT);
+
+      tdseStatus.textContent = `Live Crank–Nicolson TDSE: Reflected ${(m.reflected * 100).toFixed(1)}% · Barrier Evanescent ${(m.inside * 100).toFixed(1)}% · Tunneled ${(m.transmitted * 100).toFixed(1)}% · Unitary Norm ${m.norm.toFixed(6)}`;
+    },
+    { height: 225, loop: true, fps: 45 },
   );
 
   const wellSketch = await mountSketch(wellPlot, drawWell, { height: 220 });
@@ -254,10 +431,17 @@ export async function mount(main, { cap }) {
   for (const c of [wellLen, wellPts, kpCtrl, finCtrl, eotCtrl, gateCtrl, tempCtrl, momCtrl]) {
     c.input.addEventListener("input", recompute);
   }
+  // Live-sculpt 3D FinFET geometry whenever t_si, t_ox, or Lg changes
+  for (const c of [finCtrl, eotCtrl, gateCtrl]) {
+    c.input.addEventListener("change", () => {
+      if (active3dMode === "finfet") set3dMode("finfet", currentFinOpts());
+    });
+  }
   recompute();
 
   return {
     dispose() {
+      tdseSketch.dispose();
       wellSketch.dispose();
       kpSketch.dispose();
       finSketch.dispose();

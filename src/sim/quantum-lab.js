@@ -39,6 +39,7 @@ export const GATES = {
   Y: [0, 0, 0, -1, 0, 1, 0, 0],
   Z: [1, 0, 0, 0, 0, 0, -1, 0],
   S: [1, 0, 0, 0, 0, 0, 0, 1],
+  T: [1, 0, 0, 0, 0, 0, INV_SQRT2, INV_SQRT2],
   Rx: (theta) => [Math.cos(theta / 2), 0, 0, -Math.sin(theta / 2), 0, -Math.sin(theta / 2), Math.cos(theta / 2), 0],
   Ry: (theta) => [Math.cos(theta / 2), 0, -Math.sin(theta / 2), 0, Math.sin(theta / 2), 0, Math.cos(theta / 2), 0],
   Rz: (theta) => [Math.cos(theta / 2), -Math.sin(theta / 2), 0, 0, 0, 0, Math.cos(theta / 2), Math.sin(theta / 2)],
@@ -218,4 +219,66 @@ export function merminPeresSummary() {
     totalContexts: 6,
     contextualityDegree: 1, // minimum frustrated contexts under any classical assignment
   };
+}
+
+/** Exact von Neumann entanglement entropy S(rho_q) in bits (0 = separable, 1 = maximally entangled). */
+export function entanglementEntropy(state, target = 0) {
+  const { x, y, z } = blochVector(state, target);
+  const r = Math.min(1, Math.hypot(x, y, z));
+  const l1 = 0.5 * (1 + r);
+  const l2 = 0.5 * (1 - r);
+  let s = 0;
+  if (l1 > 1e-12) s -= l1 * Math.log2(l1);
+  if (l2 > 1e-12) s -= l2 * Math.log2(l2);
+  return Math.max(0, s);
+}
+
+/** Amplitudes with magnitude, phase (rad), and binary ket label. */
+export function amplitudesSummary(state) {
+  const out = [];
+  for (let i = 0; i < state.dim; i++) {
+    const r = state.re[i];
+    const im = state.im[i];
+    const mag = Math.hypot(r, im);
+    out.push({
+      index: i,
+      ket: `|${i.toString(2).padStart(state.nQubits, "0")}⟩`,
+      re: r,
+      im,
+      mag,
+      prob: mag * mag,
+      phase: Math.atan2(im, r),
+    });
+  }
+  return out;
+}
+
+/** Canonical 2-qubit and 3-qubit interactive circuit presets. */
+export function buildPresetState(preset) {
+  if (preset === "plus") {
+    const s = createState(2);
+    applySingleQubit(s, 0, GATES.H);
+    return { state: s, gates: ["H(q0)"] };
+  }
+  if (preset === "bell") {
+    const s = createState(2);
+    applySingleQubit(s, 0, GATES.H);
+    applyCnot(s, 0, 1);
+    return { state: s, gates: ["H(q0)", "CNOT(q0→q1)"] };
+  }
+  if (preset === "magic") {
+    const s = createState(2);
+    applySingleQubit(s, 0, GATES.H);
+    applySingleQubit(s, 0, GATES.T);
+    applySingleQubit(s, 1, GATES.Ry(Math.PI / 3));
+    return { state: s, gates: ["H(q0)", "T(q0)", "Ry(π/3, q1)"] };
+  }
+  if (preset === "ghz") {
+    const s = createState(3);
+    applySingleQubit(s, 0, GATES.H);
+    applyCnot(s, 0, 1);
+    applyCnot(s, 0, 2);
+    return { state: s, gates: ["H(q0)", "CNOT(q0→q1)", "CNOT(q0→q2)"] };
+  }
+  return { state: createState(2), gates: [] };
 }

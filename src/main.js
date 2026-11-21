@@ -15,6 +15,7 @@ const loaders = {
   gpu: () => import("./labs/gpu.js"),
   npu: () => import("./labs/npu.js"),
   memory: () => import("./labs/memory.js"),
+  thermal: () => import("./labs/thermal.js"),
   litho: () => import("./labs/litho.js"),
   transistor: () => import("./labs/transistor.js"),
   compare: () => import("./labs/compare.js"),

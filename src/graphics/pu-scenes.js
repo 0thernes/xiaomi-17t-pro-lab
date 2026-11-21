@@ -330,8 +330,8 @@ export function sceneSram(materials) {
   };
 }
 
-export function sceneFinfet(materials) {
-  const group = buildFinfet(materials);
+export function sceneFinfet(materials, opts = {}) {
+  const group = buildFinfet(materials, opts);
   // Side-by-side TSMC N2 3-ribbon GAA Nanosheet comparison
   const gaa = new THREE.Group();
   gaa.position.set(13.5, 0, 0);

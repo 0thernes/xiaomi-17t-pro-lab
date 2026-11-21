@@ -1,6 +1,12 @@
 import * as THREE from "three";
 import { boardPlacements, BOARD_MM, cameraModules } from "./board-layout.js";
+import { makeThermalOverlayMaterial } from "./shaders.js";
 import { floorplan, getSpecs, npuCounts, parseDieMm, parsePackageMm } from "../specs.js";
+
+function tagInspect(obj, title, detail, tag = "CITED") {
+  obj.userData.inspect = { title, detail, tag };
+  return obj;
+}
 
 const CORNER_MM = 10.5;
 
@@ -359,7 +365,12 @@ export function buildPhone(materials, explode = 0) {
   group.name = "phone";
 
   // 1. Sand-blasted aluminum alloy chassis frame
-  const body = slab(W, H, T, CORNER_MM, materials.frame);
+  const body = tagInspect(
+    slab(W, H, T, CORNER_MM, materials.frame),
+    "6-Series Aluminum Alloy Chassis",
+    `${W} × ${H} × ${T} mm · ${specs.device.weight_g.value} g · IP68 enclosure`,
+    "CITED",
+  );
   group.add(body);
 
   // Subtle metallic antenna breaks along side rails
@@ -369,7 +380,12 @@ export function buildPhone(materials, explode = 0) {
   }
 
   // 2. AG Matte Rear Glass Cover
-  const rear = slab(W - 1.5, H - 1.5, 0.65, CORNER_MM - 0.5, materials.rear);
+  const rear = tagInspect(
+    slab(W - 1.5, H - 1.5, 0.65, CORNER_MM - 0.5, materials.rear),
+    "AG Microfacet Rear Glass",
+    "Official finishes: Deep Violet · Black · Deep Blue (fiberglass / AG composite)",
+    "CITED",
+  );
   rear.position.z = -T / 2 - 0.42 - e * 22;
   group.add(rear);
 
@@ -378,11 +394,21 @@ export function buildPhone(materials, explode = 0) {
   bezel.position.z = T / 2 + 0.18 + e * 20;
   group.add(bezel);
 
-  const screen = new THREE.Mesh(new THREE.PlaneGeometry(W - 5.6, H - 7.8), materials.screen);
+  const screen = tagInspect(
+    new THREE.Mesh(new THREE.PlaneGeometry(W - 5.6, H - 7.8), materials.screen),
+    '6.83" CSOT LTPO AMOLED Display',
+    "2772 × 1280 px · 447 PPI · 1–144 Hz · 3,500 nits peak · 3840 Hz PWM",
+    "CITED",
+  );
   screen.position.z = T / 2 + 0.52 + e * 22;
   group.add(screen);
 
-  const glass = slab(W - 2.6, H - 2.6, 0.35, CORNER_MM - 0.9, materials.glass);
+  const glass = tagInspect(
+    slab(W - 2.6, H - 2.6, 0.35, CORNER_MM - 0.9, materials.glass),
+    "Corning Gorilla Glass 7i Cover",
+    "Optical protective glass layer (ERP teardown layer 1)",
+    "CITED",
+  );
   glass.position.z = T / 2 + 0.72 + e * 32;
   group.add(glass);
 
@@ -390,14 +416,40 @@ export function buildPhone(materials, explode = 0) {
   const plateau = new THREE.Group();
   plateau.position.set(-W * 0.17, H * 0.27, -T / 2 - 1.4 - e * 30);
   const islandOuter = slab(40.5, 40.5, 2.2, 10.5, materials.frame);
-  const islandInner = slab(38.2, 38.2, 2.7, 9.6, materials.deco || materials.substrate);
+  const islandInner = tagInspect(
+    slab(38.2, 38.2, 2.7, 9.6, materials.deco || materials.substrate),
+    "Leica Summilux Triple Camera Plateau",
+    "Vario-Summilux 1:1.62–3.0 / 15–115 mm ASPH optical array",
+    "CITED",
+  );
   islandInner.position.z = -0.25;
   plateau.add(islandOuter, islandInner);
 
   const iz = -1.65;
-  plateau.add(lens(materials, 6.8, -8.8, 8.6, iz, "round")); // OVX9500 50MP main
-  plateau.add(lens(materials, 6.4, 8.8, 8.6, iz, "periscope")); // JN5 50MP 5x telephoto
-  plateau.add(lens(materials, 5.8, -8.8, -8.6, iz, "round")); // OV13B 12MP ultrawide
+  plateau.add(
+    tagInspect(
+      lens(materials, 6.8, -8.8, 8.6, iz, "round"),
+      "OVX9500 · 50 MP Main Camera",
+      'Light Fusion 900 (1/1.31") · 23 mm f/1.62 OIS · FCC/kernel confirmed',
+      "CITED",
+    ),
+  );
+  plateau.add(
+    tagInspect(
+      lens(materials, 6.4, 8.8, 8.6, iz, "periscope"),
+      "Samsung JN5 · 50 MP 5× Periscope",
+      "115 mm f/3.0 folded-optic prism telephoto · OIS · 5× optical zoom",
+      "CITED",
+    ),
+  );
+  plateau.add(
+    tagInspect(
+      lens(materials, 5.8, -8.8, -8.6, iz, "round"),
+      "OmniVision OV13B · 12 MP Ultrawide",
+      "15 mm equivalent f/2.2 · 120° FOV wide-angle lens",
+      "CITED",
+    ),
+  );
   plateau.add(lens(materials, 2.4, 8.8, -8.6, iz, "flash")); // Dual-tone LED flash
 
   const leicaIsland = wordmark("LEICA", 11.5, 2.1, "rgba(255, 255, 255, 0.9)");
@@ -425,7 +477,12 @@ export function buildPhone(materials, explode = 0) {
   // 5-7. Exploded Internal Teardown (ERP repair manual + FCC 2AFZZPTC0G parts)
   if (e > 0.02) {
     // 3D IceLoop Copper Vapor Chamber (5500 mm^2 total dissipation stack)
-    const vcGroup = new THREE.Group();
+    const vcGroup = tagInspect(
+      new THREE.Group(),
+      "Xiaomi 3D IceLoop Vapor Chamber",
+      "5,500 mm² total copper two-phase liquid-vapor dissipation loop (ERP teardown)",
+      "CITED",
+    );
     vcGroup.position.set(0, 4, e * 10);
     vcGroup.add(slab(W - 14, H * 0.54, 0.45, 5, materials.copper));
     // Etched copper heat-pipe manifold rails
@@ -445,7 +502,12 @@ export function buildPhone(materials, explode = 0) {
 
     // Dual-cell 7000 mAh 16% Silicon-Carbon Battery + Wireless Charging Coil
     const cells = (W - 16) / 2;
-    const batGroup = new THREE.Group();
+    const batGroup = tagInspect(
+      new THREE.Group(),
+      "7,000 mAh Dual-Cell 16% Si-C Battery",
+      "27.16 Wh nominal · 90W wired HyperCharge · 50W Qi (NU1671 + SC858x + BQ28Z610)",
+      "CITED",
+    );
     batGroup.position.set(0, -H * 0.18, -e * 12);
     batGroup.add(box(cells - 1.2, H * 0.42, 3.2, materials.battery, -cells / 2, 0, 0));
     batGroup.add(box(cells - 1.2, H * 0.42, 3.2, materials.battery, cells / 2, 0, 0));
@@ -524,7 +586,12 @@ export function buildBoard(materials) {
 
   for (const part of boardPlacements()) {
     const mat = materials[part.tone] || materials.silicon;
-    const mesh = box(part.w, part.h, part.d, mat, part.x, part.y, 0.5 + part.d / 2);
+    const mesh = tagInspect(
+      box(part.w, part.h, part.d, mat, part.x, part.y, 0.5 + part.d / 2),
+      part.label,
+      `${part.role || "FCC 2AFZZPTC0G mainboard IC"} · Compeq 1-P20-EV PCB`,
+      "CITED",
+    );
     mesh.name = part.id;
     group.add(mesh);
 
@@ -619,35 +686,61 @@ export function buildDie(materials) {
   group.name = "die";
   if (!plan || !die) return group;
 
-  // Silicon substrate wafer slab
-  const slabMesh = box(die.widthMm, die.heightMm, 0.3, materials.die, 0, 0, 0);
+  // Silicon substrate wafer slab with physical thin-film optical diffraction shader
+  const slabMesh = tagInspect(
+    box(die.widthMm, die.heightMm, 0.3, materials.dieShader || materials.die, 0, 0, 0),
+    "Dimensity 9500 (MT6993Z) Silicon Die",
+    `${die.widthMm} × ${die.heightMm} mm = ${die.areaMm2} mm² · TSMC N3P FinFET (~30B transistors)`,
+    "CITED",
+  );
   group.add(slabMesh);
 
   // Raised Kurnal-area macro blocks with glowing micro-edges
   const blockDefs = {
-    cpu: { color: 0xff6900, label: "CPU 28.75 mm² (1+3+4 C1)" },
-    gpu: { color: 0x38d4f2, label: "Mali-G1 Ultra MC12 · 24.23 mm²" },
-    npu: { color: 0xa78bfa, label: "NPU 990 (4 MDLA + 2 MVPU) · 12.60 mm²" },
+    cpu: {
+      color: 0xff6900,
+      label: "CPU 28.75 mm² (1+3+4 C1)",
+      detail: "1× C1-Ultra 4.21 GHz + 3× C1-Prem + 4× C1-Pro · 16 MB L3",
+    },
+    gpu: {
+      color: 0x38d4f2,
+      label: "Mali-G1 Ultra MC12 · 24.23 mm²",
+      detail: "12 shader cores · 2 MiB L2 · RTUv2 · 5.27 TFLOPS* FP32",
+    },
+    npu: {
+      color: 0xa78bfa,
+      label: "NPU 990 (4 MDLA + 2 MVPU) · 12.60 mm²",
+      detail: "7 MiB L1 / 4 MiB L2 SRAM · BitNet 1.58-bit + CIM Super-Efficient NPU",
+    },
   };
   for (const block of plan.blocks) {
-    const info = blockDefs[block.id] || { color: 0x4ade80, label: block.id };
+    const info = blockDefs[block.id] || {
+      color: 0x4ade80,
+      label: block.id,
+      detail: `${block.areaMm2} mm² Kurnal block`,
+    };
     const cx = block.xMm + block.widthMm / 2 - die.widthMm / 2;
     const cy = block.yMm + block.heightMm / 2 - die.heightMm / 2;
-    const mesh = box(
-      block.widthMm * 0.95,
-      block.heightMm * 0.88,
-      0.28,
-      new THREE.MeshPhysicalMaterial({
-        color: info.color,
-        emissive: info.color,
-        emissiveIntensity: 0.16,
-        roughness: 0.25,
-        metalness: 0.55,
-        map: materials.die.map,
-      }),
-      cx,
-      cy,
-      0.3,
+    const mesh = tagInspect(
+      box(
+        block.widthMm * 0.95,
+        block.heightMm * 0.88,
+        0.28,
+        new THREE.MeshPhysicalMaterial({
+          color: info.color,
+          emissive: info.color,
+          emissiveIntensity: 0.18,
+          roughness: 0.24,
+          metalness: 0.58,
+          map: materials.die.map,
+        }),
+        cx,
+        cy,
+        0.3,
+      ),
+      info.label,
+      info.detail,
+      "CITED",
     );
     mesh.name = block.id;
     group.add(mesh);
@@ -668,15 +761,22 @@ export function buildDie(materials) {
   return group;
 }
 
-/** Sculpted TSMC N3P FinFET (48 nm CPP, 23 nm M0) vs TSMC N2 GAA Nanosheet contrast. */
-export function buildFinfet(materials) {
+/** Sculpted Parametric TSMC N3P FinFET (48 nm CPP, 23 nm M0) — live-wired to geometry sliders. */
+export function buildFinfet(materials, opts = {}) {
   const specs = getSpecs();
   const pitch = specs.soc.process_n3e_cpp_nm.value;
   const metal = specs.soc.process_n3e_min_metal_pitch_nm.value;
+  const tSiNm = opts.tSi > 0 ? opts.tSi : 6.5;
+  const tOxNm = opts.tOx > 0 ? opts.tOx : 0.85;
+  const lgNm = opts.lg > 0 ? opts.lg : 16;
+
   const group = new THREE.Group();
   group.name = "finfet";
   const u = 0.075;
   const span = pitch * u * 6;
+  const finW = Math.max(0.24, Math.min(1.1, tSiNm * 0.065));
+  const oxideExtra = Math.max(0.14, Math.min(0.65, tOxNm * 0.28));
+  const gateDepth = Math.max(1.1, Math.min(3.8, lgNm * 0.118));
 
   // Bulk crystalline silicon substrate + STI dielectric base
   group.add(box(span + 5, 1.4, 9.5, materials.substrate, 0, -2.1, 0));
@@ -685,15 +785,33 @@ export function buildFinfet(materials) {
   // 6 vertical silicon fins (N3P FinFET)
   for (let i = 0; i < 6; i++) {
     const fx = (i - 2.5) * pitch * u * 0.68;
-    const fin = box(0.42, 3.2, 7.6, materials.silicon, fx, 0.65, 0);
+    const fin = tagInspect(
+      box(finW, 3.2, 7.6, materials.silicon, fx, 0.65, 0),
+      `Silicon Fin #${i + 1} (t_si = ${tSiNm.toFixed(1)} nm)`,
+      "TSMC N3P monocrystalline Si channel · FinFET tri-gate electrostatic control",
+      "COMPUTED",
+    );
     group.add(fin);
     // Translucent cyan HfO2 high-k oxide collar around each fin under gate
-    group.add(box(0.68, 3.38, 2.5, materials.hfo2 || materials.cyan, fx, 0.72, 0));
+    const ox = tagInspect(
+      box(finW + oxideExtra, 3.38, gateDepth + 0.55, materials.hfo2 || materials.cyan, fx, 0.72, 0),
+      `HfO₂ High-κ Gate Dielectric (EOT = ${tOxNm.toFixed(2)} nm)`,
+      "Quantum WKB tunneling barrier preventing gate-to-channel leakage current",
+      "COMPUTED",
+    );
+    group.add(ox);
   }
 
   // Tri-gate metal wrap (TiN/W gate electrode across all fins)
-  group.add(box(span * 0.78, 3.6, 1.9, materials.copper, 0, 0.95, 0));
-  group.add(box(span * 0.8, 0.45, 2.0, materials.gold, 0, 2.95, 0));
+  group.add(
+    tagInspect(
+      box(span * 0.78, 3.6, gateDepth, materials.copper, 0, 0.95, 0),
+      `TiN / W Metal Tri-Gate (Lg = ${lgNm} nm)`,
+      "48 nm contacted poly pitch (CPP) wrapping 3 sides of each vertical silicon fin",
+      "CITED",
+    ),
+  );
+  group.add(box(span * 0.8, 0.45, gateDepth + 0.1, materials.gold, 0, 2.95, 0));
 
   // Source & Drain epitaxial contacts + vertical vias
   group.add(box(span * 0.76, 1.2, 1.2, materials.gold, 0, 1.9, -2.9));
@@ -702,14 +820,19 @@ export function buildFinfet(materials) {
   // M0 23 nm pitch copper interconnect bars overhead
   for (let i = 0; i < 6; i++) {
     group.add(
-      box(
-        metal * u * 0.45,
-        0.28,
-        8.4,
-        i % 2 === 0 ? materials.gold : materials.copper,
-        (i - 2.5) * metal * u * 1.1,
-        4.1,
-        0,
+      tagInspect(
+        box(
+          metal * u * 0.45,
+          0.28,
+          8.4,
+          i % 2 === 0 ? materials.gold : materials.copper,
+          (i - 2.5) * metal * u * 1.1,
+          4.1,
+          0,
+        ),
+        `M0 Metal Track #${i + 1} (23 nm pitch)`,
+        "TSMC N3E/N3P minimum metal pitch patterned with 0.33 NA 13.5 nm EUV",
+        "CITED",
       ),
     );
   }
@@ -726,7 +849,7 @@ export function buildFinfet(materials) {
     group.add(e);
   }
 
-  const label = partLabel("TSMC N3P FinFET · 48 nm CPP · 23 nm M0");
+  const label = partLabel(`TSMC N3P FinFET · t_si ${tSiNm.toFixed(1)} · EOT ${tOxNm.toFixed(2)} · Lg ${lgNm} nm`);
   label.scale.setScalar(0.45);
   label.position.set(0, 5.4, 0);
   group.add(label);
@@ -908,6 +1031,119 @@ export function buildBars(materials, points) {
     group.add(box(0.7, h, 0.7, materials.accent, i * 1.1, h / 2, 0));
   });
   group.name = "cache";
+  return group;
+}
+
+/**
+ * 3D FLIR Thermal Cutaway: MT6993Z Substrate + 140.57 mm² Dimensity 9500 Silicon Die
+ * with live FDTD Ironbow Thermal Shader + elevated translucent 3D IceLoop Vapor Chamber.
+ */
+export function buildThermalDieStage(materials, thermalTex) {
+  const die = parseDieMm() || { widthMm: 10.88, heightMm: 12.92, areaMm2: 140.57 };
+  const pkg = parsePackageMm() || { widthMm: 16.4, heightMm: 14.0, thickMm: 0.455 };
+  const group = new THREE.Group();
+  group.name = "thermal-die";
+
+  // Lay flat horizontally on the calibration turntable
+  const board = new THREE.Group();
+  board.rotation.x = -Math.PI / 2;
+
+  // ABF Organic Package Substrate
+  board.add(
+    tagInspect(
+      box(pkg.widthMm, pkg.heightMm, 0.55, materials.pcb, 0, 0, -0.35),
+      "MT6993Z Organic ABF Substrate",
+      `${pkg.widthMm} × ${pkg.heightMm} × ${pkg.thickMm} mm PoP package carrier`,
+      "CITED",
+    ),
+  );
+
+  // Silicon Die Base
+  board.add(
+    tagInspect(
+      box(die.widthMm, die.heightMm, 0.36, materials.silicon, 0, 0, 0.14),
+      "Dimensity 9500 Silicon Die",
+      `${die.widthMm} × ${die.heightMm} mm (${die.areaMm2} mm²) · TSMC N3P`,
+      "CITED",
+    ),
+  );
+
+  // Live FLIR Ironbow Thermal Field Shader Surface directly atop the die
+  const thermalMat = makeThermalOverlayMaterial(thermalTex);
+  const thermalPlane = tagInspect(
+    new THREE.Mesh(new THREE.PlaneGeometry(die.widthMm * 0.99, die.heightMm * 0.99), thermalMat),
+    "Live 2D FDTD FLIR Silicon Field",
+    "Real-time PDE heat solver with Kurnal block wattages + leakage thermal feedback",
+    "COMPUTED",
+  );
+  thermalPlane.position.set(0, 0, 0.36);
+  board.add(thermalPlane);
+
+  // Crisp glowing wireframe outlines for CPU / GPU / NPU / SLC Kurnal blocks
+  const outlineMat = new THREE.LineBasicMaterial({ color: 0x38d4f2, transparent: true, opacity: 0.72 });
+  const zones = [
+    { name: "CPU · 28.75 mm²", x: 0.6, y: 0.6, w: 9.68, h: 2.97 },
+    { name: "GPU · 24.23 mm²", x: 0.6, y: 3.9, w: 9.68, h: 2.5 },
+    { name: "NPU · 12.60 mm²", x: 0.6, y: 6.75, w: 5.8, h: 2.17 },
+    { name: "SLC · 8.92 mm²", x: 6.65, y: 6.75, w: 3.63, h: 2.46 },
+  ];
+  for (const z of zones) {
+    const cx = z.x + z.w / 2 - die.widthMm / 2;
+    const cy = die.heightMm / 2 - (z.y + z.h / 2);
+    const edges = new THREE.EdgesGeometry(new THREE.BoxGeometry(z.w, z.h, 0.18));
+    const lines = new THREE.LineSegments(edges, outlineMat);
+    lines.position.set(cx, cy, 0.48);
+    board.add(lines);
+  }
+
+  // Elevated semi-transparent 3D IceLoop Copper Vapor Chamber (toggleable!)
+  const vcGroup = tagInspect(
+    new THREE.Group(),
+    "Xiaomi 3D IceLoop Vapor Chamber",
+    "5,500 mm² liquid-vapor capillary heat spreader hovering above the TIM layer",
+    "CITED",
+  );
+  vcGroup.name = "iceloop-vc";
+  vcGroup.position.set(0, 0, 2.35);
+  const vcPlateMat = new THREE.MeshPhysicalMaterial({
+    color: 0xd97d3b,
+    metalness: 0.88,
+    roughness: 0.22,
+    transparent: true,
+    opacity: 0.34,
+    clearcoat: 0.5,
+  });
+  vcGroup.add(box(pkg.widthMm * 1.18, pkg.heightMm * 1.18, 0.22, vcPlateMat, 0, 0, 0));
+  // Capillary vapor-return copper tubes + flowing heat packets
+  const packets = [];
+  const pGeo = new THREE.SphereGeometry(0.16, 10, 8);
+  for (let i = -2; i <= 2; i++) {
+    const yPipe = i * 2.6;
+    vcGroup.add(box(pkg.widthMm * 1.12, 0.26, 0.16, materials.copper, 0, yPipe, 0.18));
+    const p = new THREE.Mesh(pGeo, i % 2 === 0 ? materials.accent : materials.cyan);
+    p.position.set(0, yPipe, 0.26);
+    p.userData.pipeY = yPipe;
+    p.userData.phase = i * 1.3;
+    packets.push(p);
+    vcGroup.add(p);
+  }
+  board.add(vcGroup);
+
+  const label = partLabel("Dimensity 9500 FLIR Thermal PDE · 3D IceLoop 5500 mm²");
+  label.scale.setScalar(0.5);
+  label.position.set(0, 4.4, -pkg.heightMm * 0.62);
+  group.add(board, label);
+
+  group.userData.vcGroup = vcGroup;
+  group.userData.updateThermal3d = (t, vcEnabled) => {
+    vcGroup.visible = vcEnabled;
+    if (!vcEnabled) return;
+    for (const p of packets) {
+      const span = pkg.widthMm * 0.52;
+      const u = ((t * 1.6 + p.userData.phase) % 2) - 1;
+      p.position.x = u * span;
+    }
+  };
   return group;
 }
 
