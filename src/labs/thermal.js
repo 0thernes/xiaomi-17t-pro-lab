@@ -313,7 +313,7 @@ export async function mount(main, { cap, audio }) {
       const w = p.width - padL - padR;
       const h = p.height - padT - padB;
       const xOf = (min) => padL + (min / 20) * w;
-      const yOf = (pct) => padT + (1 - Math.max(0.4, Math.min(1.05, pct / 100) - 0.4) / 0.65) * h;
+      const yOf = (pct) => padT + (1 - (Math.max(0.4, Math.min(1.05, pct / 100)) - 0.4) / 0.65) * h;
 
       // Grid lines (50%, 75%, 100%)
       p.stroke("rgba(255,255,255,0.08)");

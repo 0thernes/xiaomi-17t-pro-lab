@@ -918,33 +918,61 @@ async function mountSci(host, cap, audio) {
 
     if (which === "bloch") {
       const grp = new THREE.Group();
-      // Translucent geodesic Bloch sphere + X/Y/Z equatorial rings
+      // Glare-free geodesic Bloch sphere wireframe + crisp equatorial rings
       const sphere = new THREE.Mesh(
-        new THREE.SphereGeometry(4, 32, 24),
-        new THREE.MeshPhysicalMaterial({
+        new THREE.SphereGeometry(4, 28, 20),
+        new THREE.MeshBasicMaterial({
           color: 0x38d4f2,
           transparent: true,
-          opacity: 0.12,
-          roughness: 0.1,
-          metalness: 0.1,
+          opacity: 0.16,
           wireframe: true,
         }),
       );
-      const eqXY = new THREE.Mesh(new THREE.TorusGeometry(4, 0.035, 10, 64), mats.cyan);
+      const ringMatCyan = new THREE.MeshBasicMaterial({ color: 0x38d4f2, transparent: true, opacity: 0.72 });
+      const ringMatViolet = new THREE.MeshBasicMaterial({ color: 0xa78bfa, transparent: true, opacity: 0.55 });
+      const ringMatSlate = new THREE.MeshBasicMaterial({ color: 0x64748b, transparent: true, opacity: 0.42 });
+      const eqXY = new THREE.Mesh(new THREE.TorusGeometry(4, 0.032, 10, 64), ringMatCyan);
       eqXY.rotation.x = Math.PI / 2;
-      const eqXZ = new THREE.Mesh(new THREE.TorusGeometry(4, 0.025, 10, 64), mats.violet);
-      const eqYZ = new THREE.Mesh(new THREE.TorusGeometry(4, 0.025, 10, 64), mats.frame);
+      const eqXZ = new THREE.Mesh(new THREE.TorusGeometry(4, 0.024, 10, 64), ringMatViolet);
+      const eqYZ = new THREE.Mesh(new THREE.TorusGeometry(4, 0.024, 10, 64), ringMatSlate);
       eqYZ.rotation.y = Math.PI / 2;
       grp.add(sphere, eqXY, eqXZ, eqYZ);
 
       // Axes |0> (+Y), |1> (-Y), |+> (+X), |+i> (+Z)
-      const axisGeo = new THREE.CylinderGeometry(0.03, 0.03, 9.2, 8);
-      const yAxis = new THREE.Mesh(axisGeo, mats.gold);
-      const xAxis = new THREE.Mesh(axisGeo, mats.cyan);
+      const axisGeo = new THREE.CylinderGeometry(0.026, 0.026, 9.2, 8);
+      const yAxis = new THREE.Mesh(
+        axisGeo,
+        new THREE.MeshBasicMaterial({ color: 0xfbbf24, transparent: true, opacity: 0.8 }),
+      );
+      const xAxis = new THREE.Mesh(axisGeo, ringMatCyan);
       xAxis.rotation.z = Math.PI / 2;
-      const zAxis = new THREE.Mesh(axisGeo, mats.violet);
+      const zAxis = new THREE.Mesh(axisGeo, ringMatViolet);
       zAxis.rotation.x = Math.PI / 2;
       grp.add(yAxis, xAxis, zAxis);
+
+      const makePoleTag = (txt, color, x, y, z) => {
+        const c = document.createElement("canvas");
+        c.width = 128;
+        c.height = 64;
+        const cx = c.getContext("2d");
+        cx.fillStyle = color;
+        cx.font = "700 38px monospace";
+        cx.textAlign = "center";
+        cx.textBaseline = "middle";
+        cx.fillText(txt, 64, 34);
+        const tex = new THREE.CanvasTexture(c);
+        tex.colorSpace = THREE.SRGBColorSpace;
+        const spr = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false }));
+        spr.position.set(x, y, z);
+        spr.scale.set(1.5, 0.75, 1);
+        return spr;
+      };
+      grp.add(
+        makePoleTag("|0⟩", "#fbbf24", 0, 5.1, 0),
+        makePoleTag("|1⟩", "#fbbf24", 0, -5.1, 0),
+        makePoleTag("|+⟩", "#38d4f2", 5.1, 0, 0),
+        makePoleTag("|+i⟩", "#a78bfa", 0, 0, 5.1),
+      );
 
       // Live Bloch state vector arrow + glowing tip
       blochArrow = new THREE.ArrowHelper(
