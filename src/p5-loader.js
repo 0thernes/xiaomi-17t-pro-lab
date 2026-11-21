@@ -3,11 +3,21 @@ let pending = null;
 export function loadP5() {
   if (globalThis.p5) return Promise.resolve(globalThis.p5);
   if (!pending) {
+    // Prevent p5.js 2.4.0 FES from probing ./<lang>.json and cdn.jsdelivr.net on first load
+    try {
+      const key = `${navigator.language || "en-US"}-2.4.0`;
+      if (!window.localStorage.getItem(key)) window.localStorage.setItem(key, "{}");
+    } catch {
+      /* localStorage disabled */
+    }
     pending = new Promise((resolve, reject) => {
       const script = document.createElement("script");
       script.src = new URL("../vendor/p5/p5.min.js", import.meta.url).href;
       script.async = true;
-      script.onload = () => resolve(globalThis.p5);
+      script.onload = () => {
+        if (globalThis.p5) globalThis.p5.disableFriendlyErrors = true;
+        resolve(globalThis.p5);
+      };
       script.onerror = () => reject(new Error("p5.js did not load"));
       document.head.append(script);
     });
