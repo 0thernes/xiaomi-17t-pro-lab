@@ -2,7 +2,7 @@
  * Read a measured pointer-chase curve.
  * A jump is a rise in ns/load. Cited cache sizes may be drawn on the same
  * chart as reference marks. The curve does not, by itself, name a level L1
- * or prove a 9500 cache geometry. L1 size in specs.json is UNKNOWN.
+ * or prove a 9500 cache geometry. L1 sizes in specs.json come from the Arm manuals.
  */
 
 export function chaseJumps(points, ratio = 1.35) {
