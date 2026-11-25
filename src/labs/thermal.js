@@ -133,7 +133,7 @@ export async function mount(main, { cap, audio }) {
     ]),
     el("h1", {}, ["Thermal PDE, 3D IceLoop Vapor Chamber & Power"]),
     el("p", { class: "lede" }, [
-      "A live 2D explicit finite-difference heat solver (∂T/∂t = α∇²T + q_dyn + q_leak(T) − hΔT) runs directly across Kurnal's 140.57 mm² Dimensity 9500 floorplan. Toggle the 5,500 mm² Xiaomi 3D IceLoop vapor chamber off to watch subthreshold leakage feedback trigger DVFS throttling.",
+      "A live 2D explicit finite-difference heat solver (∂T/∂t = α∇²T + q_dyn + q_leak(T) − hΔT) runs on Kurnal's 140.57 mm² floorplan. Block watts are a model, not a measured phone power map. Toggle the 5,500 mm² Xiaomi 3D IceLoop vapor chamber off to watch the model's leakage term pull the DVFS clock down. The 20-minute axis is simulated time.",
     ]),
     readoutGrid([
       el("div", { class: "readout" }, [
@@ -154,7 +154,9 @@ export async function mount(main, { cap, audio }) {
       el("div", { class: "readout" }, [
         el("span", { class: "readout-label" }, ["7,000 mAh Si-C Est."]),
         el("span", { class: "readout-value" }, [batVal, el("span", { class: "readout-unit" }, ["hrs"])]),
-        el("span", { class: "readout-sub" }, ["27.16 Wh dual-cell 16% Si-C"]),
+        el("span", { class: "readout-sub" }, [
+          `Cited ${specs.device.battery_typical_mah.value} mAh, ${specs.device.battery_cell_voltage_v.value} V cell. Nominal Wh unpublished.`,
+        ]),
       ]),
     ]),
     stage,
@@ -387,7 +389,7 @@ export async function mount(main, { cap, audio }) {
     peakVal.className = st.peakC > 85 ? "v-danger" : st.peakC > 68 ? "v-warn" : "v-cyan";
     clkVal.textContent = st.c1UltraGHz.toFixed(2);
     pwrVal.textContent = st.totalWatts.toFixed(2);
-    batVal.textContent = st.batteryHrs.toFixed(1);
+    batVal.textContent = st.batteryHrs == null ? "—" : st.batteryHrs.toFixed(1);
 
     if (hoverSample) {
       flirProbeLine.textContent = `PROBE: ${hoverSample.zone} · (${hoverSample.xMm.toFixed(2)}, ${hoverSample.yMm.toFixed(2)}) mm · ${hoverSample.tempC.toFixed(1)} °C — click/drag to inject hotspot`;
@@ -409,7 +411,10 @@ export async function mount(main, { cap, audio }) {
       ),
       kv(
         "PMIC & Charging Stack",
-        el("span", {}, [`${specs.device.pmic.value} · 90W wired / 50W Qi `, provCited(specs.device.pmic)]),
+        el("span", {}, [
+          `${specs.device.pmic.value} · ${specs.device.wired_charge_w.value} W wired / ${specs.device.wireless_charge_w.value} W wireless `,
+          provCited(specs.device.wired_charge_w),
+        ]),
       ),
     );
   }, 220);

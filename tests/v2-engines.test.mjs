@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { describe, it } from "node:test";
 import { createDieThermalGrid, ironbowRgb, simulateSustainedThrottle } from "../src/sim/thermal-fdtd.js";
 import { createWavePacketSim } from "../src/sim/tdse.js";
@@ -62,8 +63,19 @@ describe("v2.0.0 2D FDTD silicon thermal PDE & 3D IceLoop VC", () => {
     for (const c of rgb) assert.ok(c >= 0 && c <= 255);
 
     const curve = simulateSustainedThrottle({ minutes: 20, ambientC: 25, profileId: "gaming_nomad" });
-    assert.ok(curve.length >= 20);
+    assert.equal(curve.length, 41);
+    assert.ok(Math.abs(curve[0].simSec) < 1e-9);
+    assert.ok(Math.abs(curve.at(-1).simSec - 20 * 60) < 1e-6, `last sample at ${curve.at(-1).simSec}s, want 1200`);
+    assert.ok(Math.abs(curve.at(-1).minute - 20) < 1e-9);
     assert.ok(curve.at(-1).vcPeakC < curve.at(-1).noVcPeakC);
+
+    const claim = createDieThermalGrid().stats();
+    assert.equal(claim.batteryWh, null);
+    assert.equal(claim.batteryHrs, null);
+    const sources = ["../src/sim/thermal-fdtd.js", "../src/labs/thermal.js", "../src/graphics/subjects.js"]
+      .map((rel) => readFileSync(new URL(rel, import.meta.url), "utf8"))
+      .join("\n");
+    assert.equal(/3\.88|27\.16|90W/.test(sources), false);
   });
 });
 

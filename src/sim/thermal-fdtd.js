@@ -213,10 +213,6 @@ export function createDieThermalGrid({
     }
     const baseWatts = Object.values(profile.watts).reduce((a, b) => a + b, 0);
     const totalWatts = baseWatts * throttleScale + 0.25 * Math.exp(Math.max(0, (meanC - 30) * 0.035));
-    // 7000 mAh @ 3.88 V nominal ~= 27.16 Wh (dual-cell 16% Si-C)
-    const batteryWh = 27.16;
-    const displayAndRadioW = profile.id === "idle" ? 0.8 : 2.1;
-    const batteryHrs = batteryWh / Math.max(0.5, totalWatts + displayAndRadioW);
     return {
       simTime,
       peakC,
@@ -228,7 +224,10 @@ export function createDieThermalGrid({
       throttleScale,
       c1UltraGHz: 4.21 * throttleScale,
       totalWatts,
-      batteryHrs,
+      // Typical capacity and the 4.58 V cell rating are cited. Nominal
+      // discharge voltage is not, so watt-hours and runtime are not computed.
+      batteryWh: null,
+      batteryHrs: null,
       vcEnabled: vc,
       ambientC: ambient,
       profileId: profile.id,
@@ -282,24 +281,30 @@ export function createDieThermalGrid({
   };
 }
 
-/** Compute 20-minute sustained thermal & clock stability curves comparing 3D IceLoop ON vs OFF. */
+/**
+ * Sustained thermal curves. The integrator advances `minutes` of simulated
+ * time. The axis is that clock, not a cosmetic label on a few seconds of steps.
+ */
 export function simulateSustainedThrottle({ minutes = 20, ambientC = 25, profileId = "gaming_nomad" } = {}) {
   const withVc = createDieThermalGrid({ nx: 22, ny: 26, ambientC, vcEnabled: true, profileId });
   const noVc = createDieThermalGrid({ nx: 22, ny: 26, ambientC, vcEnabled: false, profileId });
   const points = [];
   const samples = 40;
+  const dt = (minutes * 60) / samples;
   for (let s = 0; s <= samples; s++) {
     const a = withVc.stats();
     const b = noVc.stats();
     points.push({
-      minute: (s / samples) * minutes,
+      minute: a.simTime / 60,
+      simSec: a.simTime,
       vcPeakC: a.peakC,
       noVcPeakC: b.peakC,
       vcPerfPct: a.throttleScale * 100,
       noVcPerfPct: b.throttleScale * 100,
     });
-    withVc.step(0.6, 8);
-    noVc.step(0.6, 8);
+    if (s === samples) break;
+    withVc.step(dt);
+    noVc.step(dt);
   }
   return points;
 }

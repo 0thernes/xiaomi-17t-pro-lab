@@ -502,10 +502,11 @@ export function buildPhone(materials, explode = 0) {
 
     // Dual-cell 7000 mAh 16% Silicon-Carbon Battery + Wireless Charging Coil
     const cells = (W - 16) / 2;
+    const batSpecs = getSpecs().device;
     const batGroup = tagInspect(
       new THREE.Group(),
       "7,000 mAh Dual-Cell 16% Si-C Battery",
-      "27.16 Wh nominal · 90W wired HyperCharge · 50W Qi (NU1671 + SC858x + BQ28Z610)",
+      `${batSpecs.battery_typical_mah.value} mAh typical, ${batSpecs.battery_cell_voltage_v.value} V cell. Stored Wh is unpublished. ${batSpecs.wired_charge_w.value} W wired, ${batSpecs.wireless_charge_w.value} W wireless.`,
       "CITED",
     );
     batGroup.position.set(0, -H * 0.18, -e * 12);
