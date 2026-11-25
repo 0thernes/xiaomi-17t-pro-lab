@@ -6,6 +6,7 @@ All notable changes to this project are documented here. The format is based on 
 
 ### Fixed
 
+- Pages run [45552210376](https://github.com/0thernes/xiaomi-17t-pro-lab/actions/runs/45552210376) uploaded `github-pages` and then `deploy-pages` listed zero artifacts. The lookup runs in the same job, a fraction of a second after the upload is finalized, and a re-run of that same workflow then sees two artifacts and fails again ([actions/deploy-pages#451](https://github.com/actions/deploy-pages/issues/451)). Upload and deploy are now separate jobs, on `upload-pages-artifact` v5 and `deploy-pages` v5. The artifact is the browser tree (`index.html`, `src`, `styles`, `vendor`, `assets`, `.nojekyll`), not the screenshots and tests.
 - CI run [45518919910](https://github.com/0thernes/xiaomi-17t-pro-lab/actions/runs/45518919910) timed out in the all-route smoke test. That test now has a four-minute limit.
 - `style-src` no longer allows `'unsafe-inline'`. Slider fill uses a `meter` value. The raycast cursor uses a class. Chromium does report `element.style` as an inline-style violation; the hypothesis that CSSOM writes are exempt is wrong on this browser.
 
