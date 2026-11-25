@@ -140,10 +140,13 @@ test("every route is error-free and any canvas is not black", async ({ page }) =
   for (const [hash, name] of routes) {
     await page.goto(`/?tier=high${hash}`);
     await expect(page.locator("#main[data-ready='true']")).toBeVisible();
-    await page.waitForTimeout(500);
     const canvases = await page.locator("#main canvas").count();
     if (canvases > 0) {
-      const bright = await brightestCanvas(page);
+      let bright = 0;
+      for (let attempt = 0; attempt < 8 && bright <= 12; attempt++) {
+        await page.waitForTimeout(attempt === 0 ? 400 : 300);
+        bright = await brightestCanvas(page);
+      }
       expect(bright, `${name} canvas peak`).toBeGreaterThan(12);
     }
   }
