@@ -48,7 +48,7 @@ export async function mount(main) {
     type: "search",
     placeholder: "Filter parts, ICs, conflicts, issues (e.g. hynix, MT6661, UFS, NPU)…",
     "aria-label": "Search specs catalog",
-    style: "flex:1 1 280px",
+    class: "search-grow",
   });
   let activeTab = "all";
   const tabDefs = [
@@ -151,6 +151,7 @@ export async function mount(main) {
                 el("div", { class: "kv-value" }, [
                   el("strong", {}, [item.topic]),
                   el("p", { class: "note" }, [item.summary]),
+                  item.resolution ? el("p", { class: "note" }, [`Precedence: ${item.resolution}`]) : null,
                 ]),
               ]),
             ),

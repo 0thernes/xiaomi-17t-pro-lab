@@ -50,7 +50,7 @@ export async function mount(main, { cap }) {
     type: "text",
     value: "0xD503201F",
     "aria-label": "Custom 32-bit A64 hex word",
-    style: "max-width:160px;font-family:var(--font-mono)",
+    class: "hex-field",
   });
   const a64Bits = el("div", { class: "bit-row" });
   const a64Out = el("div");

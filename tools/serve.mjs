@@ -17,6 +17,7 @@ const TYPES = {
   ".webp": "image/webp",
   ".woff2": "font/woff2",
   ".wasm": "application/wasm",
+  ".wav": "audio/wav",
   ".txt": "text/plain; charset=utf-8",
   ".md": "text/markdown; charset=utf-8",
 };
@@ -51,7 +52,7 @@ const SECURITY_HEADERS = {
   "Cross-Origin-Embedder-Policy": "require-corp",
   "Cross-Origin-Resource-Policy": "same-origin",
   "Content-Security-Policy":
-    "default-src 'self'; script-src 'self' 'sha256-Fr475xZHBHPN6xm2sq3LW3tLGg/EpTH7a1ZC8aYgWsU='; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; font-src 'self'; worker-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'",
+    "default-src 'self'; script-src 'self' 'sha256-Fr475xZHBHPN6xm2sq3LW3tLGg/EpTH7a1ZC8aYgWsU='; style-src 'self'; img-src 'self' blob: data:; font-src 'self'; worker-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'",
   "Referrer-Policy": "no-referrer",
   "X-Content-Type-Options": "nosniff",
   "Cache-Control": "no-cache",

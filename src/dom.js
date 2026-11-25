@@ -70,15 +70,20 @@ export function rangeControl(label, min, max, step, value, formatOut = (v) => St
     "aria-label": label,
   });
   const output = el("output", {}, [formatOut(value)]);
+  const meter = el("meter", { min: "0", max: "100", "aria-hidden": "true" });
   const sync = () => {
     const pct = ((Number(input.value) - min) / Math.max(1e-12, max - min)) * 100;
-    input.style.setProperty("--fill", `${Math.max(0, Math.min(100, pct))}%`);
+    meter.value = Math.max(0, Math.min(100, pct));
     output.textContent = formatOut(Number(input.value));
   };
   sync();
   input.addEventListener("input", sync);
   return {
-    node: el("label", { class: "slider" }, [el("span", {}, [label]), output, input]),
+    node: el("label", { class: "slider" }, [
+      el("span", {}, [label]),
+      output,
+      el("span", { class: "track" }, [meter, input]),
+    ]),
     input,
     output,
     sync,

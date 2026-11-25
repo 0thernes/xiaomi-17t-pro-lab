@@ -968,9 +968,94 @@ code {
   border-radius: 6px;
   font-variant-numeric: tabular-nums;
 }
+.slider .track {
+  position: relative;
+  grid-column: 1 / -1;
+  display: block;
+  height: 36px;
+}
+.slider meter {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 15px;
+  width: 100%;
+  height: 5px;
+  border: 0;
+  background: var(--s4);
+  border-radius: 99px;
+}
+.slider meter::-webkit-meter-bar {
+  background: var(--s4);
+  border-radius: 99px;
+  border: 0;
+}
+.slider meter::-webkit-meter-optimum-value {
+  background: var(--accent);
+}
 .slider input[type="range"],
 .control-field input[type="range"] {
+  position: relative;
+  z-index: 1;
   grid-column: 1 / -1;
+}
+canvas.probe-hot {
+  cursor: crosshair;
+}
+.hex-field {
+  max-width: 160px;
+  font-family: var(--font-mono);
+}
+.search-grow {
+  flex: 1 1 280px;
+}
+.prompt-grow {
+  flex: 1 1 240px;
+}
+.note-gap {
+  margin-top: 8px;
+}
+.note-pad {
+  margin: 10px;
+}
+.h3-gap {
+  margin-top: 10px;
+}
+.prob-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.prob-bar {
+  width: 100%;
+  height: 8px;
+  background: var(--s4);
+  display: block;
+}
+.prob-bar-fill {
+  fill: var(--accent);
+}
+.life-arena,
+.life-raster,
+.life-spark {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: #06080c;
+}
+.life-arena {
+  max-width: 440px;
+  border-color: var(--line-strong);
+  cursor: crosshair;
+}
+.life-spark {
+  margin-top: 8px;
+}
+.formula-gap {
+  margin: 8px 0 12px;
+}
+.plot-aim {
+  cursor: crosshair;
 }
 
 /* Custom precision range input (no ugly browser default blue!) */
@@ -982,12 +1067,11 @@ input[type="range"] {
   margin: 0;
   background: transparent;
   cursor: pointer;
-  --fill: 50%;
 }
 input[type="range"]::-webkit-slider-runnable-track {
   height: 5px;
   border-radius: 99px;
-  background: linear-gradient(90deg, var(--accent) 0 var(--fill), var(--s4) var(--fill) 100%);
+  background: transparent;
 }
 input[type="range"]::-moz-range-track {
   height: 5px;

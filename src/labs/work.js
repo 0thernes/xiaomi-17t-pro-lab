@@ -258,7 +258,7 @@ async function mountLlm(host, audio) {
     type: "text",
     value: "Once upon a time",
     "aria-label": "Transformer prompt",
-    style: "flex:1 1 240px",
+    class: "prompt-grow",
   });
   const countCtrl = rangeControl("Tokens to Generate", 6, 36, 2, 16, (v) => `${v} tok`);
   const mlpCtrl = rangeControl("Neuralese MLP Gain", 0, 2.2, 0.05, 1.0, (v) => `${v.toFixed(2)}×`);
@@ -276,7 +276,7 @@ async function mountLlm(host, audio) {
     "39.4 MB FP16 TinyStories-8M weights are vendored locally. Press Stream Generate or a Neuralese preset.",
   ]);
   const streamBox = el("div", { class: "token-stream" }, [el("span", { class: "token-prompt" }, ["Once upon a time"])]);
-  const entropyLine = el("div", { class: "note", style: "margin-top:8px" }, [
+  const entropyLine = el("div", { class: "note note-gap" }, [
     "Next-token Shannon entropy H(p) and 8-layer residual norms update live per token.",
   ]);
   const probHost = el("div", { class: "prob-list" });
@@ -344,7 +344,7 @@ async function mountLlm(host, audio) {
       ),
       panel(
         "Live 16-Head Attention Heatmap, Residual Norms & Logits",
-        [attnPlot, entropyLine, el("h3", { style: "margin-top:10px" }, ["Next-Token Softmax Distribution"]), probHost],
+        [attnPlot, entropyLine, el("h3", { class: "h3-gap" }, ["Next-Token Softmax Distribution"]), probHost],
         null,
         "LAYER 7 ATTENTION + 8-LAYER ||h||₂",
       ),
@@ -432,9 +432,15 @@ async function mountLlm(host, audio) {
           ...top.map((item) => {
             const label = JSON.stringify(tokenizer.decode([item.id])).slice(1, -1);
             return el("div", { class: "prob-row" }, [
-              el("span", { style: "overflow:hidden;text-overflow:ellipsis;white-space:nowrap" }, [label || "␣"]),
-              el("div", { class: "prob-bar-bg" }, [
-                el("div", { class: "prob-bar-fill", style: `width:${(item.prob * 100).toFixed(1)}%` }),
+              el("span", { class: "prob-label" }, [label || "␣"]),
+              el("svg", { class: "prob-bar", viewBox: "0 0 100 6", preserveAspectRatio: "none" }, [
+                el("rect", {
+                  class: "prob-bar-fill",
+                  x: "0",
+                  y: "0",
+                  height: "6",
+                  width: (item.prob * 100).toFixed(1),
+                }),
               ]),
               el("span", {}, [`${(item.prob * 100).toFixed(1)}%`]),
             ]);
@@ -567,19 +573,19 @@ async function mountLife(host, audio) {
   const arenaCanvas = el("canvas", {
     width: "440",
     height: "440",
-    style: "width:100%;max-width:440px;border-radius:10px;border:1px solid var(--line-strong);cursor:crosshair",
+    class: "life-arena",
     "aria-label": "Glitchling 272-neuron foraging arena (click to drop snacks)",
   });
   const rasterCanvas = el("canvas", {
     width: "460",
     height: "320",
-    style: "width:100%;border-radius:10px;border:1px solid var(--line);background:#06080c",
+    class: "life-raster",
     "aria-label": "Live 14-region 272-neuron neural activity raster",
   });
   const homeoCanvas = el("canvas", {
     width: "460",
     height: "105",
-    style: "width:100%;border-radius:10px;border:1px solid var(--line);background:#06080c;margin-top:8px",
+    class: "life-spark",
     "aria-label": "Live metabolic homeostasis sparkline",
   });
 
@@ -1048,7 +1054,7 @@ async function mountSci(host, cap, audio) {
   // Interactive Quantum Gate Composer + Amplitude Phase Wheel
   const gateBar = el("div", { class: "chips wrap" });
   const presetBar = el("div", { class: "chips wrap" });
-  const circuitTape = el("div", { class: "formula-box", style: "margin:8px 0" }, [""]);
+  const circuitTape = el("div", { class: "formula-box formula-gap" }, [""]);
   const ampPlot = el("div", { class: "plot" });
   const circuitMetrics = el("div");
 
@@ -1314,10 +1320,10 @@ function drawContextuality(p, state) {
  * 5. BROWSER — GIGACHAD MOBILE SOVEREIGN BROWSER & 60 Hz 5-CASTE SWARM
  * ========================================================================= */
 async function mountBrowser(host, cap, audio) {
-  const bar = el("div", { class: "formula-box", style: "margin:0 0 12px" }, [
+  const bar = el("div", { class: "formula-box formula-gap" }, [
     "gigachad://mobile/cortex · 60 Hz 5-Caste Embodied Stigmergic Swarm (Click to Drop Attractors / Threats)",
   ]);
-  const swarmHost = el("div", { class: "plot", style: "cursor:crosshair" });
+  const swarmHost = el("div", { class: "plot plot-aim" });
   const body = el("div");
 
   let dropKind = "task";

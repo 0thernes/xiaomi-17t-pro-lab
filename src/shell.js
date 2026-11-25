@@ -144,7 +144,7 @@ export function mountShell(audio) {
               ],
             ),
           )
-        : [el("p", { class: "note", style: "margin:10px" }, ["No matching lab, workload, or hardware record."])]),
+        : [el("p", { class: "note note-pad" }, ["No matching lab, workload, or hardware record."])]),
     );
   }
 

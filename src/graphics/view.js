@@ -154,11 +154,11 @@ export async function mountView(canvas, cap) {
       if (target) {
         probeBox.setFromObject(target);
         probeBox.visible = true;
-        canvas.style.cursor = "crosshair";
+        canvas.classList.add("probe-hot");
         probeCallbacks.onHover?.(target.userData.inspect, target);
       } else {
         probeBox.visible = false;
-        canvas.style.cursor = "";
+        canvas.classList.remove("probe-hot");
         probeCallbacks.onHover?.(null, null);
       }
     }
@@ -186,7 +186,7 @@ export async function mountView(canvas, cap) {
     if (hoveredMesh) {
       hoveredMesh = null;
       probeBox.visible = false;
-      canvas.style.cursor = "";
+      canvas.classList.remove("probe-hot");
       probeCallbacks?.onHover?.(null, null);
     }
   }

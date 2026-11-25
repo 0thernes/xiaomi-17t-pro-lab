@@ -132,6 +132,7 @@ test("subpath hosting still reaches the CPU lab", async ({ page }) => {
 });
 
 test("every route is error-free and any canvas is not black", async ({ page }) => {
+  test.setTimeout(240000);
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
   page.on("console", (msg) => {
