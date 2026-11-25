@@ -1460,14 +1460,16 @@
       "classification": "conflict",
       "topic": "\"4-lane UFS 4.1\" vs this phone",
       "summary": "MediaTek markets D9500 \"4-lane UFS 4.1\" (two 2-lane controllers / dual UFS, as in vivo X300 Pro). The 17T Pro fits one SK hynix UFS package, so it does not get the 4-lane (dual-UFS) configuration. Do not show \"4-lane\" for this phone.",
-      "source": "https://www.mediatek.com/zh-cn/dimensity-9500"
+      "source": "https://www.mediatek.com/zh-cn/dimensity-9500",
+      "resolution": "Precedence: a SoC capability is not this phone's population. MediaTek's 4-lane figure is two host controllers. This phone's FCC photos show one UFS package, and the device lane count stays unconfirmed. Do not print 4-lane as a fact about the 17T Pro."
     },
     {
       "id": 22,
       "classification": "issue",
       "topic": "Kernel PMU compatibles",
       "summary": "MT6993 DT uses \"arm,cortex-x925-pmu\"/\"cortex-x4-pmu\"/\"cortex-a725-pmu\" for C1-Ultra/Premium/Pro (placeholder from previous gen; DT comment \"TODO: check cpus node\"). Harmless for perf but wrong names.",
-      "source": "https://github.com/MiCode/MTK_kernel_device_modules/blob/bsp-warhol-w-oss/arch/arm64/boot/dts/mediatek/mt6993.dts"
+      "source": "https://github.com/MiCode/MTK_kernel_device_modules/blob/bsp-warhol-w-oss/arch/arm64/boot/dts/mediatek/mt6993.dts",
+      "resolution": "Precedence: the device-tree comment marks these compatibles as unchecked placeholders. They are not Arm C1 PMU names. Do not cite them as the microarchitecture."
     }
   ],
   "unknowns": [

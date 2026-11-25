@@ -2,6 +2,20 @@
 
 All notable changes to this project are documented here. The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project uses [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2026-11-25
+
+### Fixed
+
+- CI run [45518919910](https://github.com/0thernes/xiaomi-17t-pro-lab/actions/runs/45518919910) timed out in the all-route smoke test. That test now has a four-minute limit.
+- `style-src` no longer allows `'unsafe-inline'`. Slider fill uses a `meter` value. The raycast cursor uses a class. Chromium does report `element.style` as an inline-style violation; the hypothesis that CSSOM writes are exempt is wrong on this browser.
+
+### Added
+
+- Three CC0 percussion hits from Versilian Studios Chamber Orchestra Community Edition, loaded only after sound is turned on. The oscillators remain the score.
+- Source precedence for conflicts 16–22 in [docs/research/source-precedence.md](docs/research/source-precedence.md). The specs page prints each resolution.
+- An optional `gpu-screenshots` job that runs only when the repository variable `GPU_RUNNER` is `true`. Registration steps are in [docs/ops/gpu-runner.md](docs/ops/gpu-runner.md). No runner was registered.
+- [docs/licenses/cqm.md](docs/licenses/cqm.md) records why the Cosmogonic TypeScript creatures stay out.
+
 ## [2.1.0] - 2026-11-25
 
 Hardening sweep over the v2.0.0 tree. The product stays on 2.x because `main` was already 2.0.0; a drop to 0.3.0 would have been a semver regression. The audit write-up is [docs/audit/REVIEW-0.3.0.md](docs/audit/REVIEW-0.3.0.md).

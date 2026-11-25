@@ -13,6 +13,13 @@ Images used as modeling references, and the files this repo is allowed to ship.
 - The frame uses the normal and roughness maps. The diffuse map is a rusty plate and is not multiplied onto the body. The file remains in the repo with this credit.
 - Detail: `assets/textures/cc0/CREDITS.md`
 
+### Versilian Studios Chamber Orchestra, Community Edition
+
+- Files: `vendor/audio/vsco-ce/claves_pp1.wav`, `snare_pp2.wav`, `shake8.wav`
+- Upstream: https://github.com/sgossner/VSCO-2-CE
+- License: CC0 1.0 (`vendor/audio/vsco-ce/LICENSE`)
+- Loaded only after the listener turns sound on. The rest of that library is not in this repo.
+
 No Xiaomi, Kurnal, TechInsights, or teardown photograph is shipped. None of those pages grant redistribution.
 
 ## Linked, not shipped

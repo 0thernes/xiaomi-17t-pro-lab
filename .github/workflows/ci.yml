@@ -24,3 +24,19 @@ jobs:
       - run: npm run test:smoke
         env:
           CI: "true"
+
+  gpu-screenshots:
+    if: vars.GPU_RUNNER == 'true'
+    runs-on: [self-hosted, gpu]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install chromium
+      - run: npm run test:smoke
+        env:
+          CI: "true"
+          SHOOT: "1"

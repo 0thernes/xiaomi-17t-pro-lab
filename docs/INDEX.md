@@ -16,6 +16,9 @@
 - [Review 0.2.0](REVIEW-0.2.0.md)
 - [Audit index](audit/INDEX.md)
 - [Review 0.3.0](audit/REVIEW-0.3.0.md)
+- [Source precedence](research/source-precedence.md)
+- [Cosmogonic license gate](licenses/cqm.md)
+- [GPU runner](ops/gpu-runner.md)
 
 Research dossiers (source narrative, 2026-11-12):
 

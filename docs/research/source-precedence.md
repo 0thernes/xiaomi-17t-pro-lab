@@ -1,0 +1,13 @@
+# Source precedence
+
+Used when two published accounts disagree. A later edit may not replace a primary document with a blog, and it may not invent a number to close a gap.
+
+1. **Vendor engineering document over a vendor marketing sheet.** Conflict 16: the Arm C1-Premium TRM states a 64 KB 4-way L1 data cache. An Arm comparison PDF that lists 64 KB/128 KB does not override the TRM. The PDF stays in the conflict record as the other side.
+2. **A measurement over a marketing name, for the property that was measured.** Conflict 18: Xiaomi markets DC dimming. Notebookcheck measured a 120 Hz component plus about 3.84 kHz at low brightness, and GSMArena reports 3840 Hz PWM. Both statements stay. The marketing line is not a measurement, and the measurement is not a claim that Xiaomi's menu is unlabeled.
+3. **A vendor launch figure over an unsourced repair-blog number.** Conflict 17: 5500 mm² is the heat-dissipation area in the MediaTek/Xiaomi launch copy. 4637 mm² has no primary source. The vapor-chamber-only area is still unpublished, so 5500 mm² is not relabeled as the VC plate alone.
+4. **A published briefing over a cell-library estimate, with the estimate still shown.** Conflict 19: about 30 billion transistors is the TechInsights/MediaTek briefing figure. Kurnal's 27.3 billion is an estimate from a cell library. The page shows both. It does not average them.
+5. **Do not cite a copied scheduling-model constant.** Conflict 20: LLVM's C1-Ultra ROB of 320 is marked as copied from Neoverse V3. No Arm figure for that reorder-buffer size was found. 320 is not a leaf.
+6. **A SoC capability is not this phone's population.** Conflict 21: MediaTek's "4-lane UFS 4.1" describes two host controllers. FCC photos of this phone show one UFS package. The device lane count stays unconfirmed. The SoC sentence is not printed as the phone's lane count.
+7. **A device-tree placeholder is not a microarchitecture name.** Conflict 22: `mt6993.dts` uses `arm,cortex-x925-pmu`, `cortex-x4-pmu`, and `cortex-a725-pmu`, and the file comments that the CPU node still needs checking. Those strings are not Arm C1 PMU identifiers.
+
+Open leaves stay open when the sources are silent or only one non-primary outlet speaks: rear-glass grade, this phone's UFS lane count, WebGPU on this Mali-G1 Ultra, the iPhone 18 Pro Max Wild Life Extreme score inside the same PhoneArena table, the two Galaxy street prices, and the reverse-wireless wattage beyond the FAQ. Battery watt-hours are in that set too. A battery-vendor page transcribes 25.82 Wh and 26.46 Wh from a teardown frame that is not in this repository. Xiaomi's spec page does not print watt-hours. The transcription is not adopted.

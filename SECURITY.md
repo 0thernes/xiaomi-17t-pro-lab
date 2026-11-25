@@ -1,6 +1,6 @@
 # Security
 
-Version 2.1.0. This is a static site. The dev server and `index.html` send a Content-Security-Policy. `script-src` is `'self'` plus the hash of the import map. `style-src` allows `'unsafe-inline'` because Three.js and p5 assign `element.style`, and attribute hashes do not cover those assignments. Glitchling is imported as a module, so `script-src` does not allow `eval`. It has no accounts, no server-side secret, and no database. The TinyStories weights under `vendor/tinystories/` are a public model checkpoint, not a credential.
+Version 2.2.0. This is a static site. The dev server and `index.html` send a Content-Security-Policy. `script-src` is `'self'` plus the hash of the import map. `style-src` is `'self'` only. Chromium blocks `element.style` and `setProperty` without `'unsafe-inline'`; the slider fill is a `meter` value and the probe cursor is a class. Glitchling is imported as a module, so `script-src` does not allow `eval`. It has no accounts, no server-side secret, and no database. The TinyStories weights under `vendor/tinystories/` are a public model checkpoint, not a credential.
 
 ## Reporting
 

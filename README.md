@@ -1,7 +1,7 @@
-# Xiaomi 17T Pro Lab (v2.1.0)
+# Xiaomi 17T Pro Lab (v2.2.0)
 
 [![CI](https://github.com/0thernes/xiaomi-17t-pro-lab/actions/workflows/ci.yml/badge.svg)](https://github.com/0thernes/xiaomi-17t-pro-lab/actions/workflows/ci.yml)
-[![version](https://img.shields.io/badge/version-2.1.0-38d4f2)](CHANGELOG.md)
+[![version](https://img.shields.io/badge/version-2.2.0-38d4f2)](CHANGELOG.md)
 [![license](https://img.shields.io/badge/license-MIT-a78bfa)](LICENSE)
 [![pages](https://img.shields.io/badge/demo-GitHub%20Pages-ff6900)](https://0thernes.github.io/xiaomi-17t-pro-lab/)
 

@@ -1,8 +1,15 @@
 /**
- * Scientific WebAudio Synthesizer & Hardware Telemetry Sonifier.
- * Muted by default until the user toggles "Sound on" (or presses M).
- * 100% live WebAudio oscillators & filters; zero sampled audio assets.
+ * Scientific WebAudio synthesizer, plus a lazy CC0 percussion layer.
+ * Muted until the user turns sound on. Oscillators stay the score.
+ * The three hits are Versilian Studios Chamber Orchestra Community Edition
+ * (CC0), fetched only after sound is enabled. See vendor/audio/vsco-ce/NOTICE.md.
  */
+
+const SAMPLE_URLS = [
+  new URL("../vendor/audio/vsco-ce/claves_pp1.wav", import.meta.url),
+  new URL("../vendor/audio/vsco-ce/snare_pp2.wav", import.meta.url),
+  new URL("../vendor/audio/vsco-ce/shake8.wav", import.meta.url),
+];
 
 const DEGREES = [1, 9 / 8, 5 / 4, 3 / 2, 5 / 3, 2];
 
@@ -12,6 +19,8 @@ export function createAudio() {
   let timer = null;
   let step = 0;
   const nodes = [];
+  let samples = null;
+  let sampleLoad = null;
 
   function ensure() {
     if (context) return;
@@ -47,6 +56,22 @@ export function createAudio() {
     bed.connect(master);
   }
 
+  function loadSamples() {
+    if (sampleLoad) return sampleLoad;
+    sampleLoad = (async () => {
+      const decoded = [];
+      for (const url of SAMPLE_URLS) {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`sample ${response.status}`);
+        decoded.push(await context.decodeAudioData(await response.arrayBuffer()));
+      }
+      samples = decoded;
+    })().catch(() => {
+      samples = [];
+    });
+    return sampleLoad;
+  }
+
   function schedule() {
     if (!context || master.gain.value === 0) return;
     const time = context.currentTime + 0.03;
@@ -66,6 +91,15 @@ export function createAudio() {
     osc.connect(tone).connect(gain).connect(master);
     osc.start(time);
     osc.stop(time + 0.46);
+    if (samples && samples.length && step % 4 === 0) {
+      const buffer = samples[((step / 4) % samples.length) | 0];
+      const hit = context.createBufferSource();
+      hit.buffer = buffer;
+      const gain = context.createGain();
+      gain.gain.value = 0.12;
+      hit.connect(gain).connect(master);
+      hit.start(time);
+    }
   }
 
   function tone(freqStart, freqEnd, dur = 0.14, peak = 0.05, type = "sine") {
@@ -131,6 +165,7 @@ export function createAudio() {
       }
       if (turningOn) {
         master.gain.value = 0.9;
+        void loadSamples();
         blip("ok");
       }
       return !turningOn;
@@ -138,6 +173,6 @@ export function createAudio() {
     blip,
     sonify,
     credits:
-      "Original WebAudio scientific synthesizer & telemetry sonifier (harmonic drone, quantum/thermal/probe synth). Zero bundled audio samples.",
+      "Live WebAudio oscillators, with three CC0 percussion hits from Versilian Studios Chamber Orchestra Community Edition (sgossner/VSCO-2-CE) loaded only after sound is turned on. The samples are not the Xiaomi ringtone.",
   };
 }

@@ -38,6 +38,13 @@ The file is the official minified build so a phone does not parse the multi-mega
 - License: CC0
 - Credits file: `assets/textures/cc0/CREDITS.md`
 
+## VSCO Community Edition percussion
+
+- Path: `vendor/audio/vsco-ce/`
+- License: CC0 1.0 (`LICENSE`)
+- Upstream: https://github.com/sgossner/VSCO-2-CE
+- Three short hits only. Notice: `NOTICE.md`
+
 ## TinyStories-8M and Glitchling
 
 - `vendor/tinystories/NOTICE.md`
