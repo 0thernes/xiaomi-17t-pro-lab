@@ -2,6 +2,18 @@
 
 All notable changes to this project are documented here. The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project uses [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2026-11-25
+
+Hardening sweep over the v2.0.0 tree. The product stays on 2.x because `main` was already 2.0.0; a drop to 0.3.0 would have been a semver regression. The audit write-up is [docs/audit/REVIEW-0.3.0.md](docs/audit/REVIEW-0.3.0.md).
+
+### Fixed
+
+- The thermal throttle chart integrates the minutes printed on its axis. It had been stepping 0.6 s while the labels said 20 minutes.
+- Battery energy no longer uses an unpublished 3.88 V to claim 27.16 Wh, and the wired-charge callout uses the cited 100 W instead of 90 W. Nominal watt-hours stay unpublished.
+- A Content-Security-Policy is on the page and the dev server. Glitchling loads as a module instead of `new Function`.
+- Playwright checks every route for console errors and a non-black canvas when the route has one.
+- The README workloads row is a single table cell again.
+
 ## [2.0.0] - 2026-11-21
 
 Major custom GLSL shaders, interactive 3D raycast inspection, live PDE/TDSE/2D-FFT physics, and quantum circuit composer release.

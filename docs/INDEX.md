@@ -11,6 +11,11 @@
 - [ADR 003 — Quality tier](ADR-003-quality-tier.md)
 - [ADR 004 — Timers and cross-origin isolation](ADR-004-timers.md)
 - [ADR 005 — NPU honesty](ADR-005-npu.md)
+- [ADR 006 — One subject](ADR-006-one-subject.md)
+- [ADR 007 — Design system](ADR-007-design-system.md)
+- [Review 0.2.0](REVIEW-0.2.0.md)
+- [Audit index](audit/INDEX.md)
+- [Review 0.3.0](audit/REVIEW-0.3.0.md)
 
 Research dossiers (source narrative, 2026-11-12):
 
