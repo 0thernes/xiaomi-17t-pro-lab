@@ -635,8 +635,8 @@ async function mountLife(host, audio) {
     ]),
   );
 
-  const code = await fetch(new URL("../../vendor/glitchling/sim.js", import.meta.url)).then((r) => r.text());
-  const GL = new Function(`${code}; return globalThis.GL;`)();
+  await import("../../vendor/glitchling/sim.js");
+  const GL = globalThis.GL;
 
   let seed = 1;
   let creature = new GL.Glitchling(seed, GL.DEFAULT_FLAWS);

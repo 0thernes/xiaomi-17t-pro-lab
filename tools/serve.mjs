@@ -46,14 +46,21 @@ export function resolveSafe(root, urlPath) {
   return full;
 }
 
+const SECURITY_HEADERS = {
+  "Cross-Origin-Opener-Policy": "same-origin",
+  "Cross-Origin-Embedder-Policy": "require-corp",
+  "Cross-Origin-Resource-Policy": "same-origin",
+  "Content-Security-Policy":
+    "default-src 'self'; script-src 'self' 'sha256-Fr475xZHBHPN6xm2sq3LW3tLGg/EpTH7a1ZC8aYgWsU='; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; font-src 'self'; worker-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'",
+  "Referrer-Policy": "no-referrer",
+  "X-Content-Type-Options": "nosniff",
+  "Cache-Control": "no-cache",
+};
+
 function send(res, status, body, type = "text/plain; charset=utf-8") {
   res.writeHead(status, {
     "Content-Type": type,
-    "Cross-Origin-Opener-Policy": "same-origin",
-    "Cross-Origin-Embedder-Policy": "require-corp",
-    "Cross-Origin-Resource-Policy": "same-origin",
-    "Cache-Control": "no-cache",
-    "X-Content-Type-Options": "nosniff",
+    ...SECURITY_HEADERS,
   });
   res.end(body);
 }
@@ -76,11 +83,7 @@ export function startServer(port) {
     const type = TYPES[path.extname(target)] || "application/octet-stream";
     res.writeHead(200, {
       "Content-Type": type,
-      "Cross-Origin-Opener-Policy": "same-origin",
-      "Cross-Origin-Embedder-Policy": "require-corp",
-      "Cross-Origin-Resource-Policy": "same-origin",
-      "Cache-Control": "no-cache",
-      "X-Content-Type-Options": "nosniff",
+      ...SECURITY_HEADERS,
     });
     fs.createReadStream(target).pipe(res);
   });

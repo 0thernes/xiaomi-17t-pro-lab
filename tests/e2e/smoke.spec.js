@@ -131,6 +131,25 @@ test("subpath hosting still reaches the CPU lab", async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
+test("every route is error-free and any canvas is not black", async ({ page }) => {
+  const errors = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  page.on("console", (msg) => {
+    if (msg.type() === "error") errors.push(msg.text());
+  });
+  for (const [hash, name] of routes) {
+    await page.goto(`/?tier=high${hash}`);
+    await expect(page.locator("#main[data-ready='true']")).toBeVisible();
+    await page.waitForTimeout(500);
+    const canvases = await page.locator("#main canvas").count();
+    if (canvases > 0) {
+      const bright = await brightestCanvas(page);
+      expect(bright, `${name} canvas peak`).toBeGreaterThan(12);
+    }
+  }
+  expect(errors).toEqual([]);
+});
+
 test("desktop layout places nav sidebar beside main without overlap", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.goto("/#/");
