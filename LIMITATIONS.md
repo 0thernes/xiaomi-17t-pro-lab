@@ -13,6 +13,15 @@ This document states explicitly what `xiaomi-17t-pro-lab` (v3.1.0) **does not pr
    - The 2D EUV lithography engine (`src/sim/litho-2d.js`) uses scalar thin-mask Kirchhoff Fourier optics, not full 3D Maxwell thick-mask absorber FDTD.
 6. **Software WebGL on CI Runners:** GitHub-hosted Ubuntu runners execute Playwright via SwiftShader CPU WebGL; physical Mali-G1 Ultra MC12 rendering requires on-device inspection.
 7. **Not Externally Peer Reviewed:** The accompanying AMS-LaTeX white paper (`dist/Donahue_2026_Xiaomi_17T_Pro_Lab.pdf`) is an independent research preprint and has not undergone external journal peer review.
+8. **Scope of the Lean Suite (2026-11-26 statement audit):**
+   - The Lean statements concern integer models of formulas, not the Dimensity 9500 hardware or the browser simulators. The device model is not formally verified.
+   - Many of the 75 audited declarations are literal arithmetic on cited constants closed by `decide` (for example die area, NPU unit count, clock ordering, the EUV/ArF photon-energy ratio, the 9-shard byte total). They check the arithmetic, not the cited values. The universally quantified results are listed in the README section "What the Lean suite proves".
+   - Crank–Nicolson norm preservation is proven only for one scalar Cayley factor with integer `h`, not for the full operator.
+   - The Rayleigh and DOF results are strict monotonicity of integer products in NA. The readings `CD = k1·λ/NA` and `DOF = k2·λ/NA²` are informal.
+   - The 9-shard Lean check is arithmetic on hard-coded sizes. The link to the actual shard files is the SHA-256 eval in `evals/run_tinystories_eval.mjs`.
+   - All results are textbook mathematics in small finite or integer settings.
+   - The six-kernel check covers the 10 comparator targets and their dependency closure. Lean default and paranoid mode are one implementation, so these are 5 distinct kernels. `leanchecker` is the Lean kernel again.
+   - Axioms are a per-declaration subset of `propext` and `Quot.sound`: 28 declarations use none, 14 use `[propext]`, 33 use `[propext, Quot.sound]`.
 
 ## 2. Literal vs. Metaphor Table
 

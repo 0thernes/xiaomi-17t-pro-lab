@@ -4,9 +4,9 @@
 
 ## 1. Epistemic Accounting — What This Repository Does vs. Does Not Solve
 
-`xiaomi-17t-pro-lab` is a **forensic hardware-provenance workbench, real-time multi-scale silicon-to-quantum simulator, 60-digit differential oracle, and six-kernel Lean 4.35.0 invariant verification suite** anchored to the Xiaomi 17T Pro (MediaTek Dimensity 9500 / MT6993Z, TSMC N3P).
+`xiaomi-17t-pro-lab` is a **forensic hardware-provenance workbench, real-time multi-scale silicon-to-quantum simulator, 60-digit differential oracle, and constructive Lean 4.35.0 invariant suite for the workbench's mathematical models** anchored to the Xiaomi 17T Pro (MediaTek Dimensity 9500 / MT6993Z, TSMC N3P).
 
-- **It DOES** certify 59 exact algebraic, numerical-stability, and quantum-contextuality declarations in Lean 4.35.0 (`XiaomiLabProofs` + `Solution.lean`) across 6 independent kernels, differentially verify 54 floating-point physics quantities against an independent 60-digit `Decimal`/`Fraction` oracle, kill 8/8 planted semantic mutants, and preserve strict hardware provenance (`cited` vs `computed` vs `measured` vs `UNKNOWN`).
+- **It DOES** prove 75 audited Lean 4.35.0 declarations (`XiaomiLabProofs` + `Solution.lean`): integer invariants of the lab's formulas (algebraic, numerical-stability, quantum-contextuality) and literal arithmetic checks of cited constants, kernel-checked by Lean, with the 10 comparator targets also accepted by 6 kernel checks in CI (5 distinct implementations). It also differentially verify 54 floating-point physics quantities against an independent 60-digit `Decimal`/`Fraction` oracle, kill 8/8 planted semantic mutants, and preserve strict hardware provenance (`cited` vs `computed` vs `measured` vs `UNKNOWN`).
 - **It DOES NOT** resolve any open conjecture or frontier engineering problem in `unsolved-problems-mega-atlas`. Every equation simulated (Rayleigh/Abbe, Mo/Si Bragg transfer matrix, WKB tunneling, Dirac dispersion, Varshni intrinsic silicon, FinFET scale length, Fourier 2D FDTD, Roofline, Crank–Nicolson TDSE, Bell-CHSH, Mermin-3 GHZ, Peres–Mermin 3×3) is established textbook physics or finite algebraic verification of known bounds.
 
 ## 2. Exact Mapping to Adjacent Mega-Atlas Open Problems (13 IDs)
@@ -38,4 +38,4 @@ For completeness when checking the broader `0thernes` portfolio against `unsolve
 - `0TH-2026-010` (`catalytic-register-frontiers`, parent `CS-005`): resolved two open questions of Vinciguerra (arXiv:2609.18692) on passive catalytic registers.
 - `0TH-2026-012` (`coded-pir-mlwe-complexity-lab`, parents `CS-053`, `CS-026`): resolved Schur-product syzygy rank and refuted Luo (arXiv:2604.15858).
 
-**`xiaomi-17t-pro-lab` (`0TH-BUILD-012`) makes NO such open-problem retirement claim.** Its contribution is rigorous forensic hardware documentation, real-time multi-scale computational simulation, 60-digit differential verification, and constructive six-kernel Lean 4.35.0 certification (75 audited declarations, zero `Classical.choice`) of its own mathematical invariants.
+**`xiaomi-17t-pro-lab` (`0TH-BUILD-012`) makes NO such open-problem retirement claim.** Its contribution is rigorous forensic hardware documentation, real-time multi-scale computational simulation, 60-digit differential verification, and constructive Lean 4.35.0 proofs (75 audited declarations, zero `Classical.choice`) of integer invariants of its own mathematical models.

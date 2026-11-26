@@ -4,6 +4,10 @@ All notable changes to this project are documented here. The format is based on 
 
 ## [Unreleased]
 
+### Changed
+
+- Claim documents corrected to match the 2026-11-26 statement audit ([audit log](https://github.com/0thernes/0thernes-research-archive/blob/main/docs/reviews/2026-11-26-statement-audit.md)). README, `CLAIMS.md`, `LIMITATIONS.md`, `docs/statement-fidelity.md`, `docs/faq.md` and `docs/mega-atlas-cross-reference.md` now describe the Lean core as a constructive invariant suite for the workbench's formulas, not a formal verification of the device or simulators; separate universal lemmas from literal checks of cited constants; state that the 6 kernel checks cover the 10 comparator targets and are 5 distinct implementations; give the axiom breakdown as 28 none, 14 `[propext]`, 33 `[propext, Quot.sound]` (the v3.1.0 entry below said "47 `[propext, Quot.sound]`"); limit Crank–Nicolson to one scalar Cayley factor; mark the Rayleigh/DOF division reading as informal; add the `E ≥ 0` and `rx, ry ≥ 0` hypotheses; reword the C09 shard claim; and fix the README claim range to `C01`–`C12`. Paper and Lean issues are recorded in `ERRATA.md` (E-008 to E-012, K-001). No Lean, paper, data or CI file changed.
+
 ## [3.1.0] - 2026-11-26
 
 Round 2 full 3-cycle forensic hardening & Playbook v1.3 Gold Standard elevation: 100% constructive zero-`Classical.choice` Lean 4.35.0 core (75 audited declarations, 10 isolated Palomar comparator targets), live negative kernel & comparator rejection in CI, strict-CSP zero-404 Blueprint, 0 broken Markdown links, live Crossref/arXiv non-retracted DOI audit, and dual RFC 3161 + OpenTimestamps cryptographic proofs.

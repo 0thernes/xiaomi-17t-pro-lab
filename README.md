@@ -2,13 +2,15 @@
 
 [![CI](https://github.com/0thernes/xiaomi-17t-pro-lab/actions/workflows/ci.yml/badge.svg)](https://github.com/0thernes/xiaomi-17t-pro-lab/actions/workflows/ci.yml)
 [![Version](https://img.shields.io/badge/version-3.1.0-38d4f2)](CHANGELOG.md)
-[![Lean 4.35.0](https://img.shields.io/badge/Lean%204.35.0-75%20constructive%20decls%20%C2%B7%200%20Choice%20%C2%B7%206%20kernels-4ade80)](lean/VerifyAxioms.lean)
+[![Lean 4.35.0](https://img.shields.io/badge/Lean%204.35.0-75%20constructive%20decls%20%C2%B7%200%20Choice%20%C2%B7%206%20kernel%20checks-4ade80)](lean/VerifyAxioms.lean)
 [![Oracle](https://img.shields.io/badge/60--digit%20oracle-54%2F54%20pass-0b6bcb)](reference/physics_oracle.py)
 [![License](https://img.shields.io/badge/license-MIT%20%2B%20CC--BY--4.0-a78bfa)](LICENSE)
 [![Status](https://img.shields.io/badge/status-active-2ea043)](ROADMAP.md)
 [![Pages](https://img.shields.io/badge/demo-GitHub%20Pages-ff6900)](https://0thernes.github.io/xiaomi-17t-pro-lab/)
 
-Forensic silicon-to-quantum hardware workbench, independent 60-digit differential physics oracle, pure Lean 4.35.0 six-kernel formal verification core, and AMS-LaTeX white paper for the **Xiaomi 17T Pro** (`2602EPTC0G`, codename `warhol`) and **MediaTek Dimensity 9500** (`MT6993Z`, TSMC N3P, `140.57 mm²`).
+Interactive silicon-to-quantum hardware workbench, independent 60-digit differential physics oracle, a constructive Lean 4.35.0 invariant suite for the workbench's mathematical models, and an AMS-LaTeX white paper for the **Xiaomi 17T Pro** (`2602EPTC0G`, codename `warhol`) and **MediaTek Dimensity 9500** (`MT6993Z`, TSMC N3P, `140.57 mm²`).
+
+The Lean suite proves integer invariants of the formulas the workbench uses and checks arithmetic on cited constants. It does not formally verify the device, the browser simulators, or their floating-point arithmetic, and it retires no open problem.
 
 ![Xiaomi 17T Pro Lab Social Preview](docs/media/social-preview.png)
 
@@ -41,7 +43,7 @@ npm run evals                                        # 9-shard TinyStories-8M We
 npm run test:smoke                                   # Playwright 19-route phone & desktop E2E smoke
 ```
 
-## 5-Second Lean 4.35.0 Kernel Verification
+## Lean 4.35.0 Kernel Check
 
 ```bash
 cd lean
@@ -49,11 +51,26 @@ lake build XiaomiLabProofs Challenge Solution
 lake env lean VerifyAxioms.lean
 lake env leanchecker --fresh XiaomiLabProofs
 lake env leanchecker --fresh Solution
-# On Linux with bubblewrap (automated in CI across all 6 kernels):
+# On Linux with bubblewrap (run in CI: 6 kernel checks of the 10 comparator targets):
 lake comparator --config comparator.json --paranoid
 ```
 
-All **75 constructive audited declarations** (65 exported theorems across 7 Palomar modules + 10 isolated Palomar comparator targets; 28 zero-axiom) compile cleanly with zero Mathlib, zero `sorry` (outside statement-only `Challenge.lean`), zero `native_decide`, and **zero `Classical.choice`** — strictly within `[propext, Quot.sound]`, paired with live negative kernel & comparator rejection (`scripts/test_negative_lean.py`). See [docs/statement-fidelity.md](docs/statement-fidelity.md), [docs/literature-search-log.md](docs/literature-search-log.md), and [formalization.yaml](formalization.yaml).
+All **75 audited declarations** (65 exported theorems across 7 modules + 10 isolated comparator targets) compile with zero Mathlib, zero `sorry` (outside statement-only `Challenge.lean`), zero `native_decide`, and **zero `Classical.choice`**. By `#print axioms`, 28 use no axioms, 14 use `[propext]`, and 33 use `[propext, Quot.sound]`. All declarations are kernel-checked by Lean (`lake build`, `leanchecker`). In CI the 10 comparator targets and their dependency closure were also accepted by 6 kernel checks (Lean default and paranoid mode, lean4lean, nanoda, con-leche, con-ron); Lean default and paranoid are one implementation, so these are 5 distinct kernels. CI also runs live negative kernel and comparator rejection (`scripts/test_negative_lean.py`). See [docs/statement-fidelity.md](docs/statement-fidelity.md), [docs/literature-search-log.md](docs/literature-search-log.md), and [formalization.yaml](formalization.yaml).
+
+### What the Lean suite proves
+
+The universally quantified results, over `Int`, `Nat` and `ℤ[i]`, are:
+
+- roofline `min(peak, ai·bw)` is at most each term, and is monotone in `bw` for `ai ≥ 0`;
+- `k·λ·NA`, and for `NA > 0` also `k·λ·NA²`, strictly increase in `NA` when `k, λ > 0`; reading this as Rayleigh `CD = k1·λ/NA` falling and `DOF = k2·λ/NA²` shrinking is informal, since division is not formalized;
+- a scalar Crank–Nicolson (Cayley) step with integer `h` preserves the norm; this is one scalar factor, not the full operator;
+- `−E < p < E` when `E ≥ 0`, `m > 0` and `E² = p² + m²`;
+- the 5-point heat stencil satisfies the min/max principle when `rx, ry ≥ 0` and `2rx + 2ry ≤ D`;
+- CHSH and Mermin-3 lie in `[−2, 2]` for ±1 inputs; any integer 3×3 Peres–Mermin assignment satisfies at most 5 of 6 contexts;
+- the single-qubit Bloch identity and purity bounds, in cleared-denominator form;
+- 2×2 determinants multiply; 2- and 4-point DFT Parseval.
+
+Many of the other declarations are literal arithmetic on cited constants (die area, unit counts, clock ordering, the photon-energy ratio, shard byte sizes) closed by `decide`. They check the arithmetic, not the cited values. All results are textbook mathematics in small finite or integer settings: the CHSH inequality (Clauser, Horne, Shimony and Holt, 1969), the Mermin GHZ bound (Mermin, 1990), the Peres–Mermin square (Peres, 1990), the Crank–Nicolson scheme (Crank and Nicolson, 1947), and the roofline model (Williams, Waterman and Patterson, 2009). None is new mathematics.
 
 ### Verbatim Headline Comparator `#print axioms` Output (CI Drift-Checked)
 
@@ -112,7 +129,7 @@ just audit       # Build Standard v1.2.0 90-item repository audit
 
 ## Verification & Research Artifacts
 
-- **Claims & Falsifiers:** [CLAIMS.md](CLAIMS.md) (`C01`–`C11`) · [VERIFICATION.md](VERIFICATION.md) · [REPLICATION.md](REPLICATION.md)
+- **Claims & Falsifiers:** [CLAIMS.md](CLAIMS.md) (`C01`–`C12`) · [VERIFICATION.md](VERIFICATION.md) · [REPLICATION.md](REPLICATION.md)
 - **Hardening & Reviews:** [HARDENING_LOG.md](HARDENING_LOG.md) · [docs/reviews/2026-11-26-round2-3-cycle-hardening-audit.md](docs/reviews/2026-11-26-round2-3-cycle-hardening-audit.md) · [docs/reviews/2026-11-25-3-cycle-hardening-audit.md](docs/reviews/2026-11-25-3-cycle-hardening-audit.md) · [ERRATA.md](ERRATA.md)
 - **Mega-Atlas & Literature:** [docs/mega-atlas-cross-reference.md](docs/mega-atlas-cross-reference.md) (**0 / 1,900** grand open problems retired) · [docs/literature-search-log.md](docs/literature-search-log.md) · [results/citation-audit.json](results/citation-audit.json) (12/12 DOIs non-retracted)
 - **Formal & Security Docs:** [docs/statement-fidelity.md](docs/statement-fidelity.md) · [docs/threat-model.md](docs/threat-model.md) · [docs/ai.md](docs/ai.md) · [docs/benchmarks.md](docs/benchmarks.md) · [docs/preregistration.md](docs/preregistration.md)

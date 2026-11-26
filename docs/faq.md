@@ -18,7 +18,7 @@ Build Standard v1.2.0 (`A24`) caps tracked repository files at 5 MiB (`5,242,880
 
 ### 5. What does the Lean 4.35.0 formal core actually prove — and what does it NOT prove?
 
-`lean/XiaomiLabProofs/` proves 59 exact algebraic, combinatorial, CFL stability, Cayley unitarity, and quantum contextuality declarations over `Nat`, `Int`, and `ℤ[i]` across 6 independent kernels with zero Mathlib and zero custom axioms. It does **not** formally verify V8 IEEE-754 floating-point rounding (which is checked differentially to `< 2.2e-14` by `reference/physics_oracle.py`).
+`lean/XiaomiLabProofs/` and `Solution.lean` contain 75 audited declarations over `Nat`, `Int`, and `ℤ[i]`: exact algebraic, combinatorial, CFL stability, scalar Cayley norm-preservation, and quantum contextuality invariants of the lab's formulas, plus literal arithmetic checks of cited constants. They use zero Mathlib and zero custom axioms and are kernel-checked by Lean (`lake build`, `leanchecker`); the 10 comparator targets were also accepted by 6 kernel checks in CI (5 distinct implementations, since Lean default and paranoid mode are one). The Lean suite does **not** verify the Dimensity 9500 hardware or the browser simulators, and it does **not** formally verify V8 IEEE-754 floating-point rounding (which is checked differentially to `< 2.2e-14` by `reference/physics_oracle.py`).
 
 ### 6. Why are there no Pull Requests or git hooks?
 
