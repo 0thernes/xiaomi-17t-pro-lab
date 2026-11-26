@@ -1,6 +1,6 @@
 # Performance Benchmarks & Latency Budgets (`docs/benchmarks.md`)
 
-Build Standard v1.2.0 **B26**, **B27**, and **A37** reproducible performance tracking for `xiaomi-17t-pro-lab` (v3.0.0).
+Build Standard v1.2.0 **B26**, **B27**, and **A37** reproducible performance tracking for `xiaomi-17t-pro-lab` (v3.1.0).
 
 ## 1. Benchmark Methodology
 
@@ -8,7 +8,7 @@ Build Standard v1.2.0 **B26**, **B27**, and **A37** reproducible performance tra
 - Each solver executes a cold warmup pass followed by 15–40 timed iterations via `performance.now()`.
 - Reported statistics: **median**, **IQR (`p75 - p25`)**, **p95**, and **hard frame-budget target** (aligned to 60–144 Hz interactive frame budgets).
 
-## 2. Measured Baseline (`v3.0.0`, Windows x64, Node 22)
+## 2. Measured Baseline (`v3.1.0`, Windows x64, Node 22)
 
 | Solver Benchmark                   | Iterations | Median (ms) | IQR (ms) | p95 (ms) | Hard Budget (ms) | Status   |
 | :--------------------------------- | ---------: | ----------: | -------: | -------: | ---------------: | :------- |

@@ -17,8 +17,8 @@ No user database or mutable server state exists. All data is immutable, version-
   git bundle create ../xiaomi-17t-pro-lab-$(git describe --tags --always).bundle --all
   git bundle verify ../xiaomi-17t-pro-lab-*.bundle
   ```
-- **Master Research Archive Mirror:** Pinned as a git submodule with frozen PDF and SHA-256 verification inside [`0thernes/0thernes-research-archive`](https://github.com/0thernes/0thernes-research-archive) (`0TH-BUILD-010`).
-- **Software Heritage Offsite Archival Mirror:** Triggered via Save Code Now for `https://github.com/0thernes/xiaomi-17t-pro-lab` on every major release tag so source, Lean proofs, and manifests remain permanently retrievable by SWHID independent of GitHub.
+- **Master Research Archive Mirror:** Pinned as a git submodule with frozen PDF and SHA-256 verification inside [`0thernes/0thernes-research-archive`](https://github.com/0thernes/0thernes-research-archive) (`0TH-BUILD-012`).
+- **Software Heritage Offsite Archival Mirror:** Permanently archived at snapshot `swh:1:snp:06ad26ff598cf7d592768bdef08d9de7616cd4e0` (`v3.1.0` revision `swh:1:rev:1d8a87126258fa7691715ed753ee7a4f0609cc28`, visit `2026-11-26T10:54:12Z`, full status) so source, Lean proofs, and manifests remain independently retrievable by SWHID.
 
 ## 3. One-Command Rollback Procedure
 

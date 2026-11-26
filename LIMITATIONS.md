@@ -1,6 +1,6 @@
 # Limitations & Literal-vs-Metaphor Boundary (`LIMITATIONS.md`)
 
-This document states explicitly what `xiaomi-17t-pro-lab` (v3.0.0) **does not prove, measure, or claim** (Build Standard v1.2.0 B41 & Playbook v1.3).
+This document states explicitly what `xiaomi-17t-pro-lab` (v3.1.0) **does not prove, measure, or claim** (Build Standard v1.2.0 B41 & Playbook v1.3).
 
 ## 1. Hard Scientific & Hardware Boundaries
 

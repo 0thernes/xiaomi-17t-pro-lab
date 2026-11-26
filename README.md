@@ -15,6 +15,7 @@ Forensic silicon-to-quantum hardware workbench, independent 60-digit differentia
 - **Live Interactive Workbench:** <https://0thernes.github.io/xiaomi-17t-pro-lab/>
 - **Interactive Lean 4.35.0 Proof Blueprint:** <https://0thernes.github.io/xiaomi-17t-pro-lab/blueprint/>
 - **Frozen AMS-LaTeX White Paper (Preprint, CC-BY-4.0):** [Donahue_2026_Xiaomi_17T_Pro_Lab.pdf](dist/Donahue_2026_Xiaomi_17T_Pro_Lab.pdf)
+- **Permanent Software Heritage Snapshot:** [`swh:1:snp:06ad26ff598cf7d592768bdef08d9de7616cd4e0`](https://archive.softwareheritage.org/swh:1:snp:06ad26ff598cf7d592768bdef08d9de7616cd4e0/) (rev `swh:1:rev:1d8a87126258fa7691715ed753ee7a4f0609cc28`, full visit `2026-11-26T10:54:12Z`)
 - **Author:** Alexander Stephen Donahue ([ORCID 0009-0006-8168-9648](https://orcid.org/0009-0006-8168-9648)), Independent Researcher, Spokane, WA, USA (`0_0@0thernes.art`)
 - **Status:** active
 

@@ -117,6 +117,33 @@ def main() -> int:
         if "unsafe-inline" in ht:
             errors.append(f"Forbidden unsafe-inline CSP directive in {html_rel}")
 
+    # 6. Markdown table column-count integrity (prevents unescaped '|' pipes breaking tables)
+    for f in files:
+        if f.suffix.lower() != ".md":
+            continue
+        rel = f.relative_to(ROOT).as_posix()
+        in_fence = False
+        expected_cols: int | None = None
+        for idx, raw_ln in enumerate(f.read_text(encoding="utf-8").splitlines(), 1):
+            s = raw_ln.strip()
+            if s.startswith("```"):
+                in_fence = not in_fence
+                expected_cols = None
+                continue
+            if in_fence:
+                continue
+            if s.startswith("|") and s.endswith("|"):
+                # Count unescaped pipes separating columns
+                cols = len(re.findall(r"(?<!\\)\|", s)) - 1
+                if expected_cols is None:
+                    expected_cols = cols
+                elif cols != expected_cols:
+                    errors.append(
+                        f"Malformed markdown table row in {rel}:{idx}: expected {expected_cols} cols, got {cols}"
+                    )
+            else:
+                expected_cols = None
+
     if errors:
         print("FAIL: Repository integrity audit found issues:", file=sys.stderr)
         for e in errors:

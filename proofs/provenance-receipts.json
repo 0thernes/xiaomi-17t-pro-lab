@@ -44,8 +44,12 @@
     "endpoint": "https://archive.softwareheritage.org/api/1/origin/save/git/url/https://github.com/0thernes/xiaomi-17t-pro-lab/",
     "http_status": 200,
     "save_request_status": "accepted",
-    "save_task_status": "scheduled",
-    "visit_date": null,
+    "save_task_status": "succeeded",
+    "visit_status": "full",
+    "visit_date": "2026-11-26T10:54:12.199000+00:00",
+    "snapshot_swhid": "swh:1:snp:06ad26ff598cf7d592768bdef08d9de7616cd4e0",
+    "revision_swhid": "swh:1:rev:1d8a87126258fa7691715ed753ee7a4f0609cc28",
+    "release_swhid": "swh:1:rel:3cf23c167983b92651e2900eec75682ca24d5347",
     "id": 2696514
   }
 }
