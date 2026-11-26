@@ -21,7 +21,36 @@ def sha256_rel(rel: str) -> str:
     return f"{hashlib.sha256(p.read_bytes()).hexdigest()}  {rel}"
 
 
+def normalize_lf(rel: str) -> None:
+    p = ROOT / rel
+    if p.exists():
+        raw = p.read_bytes()
+        if b"\r\n" in raw:
+            p.write_bytes(raw.replace(b"\r\n", b"\n"))
+
+
 def write_manifests() -> None:
+    for text_rel in (
+        "VERSION",
+        "repo.yaml",
+        "formalization.yaml",
+        "CITATION.cff",
+        "results/lean4-audit.txt",
+        "results/oracle-60digit.json",
+        "results/stats-eval.json",
+        "tests/golden/baseline-snapshot.json",
+        "lean/comparator.json",
+        "lean/Challenge.lean",
+        "lean/Solution.lean",
+        "lean/VerifyAxioms.lean",
+        "data/specs.json",
+        "data/taxonomy.json",
+        "vendor/tinystories/shards.json",
+        "vendor/tinystories/vocab.json",
+        "vendor/tinystories/merges.txt",
+    ):
+        normalize_lf(text_rel)
+
     data_files = [
         "data/specs.json",
         "data/taxonomy.json",
@@ -33,6 +62,7 @@ def write_manifests() -> None:
     (ROOT / "data" / "MANIFEST.sha256").write_text(
         "\n".join(sha256_rel(rel) for rel in data_files) + "\n",
         encoding="utf-8",
+        newline="\n",
     )
 
     checksum_files = [
@@ -44,7 +74,6 @@ def write_manifests() -> None:
         "dist/arxiv_submission.tar.gz",
         "results/lean4-audit.txt",
         "results/oracle-60digit.json",
-        "results/tinystories-eval.json",
         "results/stats-eval.json",
         "tests/golden/baseline-snapshot.json",
         "lean/comparator.json",
@@ -55,6 +84,7 @@ def write_manifests() -> None:
     (ROOT / "CHECKSUMS.sha256").write_text(
         "\n".join(sha256_rel(rel) for rel in checksum_files) + "\n",
         encoding="utf-8",
+        newline="\n",
     )
 
     llms_sources = [
@@ -81,7 +111,7 @@ def write_manifests() -> None:
         if p.exists():
             parts.append(f"\n---\n## FILE: {rel}\n---\n")
             parts.append(p.read_text(encoding="utf-8"))
-    (ROOT / "llms-full.txt").write_text("\n".join(parts).strip() + "\n", encoding="utf-8")
+    (ROOT / "llms-full.txt").write_text("\n".join(parts).strip() + "\n", encoding="utf-8", newline="\n")
     print(f"PASS: Wrote data/MANIFEST.sha256 ({len(data_files)} files), CHECKSUMS.sha256 ({len(checksum_files)} files), and llms-full.txt.")
 
 

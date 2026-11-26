@@ -2,10 +2,7 @@
   "oracle_precision_digits": 60,
   "checks_passed": 54,
   "max_relative_error": 2.1590595273733875e-14,
-  "manifests_verified": {
-    "data/MANIFEST.sha256": 14,
-    "CHECKSUMS.sha256": 15
-  },
+  "manifests_verified": {},
   "checks": [
     {
       "name": "HBAR2_OVER_2M_EV_NM2",

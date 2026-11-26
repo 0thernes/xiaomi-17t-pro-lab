@@ -16,7 +16,6 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import math
 import subprocess
 import sys
 from decimal import Decimal, getcontext
@@ -360,6 +359,7 @@ def main() -> int:
             )
             + "\n",
             encoding="utf-8",
+            newline="\n",
         )
     return 0
 

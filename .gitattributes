@@ -1,4 +1,9 @@
 * text=auto eol=lf
 *.wasm binary
 *.png binary
+*.jpg binary
 *.woff2 binary
+*.wav binary
+*.pdf binary
+*.gz binary
+*.part* binary

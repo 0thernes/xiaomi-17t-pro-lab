@@ -1,6 +1,6 @@
 # Glossary (`docs/glossary.md`)
 
-Canonical technical glossary for `xiaomi-17t-pro-lab` (Build Standard v1.2.0 **A44**). See also [GLOSSARY.md](GLOSSARY.md).
+Canonical technical glossary for `xiaomi-17t-pro-lab` (Build Standard v1.2.0 **A44**).
 
 - **CFL (Courant–Friedrichs–Lewy) Condition:** Explicit finite-difference stability criterion $\alpha \Delta t (\Delta x^{-2} + \Delta y^{-2}) \le 1/2$ in 2D; proved in Lean (`ThermalFdtd.lean`) to guarantee the Discrete Minimum/Maximum Principle.
 - **CHSH Inequality:** Clauser–Horne–Shimony–Holt Bell inequality; classical local hidden-variable models obey $|S| \le 2$ (Lean Theorem 5), whereas entangled Bell states reach Tsirelson's bound $2\sqrt{2} \approx 2.8284$.

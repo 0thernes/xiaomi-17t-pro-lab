@@ -4,7 +4,7 @@
 - [Architecture](ARCHITECTURE.md)
 - [Data provenance](DATA-PROVENANCE.md)
 - [Measurements and their limits](MEASUREMENTS.md)
-- [Glossary](GLOSSARY.md)
+- [Glossary](glossary.md)
 - [Release 0.1.0](RELEASE-0.1.0.md)
 - [ADR 001 — Zero-build static site](ADR-001-zero-build.md)
 - [ADR 002 — Provenance badges](ADR-002-provenance.md)
