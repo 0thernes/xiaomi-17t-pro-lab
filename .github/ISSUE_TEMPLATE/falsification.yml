@@ -1,0 +1,36 @@
+name: Falsification / Claim Error Report
+description: Report a hardware provenance error, physics bug, numerical discrepancy, or formal-statement gap.
+title: "[falsification] "
+labels: ["bug"]
+body:
+  - type: dropdown
+    id: finding_class
+    attributes:
+      label: Finding Class (Build Standard v1.2.0)
+      options:
+        - bug
+        - error
+        - issue
+        - problem
+        - concern
+        - dilemma
+        - conflict
+        - gap
+        - hole
+        - blindspot
+    validations:
+      required: true
+  - type: input
+    id: claim_id
+    attributes:
+      label: Affected Claim ID / File / Lean Target
+      placeholder: "e.g., C04, src/sim/litho-advanced.js, target_thm2_euv_rayleigh_and_dof"
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Reproducible Evidence or Primary Source URL
+      description: Provide the exact command output, counterexample, or primary hardware datasheet link.
+    validations:
+      required: true

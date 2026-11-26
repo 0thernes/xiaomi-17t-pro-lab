@@ -1,4 +1,4 @@
-import { HBAR2_OVER_2M_EV_NM2 } from "./constants.js";
+import { HBAR2_OVER_2M_EV_NM2, HBAR_EV_FS } from "./constants.js";
 
 /**
  * Exact Unitary 1D Time-Dependent Schrödinger Equation (TDSE) Solver
@@ -14,8 +14,6 @@ import { HBAR2_OVER_2M_EV_NM2 } from "./constants.js";
  *   tunneling diodes (Fabry-Perot quantum interference).
  */
 
-const HBAR_EV_FS = 0.6582119569; // reduced Planck constant in eV * fs
-
 export function createWavePacketSim({
   n = 240,
   lengthNm = 12,
@@ -30,6 +28,10 @@ export function createWavePacketSim({
   energyEv = 2.1,
   dtFs = 0.04,
 } = {}) {
+  if (!Number.isInteger(n) || n < 8) throw new RangeError("grid size n must be an integer >= 8");
+  if (!Number.isFinite(lengthNm) || lengthNm <= 0) throw new RangeError("lengthNm must be positive");
+  if (!Number.isFinite(mEffRatio) || mEffRatio <= 0) throw new RangeError("mEffRatio must be positive");
+  if (!Number.isFinite(dtFs) || dtFs <= 0) throw new RangeError("dtFs must be positive");
   const dx = lengthNm / (n - 1);
   const coeff = HBAR2_OVER_2M_EV_NM2 / mEffRatio; // hbar^2 / (2 m*) in eV * nm^2
 

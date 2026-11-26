@@ -678,7 +678,7 @@
         "http://www.rlitl.com/product1/showproduct.php?id=4057",
         "https://www.puris.net/archives/11439"
       ],
-      "notes": "PASS 2 2026-11-12: Marking \"SKhynix HN8T271EJK X152 ... M5NAA022GB1\" on FCC sample boards (12G+512G). Distributors list HN8T271EJKX152 as 512 GB UFS 4.1 (one lists the R-suffix variant as UFS 4.0), 153-ball BGA. NAND generation not printed; SK hynix says its UFS 4.1 uses 321-layer 1Tb TLC 4D NAND (https://news.skhynix.com/en/sk-hynix-develops-ufs-solution-based-on-321-high-nand/) but no source ties that NAND to this exact part number -> NAND layer count unconfirmed.",
+      "notes": "PASS 2 2026-11-12: Marking \"SKhynix HN8T271EJK X152 ... M5NAA022GB1\" on FCC sample boards (12G+512G). Distributors list HN8T271EJKX152 as 512 GB UFS 4.1 (one lists the R-suffix variant as UFS 4.0), 153-ball BGA. NAND generation not printed; SK hynix Newsroom (\"SK hynix Develops UFS Solution Based on 321-High NAND\", https://news.skhynix.com/en/) states its UFS 4.1 uses 321-layer 1Tb TLC 4D NAND, but no source ties that NAND to this exact part number -> NAND layer count unconfirmed.",
       "resolved_on": "2026-11-12"
     },
     "battery_cathode": {

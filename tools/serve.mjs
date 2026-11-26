@@ -14,10 +14,13 @@ const TYPES = {
   ".json": "application/json; charset=utf-8",
   ".svg": "image/svg+xml",
   ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
   ".webp": "image/webp",
   ".woff2": "font/woff2",
   ".wasm": "application/wasm",
   ".wav": "audio/wav",
+  ".pdf": "application/pdf",
   ".txt": "text/plain; charset=utf-8",
   ".md": "text/markdown; charset=utf-8",
 };
@@ -66,11 +69,55 @@ function send(res, status, body, type = "text/plain; charset=utf-8") {
   res.end(body);
 }
 
-export function startServer(port) {
+export function parsePort(raw, fallback = 47321) {
+  if (raw === undefined || raw === null || raw === "") return fallback;
+  const n = Number(raw);
+  if (!Number.isInteger(n) || n < 0 || n > 65535) {
+    throw new RangeError(`Invalid port "${raw}": must be an integer in 0..65535`);
+  }
+  return n;
+}
+
+function logEvent(level, event, extra = {}) {
+  if (process.env.LOG_FORMAT === "json") {
+    const line = JSON.stringify({ ts: new Date().toISOString(), level, event, ...extra });
+    (level === "error" ? console.error : console.log)(line);
+  }
+}
+
+export function startServer(port, { createReadStream = fs.createReadStream } = {}) {
+  const validPort = parsePort(port, 47321);
+  const startedAt = Date.now();
   const server = http.createServer((req, res) => {
+    const method = req.method || "GET";
+    if (method !== "GET" && method !== "HEAD") {
+      res.writeHead(405, {
+        Allow: "GET, HEAD",
+        "Content-Type": "text/plain; charset=utf-8",
+        ...SECURITY_HEADERS,
+      });
+      res.end("Method Not Allowed");
+      return;
+    }
+
+    const bare = (req.url || "/").split("?")[0].split("#")[0];
+    if (bare === "/healthz" || bare === `${PREFIX}/healthz`) {
+      const payload = JSON.stringify({
+        ok: true,
+        service: "xiaomi-17t-pro-lab",
+        uptimeMs: Date.now() - startedAt,
+      });
+      res.writeHead(200, {
+        "Content-Type": "application/json; charset=utf-8",
+        ...SECURITY_HEADERS,
+      });
+      res.end(method === "HEAD" ? undefined : payload);
+      return;
+    }
+
     const file = resolveSafe(ROOT, req.url || "/");
     if (!file) {
-      send(res, 403, "Forbidden");
+      send(res, 403, method === "HEAD" ? "" : "Forbidden");
       return;
     }
     let target = file;
@@ -78,25 +125,46 @@ export function startServer(port) {
       target = path.join(target, "index.html");
     }
     if (!fs.existsSync(target) || !fs.statSync(target).isFile()) {
-      send(res, 404, "Not found");
+      send(res, 404, method === "HEAD" ? "" : "Not found");
       return;
     }
     const type = TYPES[path.extname(target)] || "application/octet-stream";
-    res.writeHead(200, {
-      "Content-Type": type,
-      ...SECURITY_HEADERS,
+    if (method === "HEAD") {
+      res.writeHead(200, { "Content-Type": type, ...SECURITY_HEADERS });
+      res.end();
+      return;
+    }
+    const stream = createReadStream(target);
+    let headersSent = false;
+    stream.on("open", () => {
+      headersSent = true;
+      res.writeHead(200, {
+        "Content-Type": type,
+        ...SECURITY_HEADERS,
+      });
+      stream.pipe(res);
     });
-    fs.createReadStream(target).pipe(res);
+    stream.on("error", (err) => {
+      logEvent("error", "read_stream_error", { target, code: err?.code || "ERR", message: err?.message });
+      if (!headersSent && !res.headersSent) {
+        send(res, 500, "Internal Server Error");
+      } else if (!res.writableEnded) {
+        res.destroy();
+      }
+    });
   });
   return new Promise((resolve) => {
-    server.listen(port, "127.0.0.1", () => resolve(server));
+    server.listen(validPort, "127.0.0.1", () => {
+      logEvent("info", "server_started", { port: server.address().port });
+      resolve(server);
+    });
   });
 }
 
 const isDirect = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
 if (isDirect) {
-  const port = Number(process.argv[2] || 47321);
-  startServer(port).then(() => {
-    console.log(`http://127.0.0.1:${port}/`);
+  const port = parsePort(process.argv[2] ?? process.env.PORT, 47321);
+  startServer(port).then((srv) => {
+    console.log(`http://127.0.0.1:${srv.address().port}/`);
   });
 }

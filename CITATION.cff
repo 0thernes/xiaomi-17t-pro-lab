@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+title: "Xiaomi 17T Pro Lab: Forensic Hardware Provenance, Real-Time Multi-Scale Silicon-to-Quantum Simulation, 60-Digit Differential Oracles, and Six-Kernel Lean 4.35.0 Formal Invariants for the Dimensity 9500"
+message: "If you use this software, hardware ledger, Lean 4 formal core, or white paper, please cite it using this metadata."
+type: software
+version: "3.0.0"
+date-released: "2026-11-25"
+license: MIT
+repository-code: "https://github.com/0thernes/xiaomi-17t-pro-lab"
+url: "https://0thernes.github.io/xiaomi-17t-pro-lab/"
+authors:
+  - family-names: "Donahue"
+    given-names: "Alexander Stephen"
+    orcid: "https://orcid.org/0009-0006-8168-9648"
+    affiliation: "Independent Researcher, Spokane, WA, USA"
+    email: "0_0@0thernes.art"
+keywords:
+  - "Xiaomi 17T Pro"
+  - "Dimensity 9500"
+  - "EUV lithography"
+  - "Lean 4"
+  - "formal verification"
+  - "silicon thermal PDE"
+  - "quantum contextuality"
+  - "hardware provenance"

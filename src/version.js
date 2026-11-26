@@ -1,2 +1,2 @@
-/** Matches package.json and VERSION. Checked in tests. */
-export const VERSION = "2.2.0";
+/** Single source of truth for the release string. Matches package.json and VERSION. */
+export const VERSION = "3.0.0";

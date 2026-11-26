@@ -1,0 +1,16 @@
+name = "XiaomiLabProofs"
+version = "3.0.0"
+defaultTargets = ["XiaomiLabProofs", "Solution"]
+
+[leanOptions]
+autoImplicit = false
+relaxedAutoImplicit = false
+
+[[lean_lib]]
+name = "XiaomiLabProofs"
+
+[[lean_lib]]
+name = "Challenge"
+
+[[lean_lib]]
+name = "Solution"

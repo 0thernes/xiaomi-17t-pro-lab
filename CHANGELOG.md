@@ -2,6 +2,30 @@
 
 All notable changes to this project are documented here. The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project uses [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+## [3.0.0] - 2026-11-25
+
+Full 3-cycle hardening release upgrading `xiaomi-17t-pro-lab` to **Build Standard for LLMs v1.2.0** and **Defensible Independent AI Research Playbook v1.3**, adding a pure Lean 4.35.0 six-kernel formal core, an independent 60-digit differential physics oracle, and a publication-grade AMS-LaTeX white paper.
+
+### Fixed
+
+- **EUV Stochastic Resist LER Pinhole Inversion Bug (`src/sim/litho-advanced.js`, `ERRATA.md` E-003):** Replaced naive binary edge scanning from `c = 3` (which latched onto bright-region low-dose pinholes and inverted dose scaling) with sub-pixel falling-edge linear interpolation inside a local metrology window around the nominal aerial edge.
+- **2D FDTD Closed-Loop DVFS Bang-Bang Aliasing (`src/sim/thermal-fdtd.js`, `ERRATA.md` E-004):** Sub-cycled the DVFS thermal controller at `<= 0.5 s` intervals inside `step(dtSec)` whenever `dtSec > 0.5`, eliminating the 30-second sawtooth oscillation between 72 °C and 120 °C caught during visual inspection of white paper Figure 2.
+- **Thermal `setAmbient(NaN)` Poisoning & Missing Solver Domain Guards (`src/sim/*.js`, `src/workloads/safetensors.js`):** Added strict finite/positive `RangeError` guards across all physical, optical, quantum, thermal, roofline, and safetensors parsers.
+- **HTTP Server Stream Resilience, MIME & Methods (`tools/serve.mjs`):** Added `createReadStream` error handling (clean `500` without server crash on disk `EIO`), `GET /healthz`, `HEAD` empty-body support, `405 Method Not Allowed`, fail-fast `parsePort()`, and `.jpg`/`.jpeg`/`.pdf` MIME mappings.
+- **Broken `npm run screenshots` Script (`tools/shoot.mjs`):** Added missing cross-platform `tools/shoot.mjs` wrapper.
+- **Hard-Rule Hygiene (`R4` & `A24`):** Removed banned `.github/PULL_REQUEST_TEMPLATE.md` and replaced monolithic 39.4 MB `vendor/tinystories/model.f16.safetensors` with 9 byte-exact shards (`<= 4.5 MB` each) verified via WebCrypto SHA-256 against `9999a42aa4cb668c19760c02448ab97b0458c89871013fa8d0c5cae2a569c28f`.
+- **Exact Full-Vocabulary Shannon Entropy (`src/workloads/gpt-neo.js`, `src/labs/work.js`):** Replaced the top-6 `tail / 32` entropy heuristic with exact full-vocabulary (50,257-token) Shannon entropy.
+
+### Added
+
+- **Pure Lean 4.35.0 Six-Kernel Formal Core (`lean/`, `formalization.yaml`, `blueprint/index.html`):** Zero-Mathlib `module`-isolated suite (`XiaomiLabProofs`, 59 audited declarations across 6 modules + 9 isolated Palomar comparator targets in `Challenge.lean`/`Solution.lean`, strictly within `[propext, Classical.choice, Quot.sound]`), interactive SVG Blueprint deployed at `/blueprint/`, and 6-kernel `lake comparator --paranoid` CI job.
+- **Independent 60-Digit Differential Physics Oracle (`reference/physics_oracle.py`):** 54 differential checks against independent 60-digit `Decimal`/`Fraction` arithmetic (including a 60-digit $2\times 2$ complex Bragg transfer matrix; max relative error `2.159e-14`) + SHA-256 manifest verifier.
+- **Verification Ladder (`tests/properties-and-regressions.test.mjs`, `scripts/mutate.mjs`, `evals/run_tinystories_eval.mjs`, `scripts/bench.mjs`, `scripts/stats_eval.mjs`):** 2,500+ randomized property checks, metamorphic relations, golden SHA-256 snapshot, EIO failure injection, 8/8 killed semantic mutants, 5-prompt deterministic TinyStories-8M eval, solver latency budgets, and pre-registered 20-seed Holm–Bonferroni statistical eval (`p_holm <= 0.0008`).
+- **Publication-Grade AMS-LaTeX White Paper (`paper/`, `dist/`):** Zero-warning Tectonic PDF (`dist/Donahue_2026_Xiaomi_17T_Pro_Lab.pdf`) with 4 reproducible vector figures and verified clean-room `dist/arxiv_submission.tar.gz`.
+- **Mega-Atlas Cross-Reference & Build Standard v1.2.0 Compliance:** `docs/mega-atlas-cross-reference.md` (honest `0/1,900` retirement verdict), `docs/statement-fidelity.md`, `repo.yaml`, `CLAIMS.md`, `LIMITATIONS.md`, `REPLICATION.md`, `VERIFICATION.md`, `ERRATA.md`, `HARDENING_LOG.md`, `AGENTS.md`/`CLAUDE.md`/`GEMINI.md`/`llms.txt`/`llms-full.txt`, `CITATION.cff`, `justfile`, `examples/`, `docs/media/social-preview.png`, `docs/reviews/2026-11-25-3-cycle-hardening-audit.md`, cross-platform CI, and `release.yml` SLSA provenance.
+
 ## [2.2.0] - 2026-11-25
 
 ### Fixed

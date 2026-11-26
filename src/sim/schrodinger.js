@@ -77,6 +77,8 @@ export function finiteDifferenceHamiltonian(nPoints, dxNm, potentialEv) {
  * (Dirichlet walls). Energies in eV, L in nm.
  */
 export function infiniteWellEnergies(lengthNm, nPoints) {
+  if (!Number.isFinite(lengthNm) || lengthNm <= 0) throw new RangeError("lengthNm must be positive");
+  if (!Number.isInteger(nPoints) || nPoints < 1) throw new RangeError("nPoints must be an integer >= 1");
   const dx = lengthNm / (nPoints + 1);
   const H = finiteDifferenceHamiltonian(nPoints, dx, null);
   return jacobiEigenvalues(H);
@@ -84,6 +86,8 @@ export function infiniteWellEnergies(lengthNm, nPoints) {
 
 /** Analytic infinite-well energies, eV. n = 1, 2, 3, … */
 export function infiniteWellAnalyticEv(lengthNm, n) {
+  if (!Number.isFinite(lengthNm) || lengthNm <= 0) throw new RangeError("lengthNm must be positive");
+  if (!Number.isInteger(n) || n < 1) throw new RangeError("quantum number n must be an integer >= 1");
   const C = HBAR2_OVER_2M_EV_NM2;
   return (n * n * Math.PI * Math.PI * C) / (lengthNm * lengthNm);
 }

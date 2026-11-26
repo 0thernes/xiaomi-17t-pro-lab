@@ -1,0 +1,29 @@
+{
+  "title": "Xiaomi 17T Pro Lab (v3.0.0): Forensic Hardware Provenance, Real-Time Multi-Scale Silicon-to-Quantum Simulation, 60-Digit Differential Oracles, and Six-Kernel Lean 4.35.0 Formal Invariants for the Dimensity 9500",
+  "version": "3.0.0",
+  "upload_type": "software",
+  "license": "MIT",
+  "creators": [
+    {
+      "name": "Donahue, Alexander Stephen",
+      "affiliation": "Independent Researcher, Spokane, WA, USA",
+      "orcid": "0009-0006-8168-9648"
+    }
+  ],
+  "keywords": [
+    "Xiaomi 17T Pro",
+    "MediaTek Dimensity 9500",
+    "Lean 4",
+    "formal verification",
+    "EUV lithography",
+    "quantum contextuality",
+    "hardware provenance"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/0thernes/xiaomi-17t-pro-lab",
+      "relation": "isSupplementTo",
+      "scheme": "url"
+    }
+  ]
+}

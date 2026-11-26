@@ -374,15 +374,21 @@ async function mountLlm(host, audio) {
     try {
       const tLoad0 = performance.now();
       if (!cachedTiny) {
-        status.textContent = "Loading vendored 39.4 MB float16 TinyStories-8M safetensors…";
-        const { parseSafetensors } = await import("../workloads/safetensors.js");
+        status.textContent = "Loading vendored 39.4 MB float16 TinyStories-8M checkpoint (9 verified shards)…";
+        const { fetchShardedSafetensors, parseSafetensors } = await import("../workloads/safetensors.js");
         const { buildWeights } = await import("../workloads/gpt-neo.js");
         const { GPT2Tokenizer } = await import("../workloads/tokenizer.js");
         const base = new URL("../../vendor/tinystories/", import.meta.url);
         const [buf, vocab, merges] = await Promise.all([
-          fetch(new URL("model.f16.safetensors", base)).then((r) => r.arrayBuffer()),
-          fetch(new URL("vocab.json", base)).then((r) => r.json()),
-          fetch(new URL("merges.txt", base)).then((r) => r.text()),
+          fetchShardedSafetensors(base),
+          fetch(new URL("vocab.json", base)).then((r) => {
+            if (!r.ok) throw new Error(`Failed to fetch vocab.json (${r.status})`);
+            return r.json();
+          }),
+          fetch(new URL("merges.txt", base)).then((r) => {
+            if (!r.ok) throw new Error(`Failed to fetch merges.txt (${r.status})`);
+            return r.text();
+          }),
         ]);
         cachedTiny = {
           weights: buildWeights(parseSafetensors(buf).tensors),
@@ -418,15 +424,8 @@ async function mountLlm(host, audio) {
         produced.push(nextId);
         genSpan.textContent = tokenizer.decode(produced);
 
-        let hBits = 0;
-        let pSum = 0;
-        for (const item of top) {
-          if (item.prob > 1e-9) hBits -= item.prob * Math.log2(item.prob);
-          pSum += item.prob;
-        }
-        const tail = Math.max(0, 1 - pSum);
-        if (tail > 1e-6) hBits -= tail * Math.log2(tail / 32);
-        entropyLine.textContent = `Top-1 confidence ${(top[0].prob * 100).toFixed(1)}% · Est. Shannon Entropy H ≈ ${hBits.toFixed(2)} bits · Perplexity ≈ ${Math.pow(2, hBits).toFixed(2)}`;
+        const hBits = Number.isFinite(top.entropyBits) ? top.entropyBits : 0;
+        entropyLine.textContent = `Top-1 confidence ${(top[0].prob * 100).toFixed(1)}% · Exact Full-Vocab Shannon Entropy H = ${hBits.toFixed(2)} bits · Perplexity = ${Math.pow(2, hBits).toFixed(2)}`;
 
         probHost.replaceChildren(
           ...top.map((item) => {

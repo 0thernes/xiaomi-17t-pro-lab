@@ -1,0 +1,53 @@
+{
+  "file": "model.f16.safetensors",
+  "totalBytes": 39417097,
+  "sha256": "9999a42aa4cb668c19760c02448ab97b0458c89871013fa8d0c5cae2a569c28f",
+  "chunkMaxBytes": 4500000,
+  "shards": [
+    {
+      "path": "shards/model.f16.safetensors.part00",
+      "bytes": 4500000,
+      "sha256": "3faed96237895b370ef59415c2f6b199d1796c5663bc230bf763cca04f86f444"
+    },
+    {
+      "path": "shards/model.f16.safetensors.part01",
+      "bytes": 4500000,
+      "sha256": "b7936f3a61327c1efa96349191d62d67bb82c4775fcdb4857bc97f6f0cf21cec"
+    },
+    {
+      "path": "shards/model.f16.safetensors.part02",
+      "bytes": 4500000,
+      "sha256": "b917aa047a98e6f13a14d38188c5bcf40fdf3ed6acb82ad3cd27cd1da707d650"
+    },
+    {
+      "path": "shards/model.f16.safetensors.part03",
+      "bytes": 4500000,
+      "sha256": "c4de0d43b0444ae5066b80bf0532c39647c332d8e4ea21e3fba0a0284fc83623"
+    },
+    {
+      "path": "shards/model.f16.safetensors.part04",
+      "bytes": 4500000,
+      "sha256": "dfe18e9f2365b4a9a4ae07e66fc6243fbc055f0ba3a2ceccff7974f0737979a3"
+    },
+    {
+      "path": "shards/model.f16.safetensors.part05",
+      "bytes": 4500000,
+      "sha256": "17e21bf7683f19a9a42393306309c8f227708f0fa03b25f109ffb819309b2d47"
+    },
+    {
+      "path": "shards/model.f16.safetensors.part06",
+      "bytes": 4500000,
+      "sha256": "d5506ed57779a2d72a137d919127e96bec627fbcb63c6a0b0a39697f5e5b8562"
+    },
+    {
+      "path": "shards/model.f16.safetensors.part07",
+      "bytes": 4500000,
+      "sha256": "e349d37f3d4ba6ec50c556f0da075b9599758b32bb0191bcfc53034330ca21b0"
+    },
+    {
+      "path": "shards/model.f16.safetensors.part08",
+      "bytes": 3417097,
+      "sha256": "58b5cc943843306e435377174e2028a3cdecfdf165ffee6bfea0deb3da04b51f"
+    }
+  ]
+}

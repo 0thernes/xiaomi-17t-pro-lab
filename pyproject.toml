@@ -1,0 +1,21 @@
+[project]
+name = "xiaomi-17t-pro-lab-verification"
+version = "3.0.0"
+description = "Independent 60-digit Decimal/Fraction physics oracle, Lean axiom auditor, and AMS-LaTeX packager for xiaomi-17t-pro-lab."
+requires-python = ">=3.12"
+dependencies = []
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "B", "I"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.12"
+files = ["reference/physics_oracle.py", "scripts/check_readme_axioms.py", "scripts/package_dist.py"]
+strict = true
+warn_unused_ignores = true
+ignore_missing_imports = true

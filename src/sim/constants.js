@@ -10,8 +10,15 @@
  */
 
 export const HBAR_J_S = 1.054571817e-34;
+export const SPEED_OF_LIGHT_M_S = 299792458;
 export const ELECTRON_MASS_KG = 9.1093837015e-31;
 export const ELEMENTARY_CHARGE_C = 1.602176634e-19;
+
+/** Reduced Planck constant ħ in eV·fs (derived from CODATA 2018 exact SI definitions). */
+export const HBAR_EV_FS = (HBAR_J_S / ELEMENTARY_CHARGE_C) * 1e15;
+
+/** Photon energy-wavelength constant h·c in eV·nm (CODATA 2018 exact SI). */
+export const HC_EV_NM = ((2 * Math.PI * HBAR_J_S * SPEED_OF_LIGHT_M_S) / ELEMENTARY_CHARGE_C) * 1e9;
 
 /** ħ² / (2 m_e) in joule·metre². */
 export const HBAR2_OVER_2M_J_M2 = (HBAR_J_S * HBAR_J_S) / (2 * ELECTRON_MASS_KG);

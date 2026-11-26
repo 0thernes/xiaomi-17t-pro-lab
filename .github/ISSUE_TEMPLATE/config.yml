@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Live Interactive Hardware Lab
+    url: https://0thernes.github.io/xiaomi-17t-pro-lab/
+    about: Open the zero-build interactive workbench directly in your browser.
+  - name: Lean 4.35.0 Proof Blueprint
+    url: https://0thernes.github.io/xiaomi-17t-pro-lab/blueprint/
+    about: Inspect the formal theorem DAG and six-kernel comparator targets.

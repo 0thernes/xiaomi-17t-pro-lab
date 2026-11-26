@@ -85,6 +85,15 @@ export function createDieThermalGrid({
   vcEnabled = true,
   profileId = "gaming_nomad",
 } = {}) {
+  if (!Number.isInteger(nx) || nx < 4 || !Number.isInteger(ny) || ny < 4) {
+    throw new RangeError("thermal grid dimensions nx, ny must be integers >= 4");
+  }
+  if (!Number.isFinite(widthMm) || widthMm <= 0 || !Number.isFinite(heightMm) || heightMm <= 0) {
+    throw new RangeError("die widthMm and heightMm must be positive");
+  }
+  if (!Number.isFinite(ambientC) || ambientC < -50 || ambientC > 85) {
+    throw new RangeError("ambientC must be a finite temperature in [-50, 85] °C");
+  }
   const size = nx * ny;
   let temp = new Float64Array(size).fill(ambientC);
   let next = new Float64Array(size).fill(ambientC);
@@ -118,7 +127,7 @@ export function createDieThermalGrid({
   let profile = THERMAL_PROFILES[profileId] || THERMAL_PROFILES.gaming_nomad;
   let throttleScale = 1;
 
-  function step(dtSec = 0.08, subSteps = 6) {
+  function stepOnce(dtSec, subSteps) {
     // Effective lateral thermal spreading (3D IceLoop two-phase copper VC spreads hotspots across the die)
     const meanPrev = stats().meanC;
     const alpha = vc ? (meanPrev > 42 ? 1.9 : 1.35) : 0.42; // mm^2/s effective lateral diffusivity
@@ -131,10 +140,10 @@ export function createDieThermalGrid({
     // Thinned silicon + interposer effective areal heat capacity (J / (K * mm^2))
     const heatCapPerMm2 = vc ? 0.016 : 0.013;
 
-    // Thermal throttling controller (Tj > 84 C ramps DVFS smoothly down to 52%)
+    // Closed-loop smooth DVFS thermal controller (Tj > 84 C ramps DVFS smoothly down to 52%)
     const peakNow = stats().peakC;
     const targetThrottle = peakNow > 84 ? Math.max(0.52, 1 - (peakNow - 84) * 0.022) : 1;
-    throttleScale += (targetThrottle - throttleScale) * Math.min(1, dtSec * 1.4);
+    throttleScale += (targetThrottle - throttleScale) * Math.min(0.45, dtSec * 0.5);
 
     // Precompute power density per zone (W / mm^2)
     const zonePowerDensity = new Float64Array(DIE_HEAT_ZONES.length);
@@ -174,6 +183,17 @@ export function createDieThermalGrid({
     // Decay transient user-injected laser/hotspot probes
     const decay = Math.exp(-dtSec * 0.85);
     for (let k = 0; k < size; k++) pulse[k] *= decay;
+  }
+
+  function step(dtSec = 0.08, subSteps = 6) {
+    if (!Number.isFinite(dtSec) || dtSec <= 0) {
+      throw new RangeError("dtSec must be finite and positive");
+    }
+    // Keep closed-loop DVFS controller sub-interval <= 0.5 s to prevent bang-bang aliasing
+    const ctrlIntervals = dtSec > 0.5 ? Math.ceil(dtSec / 0.5) : 1;
+    const subDt = dtSec / ctrlIntervals;
+    const innerSub = ctrlIntervals > 1 ? 1 : subSteps;
+    for (let c = 0; c < ctrlIntervals; c++) stepOnce(subDt, innerSub);
   }
 
   function injectHotspot(uNorm, vNorm, watts = 3.5, radiusCells = 3.5) {
@@ -257,7 +277,9 @@ export function createDieThermalGrid({
       vc = Boolean(enabled);
     },
     setAmbient(c) {
-      ambient = Math.max(5, Math.min(50, Number(c)));
+      const val = Number(c);
+      if (!Number.isFinite(val)) throw new RangeError("ambient temperature must be finite");
+      ambient = Math.max(5, Math.min(50, val));
     },
     setProfile(id) {
       if (THERMAL_PROFILES[id]) profile = THERMAL_PROFILES[id];

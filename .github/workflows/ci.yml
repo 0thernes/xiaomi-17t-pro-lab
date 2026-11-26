@@ -1,29 +1,170 @@
-name: CI
+name: Formal Verification, 6-Kernel Lean Audit, Cross-Platform Tests & Manuscript CI
 
 on:
   push:
-    branches: [main]
-  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+concurrency:
+  group: xiaomi-17t-pro-lab-ci-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
+  id-token: write
+  attestations: write
 
 jobs:
-  verify:
-    runs-on: ubuntu-latest
+  cross-platform-tests:
+    name: Node & Python Full Verification (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-latest, windows-latest]
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: "22"
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install devDependencies
+        run: npm ci
+      - name: Validate specs.json, run 50 Node tests, kill 8/8 mutants, and run 3 examples
+        run: npm run verify:all
+      - name: Run deterministic TinyStories-8M 9-shard eval
+        run: npm run evals
+      - name: Run 60-digit independent Python oracle and verify SHA-256 manifests
+        run: python reference/physics_oracle.py --check-checksums
+      - name: Run Lean forbidden-token & axiom log guard
+        run: python scripts/check_readme_axioms.py
+      - name: Verify standard sha256sum manifests (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sha256sum -c data/MANIFEST.sha256
+          sha256sum -c CHECKSUMS.sha256
+      - name: Run reproducible solver benchmarks & 20-seed statistical evaluation (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          npm run bench
+          npm run stats
+
+  playwright-e2e:
+    name: Playwright 19-Route Smoke & Strict CSP Verification
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
           cache: npm
       - run: npm ci
-      - run: npm run lint
-      - run: npm test
       - run: npx playwright install --with-deps chromium
       - run: npm run test:smoke
         env:
           CI: "true"
+
+  report-only-static:
+    name: Report-Only Static Analysis, Secret/OSV Scan & Build Standard Audit (R1/R3)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: npm ci
+      - name: Prettier formatting check (report-only)
+        continue-on-error: true
+        run: npm run lint
+      - name: Node syntax check (report-only)
+        continue-on-error: true
+        run: node --check src/sim/*.js src/workloads/*.js tools/*.mjs scripts/*.mjs examples/*.mjs evals/*.mjs
+      - name: Python ruff & mypy strict checks (report-only)
+        continue-on-error: true
+        run: |
+          python -m pip install --quiet ruff mypy
+          ruff check reference scripts
+          mypy --config-file pyproject.toml
+      - name: Secret scan via gitleaks (report-only)
+        uses: gitleaks/gitleaks-action@v2
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Dependency audit via npm audit / osv-scanner (report-only)
+        continue-on-error: true
+        run: npm audit --audit-level=high
+      - name: Build Standard v1.2.0 90-item repo audit (report-only)
+        continue-on-error: true
+        run: bash scripts/audit-repo.sh .
+
+  lean4-six-kernel-audit:
+    name: Lean 4 (v4.35.0) 59-Decl Audit & 6-Kernel lake comparator --paranoid
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install elan, Lean 4.35.0 & bubblewrap
+        run: |
+          sudo apt-get update && sudo apt-get install -y bubblewrap
+          toolchain="$(tr -d '[:space:]' < lean/lean-toolchain)"
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain "$toolchain"
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Clean-build XiaomiLabProofs, Challenge & Solution + audit 59 axioms + leanchecker
+        working-directory: lean
+        shell: bash
+        run: |
+          set -o pipefail
+          lake clean
+          lake build XiaomiLabProofs Challenge Solution
+          lake env lean VerifyAxioms.lean | tee ../results/lean4-audit.txt
+          lake env leanchecker --fresh XiaomiLabProofs
+          lake env leanchecker --fresh Solution
+          cd ..
+          python3 scripts/check_readme_axioms.py
+      - name: Run 6-kernel lake comparator --config comparator.json --paranoid (bubblewrap sandbox)
+        working-directory: lean
+        run: |
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0 || true
+          lake comparator --config comparator.json --paranoid
+      - name: SLSA build provenance attestation for Lean audit log
+        uses: actions/attest-build-provenance@v2
+        continue-on-error: true
+        with:
+          subject-path: results/lean4-audit.txt
+
+  latex-manuscript-and-arxiv:
+    name: AMS-LaTeX Zero-Warning PDF & Standalone arXiv Tarball Check (Tectonic)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Tectonic
+        run: |
+          curl --proto '=https' --tlsv1.2 -fsSL https://drop-sh.fullyjustified.net | sh
+          sudo mv tectonic /usr/local/bin/tectonic
+          tectonic --version
+      - name: Compile paper/main.tex (zero warnings) & verify standalone arXiv tarball
+        run: python scripts/package_dist.py
+      - name: Upload compiled manuscript PDF artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Donahue_2026_Xiaomi_17T_Pro_Lab
+          path: dist/Donahue_2026_Xiaomi_17T_Pro_Lab.pdf
 
   gpu-screenshots:
     if: vars.GPU_RUNNER == 'true'
@@ -32,7 +173,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: "22"
           cache: npm
       - run: npm ci
       - run: npx playwright install chromium

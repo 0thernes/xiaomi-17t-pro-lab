@@ -1,0 +1,76 @@
+{
+  "seedsCount": 20,
+  "resamples": 10000,
+  "fwerMethod": "Holm-Bonferroni",
+  "allSignificant": true,
+  "hypotheses": [
+    {
+      "id": "H1_dose_ler",
+      "description": "Low dose (15 mJ/cm^2) vs High dose (60 mJ/cm^2) 3-sigma LER (nm)",
+      "nPerArm": 20,
+      "meanA": 4.404112,
+      "meanB": 3.607222,
+      "diffMean": 0.79689,
+      "ci95Diff": [
+        0.408774,
+        1.166212
+      ],
+      "cohensD": 1.2545,
+      "cliffsDelta": 0.59,
+      "pRaw": 0.0008,
+      "pHolm": 0.0008,
+      "significantAt005": true
+    },
+    {
+      "id": "H2_na_ler",
+      "description": "0.33 NA vs 0.55 High-NA 3-sigma LER at 30 nm pitch (nm)",
+      "nPerArm": 20,
+      "meanA": 3.602802,
+      "meanB": 2.871478,
+      "diffMean": 0.731324,
+      "ci95Diff": [
+        0.439366,
+        1.027026
+      ],
+      "cohensD": 1.5112,
+      "cliffsDelta": 0.755,
+      "pRaw": 0.0001,
+      "pHolm": 0.0004,
+      "significantAt005": true
+    },
+    {
+      "id": "H3_chsh_violation",
+      "description": "Bell CHSH sampled S (22.5 deg) vs classical control (0 deg)",
+      "nPerArm": 20,
+      "meanA": 2.82145,
+      "meanB": 2.003,
+      "diffMean": 0.81845,
+      "ci95Diff": [
+        0.7991,
+        0.8379
+      ],
+      "cohensD": 25.4685,
+      "cliffsDelta": 1,
+      "pRaw": 0.0001,
+      "pHolm": 0.0004,
+      "significantAt005": true
+    },
+    {
+      "id": "H4_mermin3_violation",
+      "description": "GHZ Mermin-3 sampled M (0 deg) vs classical control (60 deg)",
+      "nPerArm": 20,
+      "meanA": 4,
+      "meanB": 1.99165,
+      "diffMean": 2.00835,
+      "ci95Diff": [
+        1.992,
+        2.0245
+      ],
+      "cohensD": 74.9777,
+      "cliffsDelta": 1,
+      "pRaw": 0.0001,
+      "pHolm": 0.0004,
+      "significantAt005": true
+    }
+  ]
+}

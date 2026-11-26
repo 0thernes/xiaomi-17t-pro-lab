@@ -1,0 +1,20 @@
+{
+  "challenge_module": "Challenge",
+  "solution_module": "Solution",
+  "theorem_names": [
+    "XiaomiLab.ComparatorTarget.target_thm1_hardware_and_roofline",
+    "XiaomiLab.ComparatorTarget.target_thm2_euv_rayleigh_and_dof",
+    "XiaomiLab.ComparatorTarget.target_thm3_dirac_finfet_and_crank_nicolson",
+    "XiaomiLab.ComparatorTarget.target_thm4_fdtd_cfl_maximum_principle",
+    "XiaomiLab.ComparatorTarget.target_thm5_chsh_and_mermin3_classical_caps",
+    "XiaomiLab.ComparatorTarget.target_thm6_peres_mermin_magic_square",
+    "XiaomiLab.ComparatorTarget.target_thm7_bloch_purity_bounds",
+    "XiaomiLab.ComparatorTarget.target_thm8_adversarial_refutations",
+    "XiaomiLab.ComparatorTarget.target_nonvacuity_witnesses"
+  ],
+  "permitted_axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+  ]
+}

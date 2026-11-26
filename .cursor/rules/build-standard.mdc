@@ -1,0 +1,12 @@
+---
+description: Canonical Build Standard v1.2.0 and Playbook v1.3 rules for xiaomi-17t-pro-lab
+globs: ["**/*"]
+alwaysApply: true
+---
+
+Follow `AGENTS.md` at the repository root:
+1. Never invent unpublished Xiaomi 17T Pro or TSMC N3P leaves; keep unknowns `null` with `status: "unknown"`.
+2. Never add PR templates, `.github/copilot-instructions.md`, git hooks, or tracked files > 5 MiB.
+3. Preserve zero-build ES-module loading, strict CSP (`style-src 'self'`), and 9-shard WebCrypto-verified TinyStories delivery.
+4. Keep `lean/` strictly zero-Mathlib, zero-`sorry` (outside `Challenge.lean`), zero-`native_decide`, within `[propext, Classical.choice, Quot.sound]`.
+5. Run `just reproduce` and `just audit` before releasing.

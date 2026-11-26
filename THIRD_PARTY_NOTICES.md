@@ -1,0 +1,14 @@
+# Third-Party Notices
+
+All third-party assets shipped inside `xiaomi-17t-pro-lab` retain their original upstream licenses and notices. The repository's MIT license applies strictly to first-party source code.
+
+| Asset / Path                                                                                                      | Upstream Project                                                                  | License     | Upstream Notice                                       |
+| :---------------------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------- | :---------- | :---------------------------------------------------- |
+| `vendor/three/`                                                                                                   | Three.js (r170+)                                                                  | MIT         | `vendor/three/LICENSE`                                |
+| `vendor/p5/p5.min.js`                                                                                             | p5.js                                                                             | LGPL-2.1    | `vendor/p5/license.txt`                               |
+| `vendor/tinystories/` (9 byte-exact shards + vocab/merges)                                                        | `roneneldan/TinyStories-8M`                                                       | MIT         | `vendor/tinystories/NOTICE.md`                        |
+| `vendor/glitchling/sim.js`                                                                                        | Glitchling 272-neuron browser port                                                | MIT         | `vendor/glitchling/NOTICE.md`                         |
+| `vendor/audio/vsco-ce/` (`claves_pp1.wav`, `snare_pp2.wav`, `shake8.wav`)                                         | `sgossner/VSCO-2-CE`                                                              | CC0-1.0     | `vendor/audio/vsco-ce/LICENSE`                        |
+| `assets/textures/cc0/metal_plate/`                                                                                | Poly Haven PBR Metal Plate                                                        | CC0-1.0     | `assets/textures/cc0/CREDITS.md`                      |
+| `vendor/fonts/` (Inter, JetBrains Mono, IBM Plex Mono, Literata, Outfit, Source Sans 3, Space Grotesk, Unbounded) | Google Fonts / Fontsource                                                         | SIL OFL-1.1 | `vendor/fonts/*-OFL.txt`, `*-LICENSE`                 |
+| Development & verification tools (not bundled at runtime)                                                         | Playwright (Apache-2.0), Prettier (MIT), Lean 4.35.0 (Apache-2.0), Tectonic (MIT) | Upstream    | Installed via `devDependencies` / external toolchains |

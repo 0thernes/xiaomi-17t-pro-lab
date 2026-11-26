@@ -196,7 +196,7 @@ export function createStream(weights) {
     return best;
   }
 
-  /** Top-K next-token probability distribution (softmax at temperature). */
+  /** Top-K next-token probability distribution (softmax at temperature) plus exact full-vocab entropy. */
   function topK(hidden, k = 8, temperature = 1) {
     const { vocab } = TINY_STORIES;
     const wte = weights.wte;
@@ -213,15 +213,19 @@ export function createStream(weights) {
     }
     let expSum = 0;
     for (let i = 0; i < vocab; i++) expSum += Math.exp(logits[i] - maxL);
+    let entropyBits = 0;
     const best = [];
     for (let i = 0; i < vocab; i++) {
       const l = logits[i];
+      const p = Math.exp(l - maxL) / expSum;
+      if (p > 1e-12) entropyBits -= p * Math.log2(p);
       if (best.length < k || l > best[best.length - 1].logit) {
-        best.push({ id: i, logit: l, prob: Math.exp(l - maxL) / expSum });
+        best.push({ id: i, logit: l, prob: p });
         best.sort((a, b) => b.logit - a.logit);
         if (best.length > k) best.pop();
       }
     }
+    best.entropyBits = entropyBits;
     return best;
   }
 

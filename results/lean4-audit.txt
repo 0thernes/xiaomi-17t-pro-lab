@@ -1,0 +1,67 @@
+'XiaomiLab.Hardware.kurnal_die_area_exact' does not depend on any axioms
+'XiaomiLab.Hardware.kurnal_major_blocks_strict_packing' does not depend on any axioms
+'XiaomiLab.Hardware.npu990_unit_count' does not depend on any axioms
+'XiaomiLab.Hardware.lpddr5x_bw_strict_gap' does not depend on any axioms
+'XiaomiLab.Hardware.cpu_cluster_clock_hierarchy' does not depend on any axioms
+'XiaomiLab.Hardware.cmos_power_ratio_cancels_alpha_C_V' depends on axioms: [propext]
+'XiaomiLab.Hardware.roofline_bounded_by_peak_and_memory' depends on axioms: [propext, Classical.choice, Quot.sound]
+'XiaomiLab.Hardware.roofline_memory_bound_exact' depends on axioms: [propext]
+'XiaomiLab.Hardware.roofline_compute_bound_exact' depends on axioms: [propext, Quot.sound]
+'XiaomiLab.Hardware.roofline_monotone_bw' depends on axioms: [propext, Quot.sound]
+'XiaomiLab.Hardware.roofline_monotone_ai' depends on axioms: [propext, Quot.sound]
+'XiaomiLab.Hardware.llm_decode_halving_bits_doubles_rate' depends on axioms: [propext]
+'XiaomiLab.Lithography.rayleigh_cd_strictly_decreasing_in_na' depends on axioms: [propext]
+'XiaomiLab.Lithography.rayleigh_cd_strictly_increasing_in_lambda' depends on axioms: [propext]
+'XiaomiLab.Lithography.euv_high_na_resolution_ratio_5_3' does not depend on any axioms
+'XiaomiLab.Lithography.dof_high_na_penalty_25_9' does not depend on any axioms
+'XiaomiLab.Lithography.dof_strictly_decreasing_in_na' depends on axioms: [propext, Quot.sound]
+'XiaomiLab.Lithography.euv_vs_arf_photon_deficit_gt_14' does not depend on any axioms
+'XiaomiLab.Lithography.coherent_cutoff_monotone_na' depends on axioms: [propext]
+'XiaomiLab.QuantumTransport.int_sq_nonneg' depends on axioms: [propext, Quot.sound]
+'XiaomiLab.QuantumTransport.cint_normSq_mul' depends on axioms: [propext, Quot.sound]
+'XiaomiLab.QuantumTransport.cint_normSq_conj' depends on axioms: [propext]
+'XiaomiLab.QuantumTransport.crank_nicolson_cayley_factor_norm_eq' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'XiaomiLab.QuantumTransport.crank_nicolson_exact_unitarity' depends on axioms: [propext, Classical.choice, Quot.sound]
+'XiaomiLab.QuantumTransport.dirac_subluminal_for_positive_mass' depends on axioms: [propext, Quot.sound]
+'XiaomiLab.QuantumTransport.pair_threshold_exceeds_euv_by_11000x' does not depend on any axioms
+'XiaomiLab.QuantumTransport.finfet_permittivity_ratio_invariance' depends on axioms: [propext]
+'XiaomiLab.QuantumTransport.finfet_thinner_body_reduces_lambda_sq' depends on axioms: [propext]
+'XiaomiLab.Thermal.fdtd_stencil_weights_sum_to_D' depends on axioms: [propext, Quot.sound]
+'XiaomiLab.Thermal.fdtd_uniform_field_fixed_point' depends on axioms: [propext, Quot.sound]
+'XiaomiLab.Thermal.fdtd_cfl_discrete_max_principle' depends on axioms: [propext, Quot.sound]
+'XiaomiLab.Thermal.fdtd_cfl_discrete_min_principle' depends on axioms: [propext, Quot.sound]
+'XiaomiLab.Thermal.iceloop_vc_strictly_cools_faster' depends on axioms: [propext, Quot.sound]
+'XiaomiLab.Thermal.code_cfl_cap_strictly_subcritical' does not depend on any axioms
+'XiaomiLab.Thermal.sustained_clock_exact_20min' does not depend on any axioms
+'XiaomiLab.Contextuality.chsh_classical_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'XiaomiLab.Contextuality.tsirelson_sq_strictly_exceeds_classical_sq' does not depend on any axioms
+'XiaomiLab.Contextuality.mermin3_classical_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'XiaomiLab.Contextuality.mermin3_quantum_exceeds_classical' does not depend on any axioms
+'XiaomiLab.Contextuality.pm_row_prod_eq_col_prod' depends on axioms: [propext]
+'XiaomiLab.Contextuality.peres_mermin_no_6_of_6' depends on axioms: [propext, Quot.sound]
+'XiaomiLab.Contextuality.peres_mermin_classical_cap_le_5' depends on axioms: [propext, Quot.sound]
+'XiaomiLab.Contextuality.peres_mermin_5_of_6_achievable' depends on axioms: [propext]
+'XiaomiLab.Contextuality.bloch_pure_state_sphere_identity' depends on axioms: [propext, Quot.sound]
+'XiaomiLab.Contextuality.qubit_purity_bounds' depends on axioms: [propext, Classical.choice, Quot.sound]
+'XiaomiLab.Adversarial.adv_fdtd_cfl_violation_undershoots' does not depend on any axioms
+'XiaomiLab.Adversarial.adv_chsh_relaxed_domain_breaks_bound' does not depend on any axioms
+'XiaomiLab.Adversarial.adv_massless_dirac_not_subluminal' does not depend on any axioms
+'XiaomiLab.Adversarial.adv_peres_mermin_without_minus_sign_is_classical' depends on axioms: [propext]
+'XiaomiLab.Adversarial.adv_roofline_max_violates_memory_wall' does not depend on any axioms
+'XiaomiLab.ComparatorTarget.target_thm1_hardware_and_roofline' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'XiaomiLab.ComparatorTarget.target_thm2_euv_rayleigh_and_dof' depends on axioms: [propext, Quot.sound]
+'XiaomiLab.ComparatorTarget.target_thm3_dirac_finfet_and_crank_nicolson' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'XiaomiLab.ComparatorTarget.target_thm4_fdtd_cfl_maximum_principle' depends on axioms: [propext, Quot.sound]
+'XiaomiLab.ComparatorTarget.target_thm5_chsh_and_mermin3_classical_caps' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'XiaomiLab.ComparatorTarget.target_thm6_peres_mermin_magic_square' depends on axioms: [propext, Quot.sound]
+'XiaomiLab.ComparatorTarget.target_thm7_bloch_purity_bounds' depends on axioms: [propext, Classical.choice, Quot.sound]
+'XiaomiLab.ComparatorTarget.target_thm8_adversarial_refutations' does not depend on any axioms
+'XiaomiLab.ComparatorTarget.target_nonvacuity_witnesses' does not depend on any axioms

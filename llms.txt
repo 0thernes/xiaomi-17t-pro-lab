@@ -1,0 +1,23 @@
+# Xiaomi 17T Pro Lab (`xiaomi-17t-pro-lab`)
+
+> Phone-first zero-build silicon-to-quantum interactive hardware lab, 60-digit differential physics oracle, pure Lean 4.35.0 six-kernel formal verification core, and AMS-LaTeX white paper for the Xiaomi 17T Pro & MediaTek Dimensity 9500 (MT6993Z, TSMC N3P).
+
+- Live interactive lab: https://0thernes.github.io/xiaomi-17t-pro-lab/
+- Live Lean 4.35.0 Proof Blueprint: https://0thernes.github.io/xiaomi-17t-pro-lab/blueprint/
+- Repository: https://github.com/0thernes/xiaomi-17t-pro-lab
+- Author: Alexander Stephen Donahue (ORCID 0009-0006-8168-9648, Independent Researcher, Spokane, WA, USA)
+
+## Core Documentation
+- [README.md](README.md): Overview, quickstart, usage, verification ladder, and live links.
+- [AGENTS.md](AGENTS.md): Canonical instructions for AI coding and research agents.
+- [CLAIMS.md](CLAIMS.md): Numbered claims ledger with verification commands and explicit falsifiers.
+- [LIMITATIONS.md](LIMITATIONS.md): Modeling boundaries, literal-vs-metaphor table, and non-claims.
+- [REPLICATION.md](REPLICATION.md): Clean-clone replication protocol and dated verification log.
+- [VERIFICATION.md](VERIFICATION.md): Verification ladder summary (Lean 4, 60-digit oracle, mutants, stats, Playwright).
+- [docs/statement-fidelity.md](docs/statement-fidelity.md): 1-to-1 audit of paper theorems vs. `lean/Challenge.lean`.
+- [docs/mega-atlas-cross-reference.md](docs/mega-atlas-cross-reference.md): Honest audit against all 1,900 Mega-Atlas problems (0/1,900 retired).
+- [docs/ai.md](docs/ai.md): TinyStories-8M sharding, SHA-256 pinning, evaluation harness, and budgets.
+- [docs/benchmarks.md](docs/benchmarks.md): Reproducible solver timing distributions and performance budgets.
+- [docs/threat-model.md](docs/threat-model.md): STRIDE threat model mapped to CSP, loopback server, and EIO tests.
+- [formalization.yaml](formalization.yaml): Palomar Registry formalization metadata.
+- [paper/main.tex](paper/main.tex): Publication-grade AMS-LaTeX white paper source (`dist/Donahue_2026_Xiaomi_17T_Pro_Lab.pdf`).

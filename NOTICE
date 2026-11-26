@@ -1,0 +1,14 @@
+Xiaomi 17T Pro Lab (v3.0.0)
+Copyright (c) 2026 Alexander Stephen Donahue (ORCID: 0009-0006-8168-9648)
+Independent Researcher, Spokane, WA, USA <0_0@0thernes.art>
+
+First-party source code is licensed under the MIT License (see LICENSE).
+The AMS-LaTeX white paper (paper/, dist/), figures, and technical documentation
+are licensed under Creative Commons Attribution 4.0 International (CC-BY-4.0).
+
+This repository bundles unmodified third-party open-source libraries, fonts,
+textures, audio samples, and model weights under their respective licenses; see
+THIRD_PARTY_NOTICES.md for the complete attribution manifest.
+
+No affiliation or endorsement is implied with Xiaomi Corporation, MediaTek Inc.,
+TSMC, Arm Ltd., ASML Holding N.V., or SK hynix Inc.

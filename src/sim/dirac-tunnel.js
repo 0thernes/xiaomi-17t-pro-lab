@@ -12,6 +12,15 @@ export const BOLTZMANN_EV_K = 8.617333262e-5;
  * T(E) = exp(-2 * kappa * d), kappa = sqrt((V0 - E) / (hbar^2 / (2 m*))).
  */
 export function wkbTunnelTransmission({ energyEv = 0.25, barrierEv = 3.1, thicknessNm = 1.0, effMassRatio = 0.5 }) {
+  if (!Number.isFinite(energyEv) || !Number.isFinite(barrierEv)) {
+    throw new RangeError("energyEv and barrierEv must be finite");
+  }
+  if (!Number.isFinite(thicknessNm) || thicknessNm < 0) {
+    throw new RangeError("thicknessNm must be finite and non-negative");
+  }
+  if (!Number.isFinite(effMassRatio) || effMassRatio <= 0) {
+    throw new RangeError("effMassRatio must be finite and positive");
+  }
   if (energyEv >= barrierEv) return { transmission: 1, kappaPerNm: 0, decayLengthNm: Infinity };
   const hbar2Over2mStar = HBAR2_OVER_2M_EV_NM2 / effMassRatio;
   const kappa = Math.sqrt((barrierEv - energyEv) / hbar2Over2mStar);

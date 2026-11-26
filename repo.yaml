@@ -1,0 +1,128 @@
+# XIAOMI 17T PRO LAB — Build Standard v1.2.0 Compliance Manifest (repo.yaml)
+# Audited automatically by scripts/Audit-Repo.ps1 and scripts/audit-repo.sh
+
+standard: "1.2.0"
+name: "xiaomi-17t-pro-lab"
+version: "3.0.0"
+project_type: "research"
+owner: "Alexander Stephen Donahue (0thernes)"
+orcid: "0009-0006-8168-9648"
+license: "MIT"
+stack:
+  - node
+  - python
+  - lean
+  - latex
+
+flags:
+  public: true
+  package: true
+  visual: true
+  ui: true
+  native: false
+  ai: true
+  personal_data: false
+  service: true
+  deployed: true
+  api: true
+  perf: true
+  concurrent: false
+  numeric: true
+  experimental: true
+  ml: false
+  formal: true
+
+items:
+  # ---- Part A: Repository Structure, Docs, Hygiene & Operations (A01-A45) ----
+  A01: { status: done, evidence: "README.md with clear one-line purpose, scope, and hardware/formal overview" }
+  A02: { status: done, evidence: "README.md shields.io badge ribbon (CI, Pages, Lean 4.35.0, License, Status)" }
+  A03: { status: done, evidence: "README.md ## Quickstart section verified from a clean clone" }
+  A04: { status: done, evidence: "README.md ## Usage section plus runnable scripts in examples/" }
+  A05: { status: done, evidence: "README.md embeds docs/media/social-preview.png and route screenshots" }
+  A06: { status: done, evidence: "LICENSE (MIT first-party code) + CC-BY-4.0 paper/docs + NOTICE" }
+  A07: { status: done, evidence: "CHANGELOG.md (Keep a Changelog with ## [Unreleased] and ## [3.0.0])" }
+  A08: { status: done, evidence: "VERSION (3.0.0) synced across package.json, src/version.js, CHANGELOG.md, CITATION.cff, paper/main.tex" }
+  A09: { status: done, evidence: "50 passing Node unit/property/metamorphic/golden/EIO tests + 8 Playwright E2E smoke specs" }
+  A10: { status: done, evidence: ".github/workflows/ci.yml runs automatically on push to main (R1/R2 linear workflow)" }
+  A11: { status: done, evidence: ".github/workflows/release.yml triggered on tags: ['v*'] attaching PDF, arXiv tarball, SHA256SUMS" }
+  A12: { status: done, evidence: ".gitignore excludes node_modules, .lake, paper/build, .venv, .env, test outputs" }
+  A13: { status: done, evidence: ".gitattributes and .editorconfig enforce UTF-8, LF endings, and binary handling" }
+  A14: { status: done, evidence: "CONTRIBUTING.md aligned with direct-to-main workflow and issue reporting" }
+  A15: { status: done, evidence: "CODE_OF_CONDUCT.md" }
+  A16: { status: done, evidence: "SECURITY.md updated for v3.0.x with disclosure contact 0_0@0thernes.art" }
+  A17: { status: done, evidence: "SUPPORT.md" }
+  A18: { status: done, evidence: ".github/ISSUE_TEMPLATE/{bug,feature,falsification,replication,config}.yml; zero PR template (R4)" }
+  A19: { status: done, evidence: "GitHub About description, homepage https://0thernes.github.io/xiaomi-17t-pro-lab/, and >= 6 topics set via gh repo edit" }
+  A20: { status: done, evidence: "docs/ARCHITECTURE.md plus full docs/ hierarchy (audit, adr, design, research, reviews)" }
+  A21: { status: done, evidence: "docs/adr/README.md + docs/adr/0001..0008*.md" }
+  A22: { status: done, evidence: "CITATION.cff (v3.0.0, ORCID 0009-0006-8168-9648) + .zenodo.json" }
+  A23: { status: done, evidence: "Linear main branch history with verified real author identity" }
+  A24: { status: done, evidence: "Zero tracked files > 5 MiB (TinyStories sharded <= 4.5 MB), zero build outputs, zero secrets" }
+  A25: { status: done, evidence: ".github/workflows/ci.yml cross-platform matrix (ubuntu-24.04, macos-latest, windows-latest, fail-fast: false)" }
+  A26: { status: done, evidence: "docs/media/social-preview.png (1280x640, ~133 KB)" }
+  A27: { status: done, evidence: ".github/workflows/pages.yml deploys interactive lab + /blueprint/ + white paper PDF" }
+  A28: { status: done, evidence: "package.json + pyproject.toml + lean/lakefile.toml" }
+  A29: { status: done, evidence: "ROADMAP.md" }
+  A30: { status: done, evidence: ".github/labels.tsv containing all 10 Build Standard finding classes" }
+  A31: { status: done, evidence: "justfile with setup/serve/validate/test/oracle/evals/bench/stats/examples/lean/paper/smoke/audit/reproduce/rollback" }
+  A32: { status: done, evidence: "AGENTS.md (< 32 KiB canonical), CLAUDE.md (@AGENTS.md), GEMINI.md, .cursor/rules/build-standard.mdc, llms.txt, llms-full.txt" }
+  A33: { status: done, evidence: ".env.example, tools/serve.mjs fail-fast parsePort(), and docs/configuration.md" }
+  A34: { status: done, evidence: "tools/serve.mjs GET /healthz JSON endpoint + structured LOG_FORMAT=json error/startup logging" }
+  A35: { status: done, evidence: "docs/operations.md documents git bundle backups, 0thernes-research-archive pin, and Software Heritage offsite mirror" }
+  A36: { status: done, evidence: "justfile rollback target + docs/operations.md forward-revert Pages rollback runbook" }
+  A37: { status: done, evidence: "scripts/bench.mjs, results/perf-benchmarks.json, and docs/benchmarks.md with hard frame budgets" }
+  A38: { status: done, evidence: "WCAG 2.2 AA UI: skip link, :focus-visible, >= 44 px dock targets, aria-pressed, reduced-motion orbit, >= 5.1:1 contrast verified in smoke.spec.js" }
+  A39: { status: done, evidence: "NOTICE + THIRD_PARTY_NOTICES.md + upstream license files for three.js, p5.js, TinyStories, Glitchling, VSCO-2-CE, Poly Haven, fonts" }
+  A40: { status: done, evidence: "docs/ai.md pins TinyStories-8M FP16 SHA-256 across 9 shards, documents deterministic evals, and specifies zero-API-cost + transfer/RAM/latency budgets" }
+  A41: { status: done, evidence: "UPGRADING.md covering v2.2.0 -> v3.0.0 sharding, input-guard, and HTTP contract changes" }
+  A42: { status: done, evidence: "Status: active declared in README.md and ROADMAP.md" }
+  A43: { status: done, evidence: "examples/{README.md,01_euv_and_bragg.mjs,02_thermal_fdtd_iceloop.mjs,03_quantum_contextuality.mjs} smoke-tested in CI" }
+  A44: { status: done, evidence: "docs/faq.md (7 skeptical Q&As) and docs/glossary.md" }
+  A45: { status: n/a, reason: "Zero personal data, accounts, cookies, or user telemetry collected (personal_data: false)" }
+
+  # ---- Part B: Scientific Verification, Formal Proofs & Rigor (B01-B45) ----
+  B01: { status: done, evidence: "just reproduce executes full validate/test/mutate/examples/oracle/evals/bench/stats/Lean/LaTeX pipeline" }
+  B02: { status: done, evidence: "package-lock.json, .nvmrc, .python-version, lean/lean-toolchain, and lean/lake-manifest.json pinned" }
+  B03: { status: done, evidence: "tests/properties-and-regressions.test.mjs bit-exact SHA-256 determinism + deterministic TinyStories greedy decode" }
+  B04: { status: done, evidence: "CLAIMS.md maps claims C01-C11 to epistemic tiers, commands, and falsifiers" }
+  B05: { status: done, evidence: "Falsifiable test suites cover every claim across tests/*.test.mjs, scripts/mutate.mjs, and reference/physics_oracle.py" }
+  B06: { status: done, evidence: "tests/properties-and-regressions.test.mjs tests 25+ out-of-domain / NaN / zero / corrupt-buffer rejections" }
+  B07: { status: done, evidence: "Dedicated regression tests for thermal clock (1200 s), battery Wh null, setAmbient(NaN), DVFS anti-oscillation, sharded safetensors, JPEG MIME, and EIO" }
+  B08: { status: done, evidence: "tests/properties-and-regressions.test.mjs pinned against tests/golden/baseline-snapshot.json" }
+  B09: { status: done, evidence: "tests/server.test.mjs + tests/properties-and-regressions.test.mjs verify /healthz, HEAD, 405, 403, 404, MIME, and strict CSP" }
+  B10: { status: done, evidence: "tests/properties-and-regressions.test.mjs prop_check runs 2,500+ randomized physical and quantum invariants" }
+  B11: { status: done, evidence: "reference/physics_oracle.py differentially verifies 54 JS solver outputs against independent 60-digit arithmetic (max rel err 2.16e-14)" }
+  B12: { status: done, evidence: "reference/physics_oracle.py implements standalone textbook 60-digit Decimal/Fraction equations including complex 2x2 Bragg matrix" }
+  B13: { status: done, evidence: "scripts/mutate.mjs plants 8 semantic/security mutants (M1-M8) in isolated temp stages and kills 8/8 (100.0%)" }
+  B14: { status: done, evidence: "tests/properties-and-regressions.test.mjs verifies U(1) global phase invariance, optical wavelength-pitch scaling, and quantization equivariance" }
+  B15: { status: n/a, reason: "No C/C++/Rust native binary parsers exposed (native: false)" }
+  B16: { status: n/a, reason: "No C/C++/Rust native memory code (native: false)" }
+  B17: { status: done, evidence: "Prettier, node --check, and pyproject.toml ruff run report-only in .github/workflows/ci.yml" }
+  B18: { status: done, evidence: "jsconfig.json (strict checkJs) and pyproject.toml mypy run report-only in .github/workflows/ci.yml" }
+  B19: { status: n/a, reason: "Single-threaded deterministic JS solvers and synchronous unit tests (concurrent: false)" }
+  B20: { status: done, evidence: "60-digit differential stability checks, Crank-Nicolson < 1e-8 norm check, CFL sub-stepping, and finite/positive guards" }
+  B21: { status: done, evidence: "tests/properties-and-regressions.test.mjs injects simulated disk EIO stream error and asserts 500 + server survival" }
+  B22: { status: done, evidence: "lean/XiaomiLabProofs/ (59 audited declarations) + Challenge/Solution 6-kernel lake comparator --paranoid" }
+  B23: { status: n/a, reason: "Formal verification uses Lean 4.35.0 theorem proving (B22) rather than TLA+/Alloy model checking" }
+  B24: { status: n/a, reason: "Formal verification uses Lean 4.35.0 (B22) rather than Dafny/F* contract languages" }
+  B25: { status: n/a, reason: "No C/Rust implementation code (native: false); Lean 4 six-kernel comparator provides formal soundness" }
+  B26: { status: done, evidence: "scripts/bench.mjs -> results/perf-benchmarks.json & docs/benchmarks.md with hardware, median, IQR, p95, and budgets" }
+  B27: { status: done, evidence: "docs/benchmarks.md and LIMITATIONS.md document JIT jitter and SwiftShader vs Mali GPU tracking caveats" }
+  B28: { status: done, evidence: "scripts/stats_eval.mjs runs 20 deterministic seeds with explicit classical and low-dose/low-NA control arms" }
+  B29: { status: done, evidence: "scripts/stats_eval.mjs runs 10,000-resample Monte Carlo permutation tests (results/stats-eval.json)" }
+  B30: { status: done, evidence: "scripts/stats_eval.mjs reports 10,000-resample 95% bootstrap CIs, Cohen's d, and Cliff's delta" }
+  B31: { status: done, evidence: "scripts/stats_eval.mjs applies Holm-Bonferroni FWER correction across H1-H4 (p_holm <= 0.0008)" }
+  B32: { status: done, evidence: "docs/preregistration.md documents pre-registered hypotheses H1-H4 and transparently logs the Cycle 1 LER defect discovery" }
+  B33: { status: n/a, reason: "Ships a frozen pre-trained checkpoint (TinyStories-8M); performs zero ML model training or train/test splitting (ml: false)" }
+  B34: { status: done, evidence: "evals/run_tinystories_eval.mjs verifies 9-shard SHA-256, 5-prompt greedy regression, exact entropy, and L4 ablation (results/tinystories-eval.json)" }
+  B35: { status: done, evidence: "Report-only gitleaks secret scan and osv-scanner dependency audit in .github/workflows/ci.yml (continue-on-error: true)" }
+  B36: { status: done, evidence: "docs/threat-model.md STRIDE matrix mapped 1-to-1 to server tests, WebCrypto SHA-256, and strict CSP" }
+  B37: { status: done, evidence: "CHECKSUMS.sha256 + .github/workflows/release.yml SHA256SUMS" }
+  B38: { status: done, evidence: ".github/workflows/release.yml actions/attest-build-provenance@v2 (soft SLSA provenance)" }
+  B39: { status: done, evidence: "data/MANIFEST.sha256 + vendor/tinystories/SHA256.txt verified by reference/physics_oracle.py --check-checksums" }
+  B40: { status: done, evidence: "docs/run-log.md append-only chronological execution & audit log" }
+  B41: { status: done, evidence: "LIMITATIONS.md + README.md ## Limitations section with literal-vs-metaphor table" }
+  B42: { status: done, evidence: "CLAIMS.md includes explicit 'What Would Prove Us Wrong' falsifier column for every claim C01-C11" }
+  B43: { status: done, evidence: "REPLICATION.md clean-clone protocol with pinned toolchains, commands, and tolerances" }
+  B44: { status: done, evidence: "REPLICATION.md dated replication log table covering v2.0.0 through v3.0.0" }
+  B45: { status: done, evidence: "docs/reviews/2026-11-25-3-cycle-hardening-audit.md + HARDENING_LOG.md 10-pass 3-cycle adversarial review dossier" }

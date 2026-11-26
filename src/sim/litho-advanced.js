@@ -1,12 +1,12 @@
-import { EUV_LAMBDA_NM } from "./constants.js";
+import { ELEMENTARY_CHARGE_C, EUV_LAMBDA_NM, HC_EV_NM } from "./constants.js";
 import { fftRadix2 } from "./fft.js";
 import { mulberry32 } from "./quant.js";
 
-const HC_EV_NM = 1239.8419843320026;
-const EV_TO_J = 1.602176634e-19;
-
 /** Photon energy in eV for a given wavelength in nm (EUV 13.5 nm -> 91.840 eV). */
 export function euvPhotonEnergyEv(lambdaNm = EUV_LAMBDA_NM) {
+  if (!Number.isFinite(lambdaNm) || lambdaNm <= 0) {
+    throw new RangeError("wavelength lambdaNm must be finite and positive");
+  }
   return HC_EV_NM / lambdaNm;
 }
 
@@ -100,6 +100,16 @@ export function braggSpectrum({ pairs = 40, dNm = 6.92, gamma = 0.4, samples = 8
 
 /** Depth of focus DOF = k2 * lambda / NA^2 (nm). */
 export function depthOfFocusNm(na, k2 = 0.5, lambdaNm = EUV_LAMBDA_NM) {
+  if (
+    !Number.isFinite(na) ||
+    na <= 0 ||
+    !Number.isFinite(lambdaNm) ||
+    lambdaNm <= 0 ||
+    !Number.isFinite(k2) ||
+    k2 < 0
+  ) {
+    throw new RangeError("na and lambdaNm must be positive; k2 must be finite and non-negative");
+  }
   return (k2 * lambdaNm) / (na * na);
 }
 
@@ -227,9 +237,9 @@ export function simulateStochasticResist({
   const pixelNm = extentNm / cols;
   const pixelAreaM2 = pixelNm * 1e-9 * (pixelNm * 1e-9);
   const doseJm2 = doseMjCm2 * 10; // 1 mJ/cm^2 = 10 J/m^2
-  const photonJ = euvPhotonEnergyEv(lambdaNm) * EV_TO_J;
+  const photonJ = euvPhotonEnergyEv(lambdaNm) * ELEMENTARY_CHARGE_C;
   const incidentPhotonsPerPixel = (doseJm2 * pixelAreaM2) / photonJ;
-  // ~20% EUV resist absorption quantum yield in thin CAR film
+  // 25% illustrative EUV resist absorption quantum yield in thin CAR film
   const absorbedMeanAtUnit = incidentPhotonsPerPixel * 0.25;
   const rng = mulberry32(seed);
 
@@ -242,10 +252,20 @@ export function simulateStochasticResist({
       field[r * cols + c] = absorbedMeanAtUnit > 0 ? count / absorbedMeanAtUnit : 0;
     }
   }
-  // 3x3 acid-diffusion kernel (chemical amplification blur)
+  // Locate the nominal falling edge of the noiseless aerial image for sub-pixel LER metrology
+  let nominalEdgeCol = Math.floor(cols / 8);
+  for (let c = 1; c < Math.floor(cols / 2); c++) {
+    if (intensity1d[c - 1] >= threshold && intensity1d[c] < threshold) {
+      nominalEdgeCol = c;
+      break;
+    }
+  }
+  const searchHalfWin = Math.max(4, Math.floor(cols / 16));
+
+  // 3x3 acid-diffusion kernel (chemical amplification blur) + sub-pixel threshold crossing
+  const blurred = new Float32Array(rows * cols);
   const edges = [];
   for (let r = 0; r < rows; r++) {
-    let firstEdge = -1;
     for (let c = 0; c < cols; c++) {
       let sum = 0;
       let w = 0;
@@ -259,12 +279,28 @@ export function simulateStochasticResist({
         }
       }
       const val = sum / w;
+      blurred[r * cols + c] = val;
       resist[r * cols + c] = val >= threshold ? 1 : 0;
-      if (firstEdge < 0 && c > 2 && c < cols / 2 && resist[r * cols + c] !== resist[r * cols + c - 1]) {
-        firstEdge = c * pixelNm;
+    }
+    // Find falling threshold crossing closest to nominalEdgeCol inside metrology window
+    let bestEdge = -1;
+    let bestDist = Infinity;
+    const cStart = Math.max(1, nominalEdgeCol - searchHalfWin);
+    const cEnd = Math.min(cols - 1, nominalEdgeCol + searchHalfWin);
+    for (let c = cStart; c <= cEnd; c++) {
+      const v0 = blurred[r * cols + (c - 1)];
+      const v1 = blurred[r * cols + c];
+      if (v0 >= threshold && v1 < threshold) {
+        const frac = v0 !== v1 ? (v0 - threshold) / (v0 - v1) : 0.5;
+        const posCol = c - 1 + frac;
+        const dist = Math.abs(posCol - nominalEdgeCol);
+        if (dist < bestDist) {
+          bestDist = dist;
+          bestEdge = posCol * pixelNm;
+        }
       }
     }
-    if (firstEdge >= 0) edges.push(firstEdge);
+    if (bestEdge >= 0) edges.push(bestEdge);
   }
   let meanEdge = 0;
   for (const e of edges) meanEdge += e;
@@ -273,7 +309,7 @@ export function simulateStochasticResist({
   for (const e of edges) variance += (e - meanEdge) ** 2;
   const sigmaNm = Math.sqrt(variance / Math.max(1, edges.length));
 
-  const arfPhotonsPerPixel = (doseJm2 * pixelAreaM2) / (euvPhotonEnergyEv(193.3) * EV_TO_J);
+  const arfPhotonsPerPixel = (doseJm2 * pixelAreaM2) / (euvPhotonEnergyEv(193.3) * ELEMENTARY_CHARGE_C);
   return {
     rows,
     cols,

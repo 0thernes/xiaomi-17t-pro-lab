@@ -91,6 +91,9 @@ export function rmse(a, b) {
 }
 
 export function maxAbsErr(a, b) {
+  if (a.length !== b.length || a.length === 0) {
+    throw new Error("maxAbsErr inputs must be non-empty and the same length");
+  }
   let m = 0;
   for (let i = 0; i < a.length; i++) m = Math.max(m, Math.abs(a[i] - b[i]));
   return m;

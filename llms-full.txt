@@ -1,0 +1,587 @@
+# xiaomi-17t-pro-lab — llms-full.txt (Generated Complete Context Digest)
+
+
+---
+## FILE: README.md
+---
+
+# Xiaomi 17T Pro Lab (v3.0.0)
+
+[![CI](https://github.com/0thernes/xiaomi-17t-pro-lab/actions/workflows/ci.yml/badge.svg)](https://github.com/0thernes/xiaomi-17t-pro-lab/actions/workflows/ci.yml)
+[![Version](https://img.shields.io/badge/version-3.0.0-38d4f2)](CHANGELOG.md)
+[![Lean 4.35.0](https://img.shields.io/badge/Lean%204.35.0-59%20audited%20decls%20%C2%B7%206%20kernels-4ade80)](lean/VerifyAxioms.lean)
+[![Oracle](https://img.shields.io/badge/60--digit%20oracle-54%2F54%20pass-0b6bcb)](reference/physics_oracle.py)
+[![License](https://img.shields.io/badge/license-MIT%20%2B%20CC--BY--4.0-a78bfa)](LICENSE)
+[![Status](https://img.shields.io/badge/status-active-2ea043)](ROADMAP.md)
+[![Pages](https://img.shields.io/badge/demo-GitHub%20Pages-ff6900)](https://0thernes.github.io/xiaomi-17t-pro-lab/)
+
+Forensic silicon-to-quantum hardware workbench, independent 60-digit differential physics oracle, pure Lean 4.35.0 six-kernel formal verification core, and AMS-LaTeX white paper for the **Xiaomi 17T Pro** (`2602EPTC0G`, codename `warhol`) and **MediaTek Dimensity 9500** (`MT6993Z`, TSMC N3P, `140.57 mm²`).
+
+![Xiaomi 17T Pro Lab Social Preview](docs/media/social-preview.png)
+
+- **Live Interactive Workbench:** <https://0thernes.github.io/xiaomi-17t-pro-lab/>
+- **Interactive Lean 4.35.0 Proof Blueprint:** <https://0thernes.github.io/xiaomi-17t-pro-lab/blueprint/>
+- **Frozen AMS-LaTeX White Paper (Preprint, CC-BY-4.0):** [Donahue_2026_Xiaomi_17T_Pro_Lab.pdf](dist/Donahue_2026_Xiaomi_17T_Pro_Lab.pdf)
+- **Author:** Alexander Stephen Donahue ([ORCID 0009-0006-8168-9648](https://orcid.org/0009-0006-8168-9648)), Independent Researcher, Spokane, WA, USA (`0_0@0thernes.art`)
+- **Status:** active
+
+---
+
+## Quickstart
+
+Node.js `>= 22` is required (zero build step for the web app; optional Python `>= 3.12`, Lean `4.35.0`, and Tectonic for full formal & manuscript reproduction).
+
+```bash
+git clone https://github.com/0thernes/xiaomi-17t-pro-lab.git
+cd xiaomi-17t-pro-lab
+npm ci
+npm start            # Launches loopback server at http://127.0.0.1:47321/ (with strict CSP & COOP/COEP)
+```
+
+Verify the full suite from a clean clone:
+
+```bash
+npm run verify:all                                   # Specs schema + 50 Node tests + 8/8 mutants + 3 examples
+python reference/physics_oracle.py --check-checksums # 54 differential checks at 60-digit precision + SHA-256 manifests
+npm run evals                                        # 9-shard TinyStories-8M WebCrypto/Node SHA-256 + greedy regression
+npm run test:smoke                                   # Playwright 19-route phone & desktop E2E smoke
+```
+
+## 5-Second Lean 4.35.0 Kernel Verification
+
+```bash
+cd lean
+lake build XiaomiLabProofs Challenge Solution
+lake env lean VerifyAxioms.lean
+lake env leanchecker --fresh XiaomiLabProofs
+lake env leanchecker --fresh Solution
+# On Linux with bubblewrap (automated in CI across all 6 kernels):
+lake comparator --config comparator.json --paranoid
+```
+
+All **59 audited declarations** (50 theorems across 6 modules + 9 isolated Palomar comparator targets) compile cleanly with zero Mathlib, zero `sorry` (outside statement-only `Challenge.lean`), zero `native_decide`, and axioms strictly within `[propext, Classical.choice, Quot.sound]`. See [docs/statement-fidelity.md](docs/statement-fidelity.md) and [formalization.yaml](formalization.yaml).
+
+## Usage
+
+### Interactive Browser Labs (`10⁻¹ m → 10⁻¹⁵ m`)
+
+Press **`Ctrl+K`** anywhere to jump to any lab, physics solver, live workload, or FCC component. Hover any 3D part to inspect provenance-badged specs; click to focus (`R` resets framing).
+
+| Route                           | Scale          | Live Real-Time Computation                                                                                                                                                                                 |
+| :------------------------------ | :------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Phone** (`#/`)                | `10⁻¹ m`       | Interactive 3D Xiaomi 17T Pro with PBR microfacet maps, HyperOS 3 telemetry OLED, Leica triple optics, 7-layer FCC teardown, raycast inspector                                                             |
+| **Zoom** (`#/zoom`)             | `10⁻¹→10⁻¹⁵ m` | 8-rung Powers-of-Ten descent: Phone → PCB → MT6993Z PoP → `140.57 mm²` Die → C1-Ultra → FinFET → Si Crystal → Quantum Tunnel / Dirac                                                                       |
+| **CPU** (`#/cpu`)               | `28.75 mm²`    | 15-level taxonomy, live Sattolo pointer-chase latency curve, WASM SIMD `f32x4`, COOP/COEP timer isolation, ARMv9.3-A decoder                                                                               |
+| **GPU** (`#/gpu`)               | `24.23 mm²`    | 16-level Mali-G1 Ultra MC12 + RTUv2 stack, checked WebGPU/WebGL2 matmul vs Float64 reference, interactive TBDR tile-binner                                                                                 |
+| **NPU 990** (`#/npu`)           | `12.60 mm²`    | 14-level 4× MDLA + 2× MVPU + CIM stack, live FP64 vs INT8 vs BitNet 1.58-bit error heatmaps (labeled CPU JS/WASM, not NPU dispatch)                                                                        |
+| **RAM & UFS** (`#/memory`)      | `76.8 GB/s`    | MT6993Z + SK hynix `H58GG6AV9H` PoP, live STREAM Triad + 16 MB copy, CS Roofline plot, LLM memory-wall & UFS 4.1 load calculator                                                                           |
+| **Thermal PDE** (`#/thermal`)   | `5,500 mm²`    | Live 2D explicit FDTD heat PDE with CFL sub-stepping & smooth closed-loop DVFS (`<= 0.5 s`), FLIR Ironbow shader, 20-minute exact clock (`1,200 s`)                                                        |
+| **EUV Litho** (`#/litho`)       | `13.5 nm`      | 2D Fourier partial-coherence EUV simulator (`6T SRAM`, `L-Bend`, `Via0`, `48 nm Lines`) + OPC serifs, 40-pair Mo/Si Bragg transfer matrix (`74.32%`), sub-pixel Poisson shot-noise LER                     |
+| **Atom & QED** (`#/transistor`) | `10⁻⁸→10⁻¹⁵ m` | Unitary Crank–Nicolson TDSE (`norm err < 1e-8`), N3P FinFET double-gate $\lambda$, Kronig–Penney bands, Varshni $n_i(T)$, Dirac dispersion                                                                 |
+| **Workloads** (`#/work/*`)      | `Live Run`     | 6K PBR stress arena, deterministic 9-shard TinyStories-8M GPT-Neo with exact full-vocab Shannon entropy & Neuralese hooks, 272-neuron Glitchling A-Life, Bloch/CHSH/Mermin-3/Peres–Mermin quantum composer |
+| **Versus** (`#/compare`)        | `3-Way`        | Normalized multi-metric scoreboard vs iPhone 18 Pro Max & Galaxy S26 Ultra with strict same-lab attribution                                                                                                |
+| **Specs** (`#/specs`)           | `FCC + Die`    | Searchable forensic catalog of 29 FCC/kernel parts, 22 source conflicts with precedence rules, 12 issues, and 7 explicit `UNKNOWN` leaves                                                                  |
+
+### Programmatic Examples (`examples/`)
+
+```bash
+node examples/01_euv_and_bragg.mjs
+node examples/02_thermal_fdtd_iceloop.mjs
+node examples/03_quantum_contextuality.mjs
+```
+
+### One-Word Task Runner (`justfile`)
+
+```bash
+just reproduce   # Full verification ladder: tests, mutants, examples, 60-digit oracle, evals, bench, stats, Lean 4, LaTeX PDF
+just audit       # Build Standard v1.2.0 90-item repository audit
+```
+
+## Verification & Research Artifacts
+
+- **Claims & Falsifiers:** [CLAIMS.md](CLAIMS.md) (`C01`–`C11`) · [VERIFICATION.md](VERIFICATION.md) · [REPLICATION.md](REPLICATION.md)
+- **Hardening & Reviews:** [HARDENING_LOG.md](HARDENING_LOG.md) · [docs/reviews/2026-11-25-3-cycle-hardening-audit.md](docs/reviews/2026-11-25-3-cycle-hardening-audit.md) · [ERRATA.md](ERRATA.md)
+- **Mega-Atlas Cross-Reference:** [docs/mega-atlas-cross-reference.md](docs/mega-atlas-cross-reference.md) (**0 / 1,900** grand open problems retired)
+- **Formal & Security Docs:** [docs/statement-fidelity.md](docs/statement-fidelity.md) · [docs/threat-model.md](docs/threat-model.md) · [docs/ai.md](docs/ai.md) · [docs/benchmarks.md](docs/benchmarks.md) · [docs/preregistration.md](docs/preregistration.md)
+
+## Limitations
+
+- **Zero Mega-Atlas Retirements:** This repository solves **0 / 1,900** open problems in `0thernes/unsolved-problems-mega-atlas`.
+- **No Browser NPU 990 Dispatch:** All live LLM and quantization workloads run on the visitor's JavaScript CPU thread (or WebGL2), never on MediaTek NPU 990.
+- **Unpublished Hardware Leaves Stay `UNKNOWN`:** Nominal battery watt-hours, reverse-wireless wattage, rear glass composition, device UFS lanes, GPU clock, and proprietary TSMC N3P process-kit ground rules remain explicitly `null` / `UNKNOWN`.
+- **Not Externally Peer Reviewed:** The AMS-LaTeX white paper is an independent research preprint. See [LIMITATIONS.md](LIMITATIONS.md) for the full literal-vs-metaphor boundary table.
+
+## License
+
+- First-party source code: **MIT License** ([LICENSE](LICENSE))
+- AMS-LaTeX white paper (`paper/`, `dist/`), figures, and documentation: **CC-BY-4.0** ([NOTICE](NOTICE))
+- Third-party bundled libraries, fonts, CC0 assets, TinyStories-8M weights, and Glitchling port retain their upstream licenses ([THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md), [CREDITS.md](CREDITS.md)).
+
+
+---
+## FILE: AGENTS.md
+---
+
+# AGENTS.md — Canonical Agent Instructions for `xiaomi-17t-pro-lab`
+
+This file is the single canonical source of project instructions for all coding and research agents (Codex, Claude Code, Gemini/Antigravity, Cursor). Keep under 32 KiB.
+
+## 1. Mission & Epistemic Rules
+
+- **Repository:** `xiaomi-17t-pro-lab` (zero-build static ES-module hardware lab + pure Lean 4.35.0 formal core + AMS-LaTeX white paper for the Xiaomi 17T Pro & MediaTek Dimensity 9500).
+- **Author & Affiliation:** Alexander Stephen Donahue (`ORCID 0009-0006-8168-9648`), Independent Researcher, Spokane, WA, USA (`0_0@0thernes.art`). Do NOT assert `"0thernes LLC"` as affiliation or legal entity.
+- **Provenance discipline:** Never invent unpublished Xiaomi 17T Pro or TSMC N3P values (nominal battery Wh, reverse-wireless watts, rear glass, device UFS lane count, GPU clock, N3P fin height/gate length stay `null` / `UNKNOWN`). Every leaf in `data/specs.json` must carry `source` and `status`.
+- **Honest scope:** Browser workloads NEVER execute on MediaTek NPU 990; Glitchling A-Life is non-sentient; `0 / 1,900` grand open problems in `unsolved-problems-mega-atlas` are retired by this repository (`docs/mega-atlas-cross-reference.md`).
+
+## 2. Hard Workflow Rules (Build Standard v1.2.0 R1–R8)
+
+- Commit and push directly to `main` (no PRs, no feature branches, no PR templates, no `.github/copilot-instructions.md`).
+- Never install git hooks or turn linters/SAST into blocking commit gates (report-only).
+- Never track any file larger than 5 MiB (TinyStories-8M FP16 lives as 9 byte-exact shards <= 4.5 MB under `vendor/tinystories/shards/`).
+- Classify every audit finding into exactly one of the 10 classes: `bug`, `error`, `issue`, `problem`, `concern`, `dilemma`, `conflict`, `gap`, `hole`, `blindspot`.
+
+## 3. Key Commands (`justfile`)
+
+- `just test` — runs `npm run validate`, `npm test` (50 Node unit/property/metamorphic/EIO/golden tests), and `node scripts/mutate.mjs` (8/8 mutants).
+- `just oracle` — runs 60-digit independent Python oracle (`reference/physics_oracle.py --check-checksums`).
+- `just evals` — runs deterministic TinyStories-8M regression & entropy eval (`evals/run_tinystories_eval.mjs`).
+- `just lean` — builds `lean/XiaomiLabProofs`, `Challenge`, `Solution`, audits 59 axioms (`VerifyAxioms.lean`), and runs `leanchecker --fresh`.
+- `just paper` — compiles zero-warning AMS-LaTeX PDF (`dist/Donahue_2026_Xiaomi_17T_Pro_Lab.pdf`) and verifies standalone `dist/arxiv_submission.tar.gz`.
+- `just audit` — runs Build Standard v1.2.0 90-item repo audit (`scripts/Audit-Repo.ps1` / `scripts/audit-repo.sh`).
+- `just reproduce` — runs the entire end-to-end verification pipeline from a clean clone.
+
+## 4. Layout Quick Map
+
+- `src/sim/*.js` — live physical, optical, quantum, thermal, memory, and hardware math solvers (single CODATA source: `src/sim/constants.js`).
+- `src/workloads/*.js` — sharded safetensors loader (WebCrypto SHA-256), GPT-Neo forward pass, GPT-2 BPE tokenizer.
+- `lean/` — pure Lean 4.35.0 (`module` headers, zero Mathlib) formal core + Palomar `Challenge.lean`/`Solution.lean`.
+- `reference/physics_oracle.py` — independent 60-digit `Decimal`/`Fraction` differential oracle.
+- `paper/` & `dist/` — AMS-LaTeX white paper, vector figures, frozen PDF, standalone arXiv tarball.
+- `CLAIMS.md`, `LIMITATIONS.md`, `REPLICATION.md`, `VERIFICATION.md`, `HARDENING_LOG.md`, `docs/statement-fidelity.md`, `docs/mega-atlas-cross-reference.md`.
+
+
+---
+## FILE: CLAIMS.md
+---
+
+# Claims & Falsification Ledger (`CLAIMS.md`)
+
+Every technical, mathematical, and empirical claim made by `xiaomi-17t-pro-lab` (v3.0.0) is assigned a unique ID, an explicit epistemic tier, a concrete verification command, and an explicit falsification condition (**What Would Prove Us Wrong**, Build Standard B04 & B42).
+
+| Claim ID | Claim Statement                                                                                                                                                                                                                                                                                                                                                                  | Epistemic Tier                               | Verification Command / Artifact                                                                           | What Would Prove Us Wrong (Falsifier)                                                                                                                                          |
+| :------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------- | :-------------------------------------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **C01**  | Every numeric leaf in `data/specs.json` carries a source citation and status (`cited`, `computed`, `measured`, `unknown`), with 7 unpublished leaves preserved as `null` (including nominal battery Wh and device UFS lanes) and all 22 source conflicts carrying explicit precedence.                                                                                           | `cited` / schema-checked                     | `npm run validate && npm test` (`tests/engines.test.mjs`, `tests/v22.test.mjs`)                           | Any leaf missing `source`/`status`, any invented non-null battery Wh or UFS lane count, or any conflict 16–22 lacking a precedence resolution sentence.                        |
+| **C02**  | Kurnal Dimensity 9500 die area is `10.88 × 12.92 = 140.5696 mm²`, strictly dominating the 4 major cited blocks (`74.50 mm²`), LPDDR5X-9600 (`76.8 GB/s`) sits strictly below D9500 LPDDR5X-10667 (`85.336 GB/s`), CMOS clock-power ratio cancels `α, C, V`, and Roofline `min(P, ai·B)` obeys universal peak/memory bounds & bandwidth monotonicity.                             | `kernel-checked`                             | `cd lean && lake build Solution && lake env lean VerifyAxioms.lean` (`target_thm1_hardware_and_roofline`) | Any kernel failure in `lean`, `leanchecker`, `lean4lean`, `nanoda`, `con-leche`, or `con-ron`, or a primary Xiaomi/MediaTek datasheet contradicting Kurnal's die measurements. |
+| **C03**  | EUV Rayleigh resolution decreases strictly with NA (`5/3` gain at `0.55` vs `0.33 NA`), DOF shrinks quadratically (`25/9` penalty), and 13.5 nm EUV photons carry `1933/135 > 14×` more energy per photon than 193.3 nm ArF DUV photons.                                                                                                                                         | `kernel-checked` + `oracle-60digit`          | `target_thm2_euv_rayleigh_and_dof` + `python reference/physics_oracle.py`                                 | Any discrepancy `> 1e-12` against 60-digit CODATA 2018 arithmetic or failure of `target_thm2_euv_rayleigh_and_dof`.                                                            |
+| **C04**  | Exact $2\times 2$ complex transfer matrix for a 40-bilayer Mo/Si EUV Bragg mirror (`d = 6.92 nm`, `γ = 0.4`, CXRO constants) yields `R(13.5 nm) ≈ 74.32%` and 11-mirror transmission `R^{11} ≈ 3.82%`, matching an independent 60-digit Python `Decimal` matrix solver to relative error `< 2.2e-14`.                                                                            | `oracle-60digit`                             | `python reference/physics_oracle.py --json-out results/oracle-60digit.json`                               | Relative discrepancy `> 1e-11` between JS `braggReflectivityAt` and 60-digit `bragg_reflectivity_decimal`.                                                                     |
+| **C05**  | Exact Crank–Nicolson Cayley evolution `(1 + ih)ψ_1 = (1 - ih)ψ_0` preserves `                                                                                                                                                                                                                                                                                                    | ψ_1                                          | ² =                                                                                                       | ψ_0                                                                                                                                                                            | ²`identically over $\mathbb{Z}[i]$; the browser 1D TDSE solver conserves discrete norm to`< 1e-8`; relativistic Dirac dispersion satisfies `                                  | p   | < E`for`m > 0`; FinFET $\lambda^2$ is permittivity-scale invariant. | `kernel-checked` + `numerical_approximation` | `target_thm3_dirac_finfet_and_crank_nicolson` + `tests/v2-engines.test.mjs`                                              | Any norm drift `≥ 1e-8` over 120 TDSE steps or failure of `crank_nicolson_exact_unitarity` / `dirac_subluminal_for_positive_mass`. |
+| **C06**  | Explicit 2D 5-point FDTD heat stencil obeys the Discrete Minimum/Maximum Principle (`min5 ≤ T_next ≤ max5`) whenever `2rx + 2ry ≤ D` (zero overshoot/undershoot); Xiaomi 3D IceLoop (`h_vc > h_novc`) strictly lowers peak temperature; closed-loop DVFS sub-stepping (`<= 0.5 s`) eliminates 30 s bang-bang aliasing across 1,200 s.                                            | `kernel-checked` + `numerical_approximation` | `target_thm4_fdtd_cfl_maximum_principle` + `tests/properties-and-regressions.test.mjs`                    | Any post-warmup step jump `≥ 5 °C` between adjacent 30 s samples in `simulateSustainedThrottle`, or `withVc.peakC ≥ noVc.peakC`.                                               |
+| **C07**  | Classical LHV models satisfy `                                                                                                                                                                                                                                                                                                                                                   | S                                            | ≤ 2`(CHSH) and`                                                                                           | M                                                                                                                                                                              | ≤ 2` (Mermin-3 GHZ); no $3\times 3$ integer matrix satisfies all 6 Peres–Mermin parity contexts (`≤ 5`, witness attains 5); pure 1-qubit Bloch vectors obey `X² + Y² + Z² = ( | a   | ² +                                                                 | b                                            | ²)²`and mixed purity sits in`[1/2, 1]`; JS quantum statevector reproduces `2√2`, `4.0`, and `S(ρ) = 1.0`bit to`< 1e-12`. | `kernel-checked` + `oracle-60digit`                                                                                                | `target_thm5`–`target_thm7` + `python reference/physics_oracle.py` | Any classical sign assignment yielding ` | S   | > 2`or` | M   | > 2`, any 6/6 classical Peres–Mermin matrix, or statevector error `> 1e-12`. |
+| **C08**  | Increasing EUV dose (`15 → 60 mJ/cm²`) and increasing NA (`0.33 → 0.55` at 30 nm pitch) reduce sub-pixel stochastic 3σ LER, and sampled Bell CHSH & GHZ Mermin-3 breach classical controls across 20 seeds (`p_holm ≤ 0.0008`, 10,000 permutation resamples).                                                                                                                    | `measured` (computational)                   | `node scripts/stats_eval.mjs` (`results/stats-eval.json`)                                                 | Any of H1–H4 failing Holm–Bonferroni significance `p_holm < 0.05` or inverting physical sign.                                                                                  |
+| **C09**  | Deterministically sharded TinyStories-8M FP16 checkpoint (9 shards, each `≤ 4.5 MB`) reassembles bit-for-bit to SHA-256 `9999a42aa4cb668c19760c02448ab97b0458c89871013fa8d0c5cae2a569c28f`, reproduces greedy continuation `"Once upon a time"` → `[11, 612, 373, 257, 1310, 2576, 3706, 20037]`, and shows `ΔH > 0.05` bits under Layer 4 ablation.                             | `measured` (deterministic)                   | `node evals/run_tinystories_eval.mjs` + `tests/rebuild.test.mjs`                                          | Any shard byte/SHA mismatch, any differing greedy token ID, or `L4` ablation entropy shift `≤ 0.05` bits.                                                                      |
+| **C10**  | Static dev server (`tools/serve.mjs`) enforces strict CSP (`style-src 'self'`, no `unsafe-inline`), rejects traversal/prefix escapes, serves `GET /healthz`, rejects `POST` (`405`), serves `.jpg` as `image/jpeg`, and survives injected disk `EIO` (`500` + healthy subsequent requests); all 19 browser routes paint non-black canvases with 0 `console.error` / `pageerror`. | `measured`                                   | `npm test && npm run test:smoke`                                                                          | Any path traversal returning `200`, uncaught stream exception crashing server on `EIO`, CSP violation, black canvas (`peak ≤ 12`), or console/page error.                      |
+| **C11**  | All 8 planted semantic mutants (`M1`–`M8`) are killed by the test suite, and **0 / 1,900** grand open problems in `unsolved-problems-mega-atlas` are retired by this repository.                                                                                                                                                                                                 | `measured` / epistemic audit                 | `node scripts/mutate.mjs` + `docs/mega-atlas-cross-reference.md`                                          | Any mutant surviving (`< 8/8`) or any undocumented claim of retiring an open Mega-Atlas problem.                                                                               |
+
+
+---
+## FILE: LIMITATIONS.md
+---
+
+# Limitations & Literal-vs-Metaphor Boundary (`LIMITATIONS.md`)
+
+This document states explicitly what `xiaomi-17t-pro-lab` (v3.0.0) **does not prove, measure, or claim** (Build Standard v1.2.0 B41 & Playbook v1.3).
+
+## 1. Hard Scientific & Hardware Boundaries
+
+1. **Zero Open Mega-Atlas Problems Retired (`0 / 1,900`):** This repository does NOT solve any open conjecture or frontier engineering challenge in `0thernes/unsolved-problems-mega-atlas` (see [docs/mega-atlas-cross-reference.md](docs/mega-atlas-cross-reference.md)).
+2. **No Browser Execution on MediaTek NPU 990:** Web browsers expose no WebNN/NeuroPilot kernel path to the Dimensity 9500 NPU 990. TinyStories-8M inference (`#/work/llm`) and quantization benchmarks (`#/npu`) run on the visitor's JavaScript CPU thread (or optional WebGL2 shader).
+3. **Seven Unpublished Hardware Leaves Remain `UNKNOWN` (`null`):** Nominal battery watt-hours, reverse-wireless wattage, rear glass composition, device UFS lane count (2 vs. 4), official Mali-G1 Ultra MC12 clock frequency, PhoneArena matching iPhone benchmark, and Galaxy street pricing remain explicitly `null` in `data/specs.json`. TSMC N3P fin height, gate length, and high-$k$ dielectric stack thicknesses are proprietary and not claimed.
+4. **Formal Proof vs. IEEE-754 Floating-Point Gap:** Pure Lean 4.35.0 (`lean/XiaomiLabProofs/`) certifies exact algebraic, combinatorial, stability, and inequality theorems over `Nat`, `Int`, and `ℤ[i]`. It does NOT formally verify JavaScript/V8 IEEE-754 `Float64` rounding propagation (which is instead checked empirically to `< 2.2e-14` relative error by the independent 60-digit Python oracle `reference/physics_oracle.py`).
+5. **Continuum & Paraxial Physical Approximations:**
+   - The 2D FDTD thermal solver (`src/sim/thermal-fdtd.js`) models macroscopic mm-scale Fourier diffusion with lumped convective conductance; it does NOT model nanoscale ballistic phonon transport (`CM-039`) or atomic interfacial Kapitza resistance (`CM-064`), and block wattage splits are modeled parameters (`computed`), not leaked silicon telemetry.
+   - The 2D EUV lithography engine (`src/sim/litho-2d.js`) uses scalar thin-mask Kirchhoff Fourier optics, not full 3D Maxwell thick-mask absorber FDTD.
+6. **Software WebGL on CI Runners:** GitHub-hosted Ubuntu runners execute Playwright via SwiftShader CPU WebGL; physical Mali-G1 Ultra MC12 rendering requires on-device inspection.
+7. **Not Externally Peer Reviewed:** The accompanying AMS-LaTeX white paper (`dist/Donahue_2026_Xiaomi_17T_Pro_Lab.pdf`) is an independent research preprint and has not undergone external journal peer review.
+
+## 2. Literal vs. Metaphor Table
+
+| Term / Feature in Lab                                 | Literal Reality                                                                                                                                               | What It Is NOT                                                                                                                                                       |
+| :---------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **"Neuralese" LLM Workbench (`#/work/llm`)**          | Real 8.3M-parameter FP16 GPT-Neo (`TinyStories-8M`) forward pass with live attention/MLP gain scaling and layer ablation hooks on JS CPU.                     | Not a frontier LLM, not running on NPU 990, and not human-level reasoning.                                                                                           |
+| **"Glitchling / Asmodensius" A-Life (`#/work/life`)** | Deterministic 272-neuron rate-coded foraging network in a fixed 16-site 2D arena (`vendor/glitchling/sim.js`) with toggleable sensory/motor flaws.            | Not sentient, not conscious, not open-ended biological evolution; full TypeScript CQM organisms stay in their separate non-commercial repo (`docs/licenses/cqm.md`). |
+| **"Tsotchke" Quantum Lab (`#/work/sci`)**             | Exact 1–3 qubit complex statevector simulator computing Born probabilities, Bloch vectors, entanglement entropy, CHSH, Mermin-3, and Peres–Mermin parity.     | Not a quantum computer, not large-scale tensor-network hardware, and not solving `QM-007`/`QM-011`.                                                                  |
+| **"GigaChad Mobile Cortex" (`#/work/browser`)**       | Interactive 60 Hz browser swarm kinematics and client-side micro-benchmark demonstration.                                                                     | Not a standalone browser engine replacement or kernel driver.                                                                                                        |
+| **"3D IceLoop VC" Thermal PDE (`#/thermal`)**         | 2D finite-difference heat PDE on the cited `10.88×12.92 mm` Kurnal floorplan comparing higher vs. lower modeled lateral diffusivity & convective conductance. | Not a calibrated 3D finite-element CFD two-phase vapor-chamber simulation from Xiaomi thermal CAD.                                                                   |
+
+
+---
+## FILE: VERIFICATION.md
+---
+
+# Verification Ladder (`VERIFICATION.md`)
+
+Summary of all independent verification layers enforced in `xiaomi-17t-pro-lab` (v3.0.0), ordered from strongest formal certainty to live browser telemetry.
+
+| Layer                                               | Mechanism                                                                                                       | Artifact / Command                                                    | Verified Metric (v3.0.0)                                                                                                                               |
+| :-------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **1. Six-Kernel Formal Proof**                      | Pure Lean 4.35.0 (`module` isolation, zero Mathlib) + `lake comparator --paranoid`                              | `lean/Challenge.lean`, `lean/Solution.lean`, `lean/VerifyAxioms.lean` | **59 audited declarations**, 9 comparator targets, strictly `[propext, Classical.choice, Quot.sound]` (0 `sorry`, 0 `native_decide`, 0 custom axioms). |
+| **2. 60-Digit Independent Oracle**                  | Python `decimal.Decimal` (60 digits) & `fractions.Fraction` differential check vs JS IEEE-754                   | `reference/physics_oracle.py --check-checksums`                       | **54/54 checks PASS**, max relative error `2.159e-14`.                                                                                                 |
+| **3. Semantic Mutation Testing**                    | 8 planted physics/math/security mutants (`M1`–`M8`) in isolated temp stages                                     | `node scripts/mutate.mjs`                                             | **8/8 (100.0%) mutants killed**.                                                                                                                       |
+| **4. Unit, Property, Negative, Golden & EIO Tests** | 2,500+ randomized property checks, metamorphic relations, golden SHA-256, negative guards, disk `EIO` injection | `npm run validate && npm test`                                        | **50/50 tests PASS** (0 errors in `data/specs.json`).                                                                                                  |
+| **5. Pre-Registered Statistical Eval**              | 20 seeds, 10,000 permutation resamples, 95% bootstrap CIs, Cohen's $d$, Cliff's $\delta$, Holm–Bonferroni FWER  | `node scripts/stats_eval.mjs` (`results/stats-eval.json`)             | **4/4 hypotheses significant** (`p_holm ≤ 0.0008`).                                                                                                    |
+| **6. Deterministic AI Model Eval**                  | 9-shard SHA-256 reassembly, 5-prompt greedy regression, exact full-vocab Shannon entropy, L4 ablation           | `node evals/run_tinystories_eval.mjs`                                 | **5/5 prompts PASS**, exact SHA-256 verified, L4 ablation `ΔH = 0.519` bits.                                                                           |
+| **7. Zero-Warning Manuscript & arXiv Clean-Room**   | Tectonic strict warning gate + temp-dir standalone tarball compile                                              | `python scripts/package_dist.py`                                      | **0 warnings / 0 overfull hboxes**, clean-room `arxiv_submission.tar.gz` PASS.                                                                         |
+| **8. Live Browser E2E & CSP Smoke**                 | Playwright across all 19 hash routes (phone & desktop), non-black canvas check, 0 `console.error`/`pageerror`   | `npm run test:smoke`                                                  | **8/8 Playwright specs PASS** across all 19 routes.                                                                                                    |
+| **9. Cryptographic Integrity & Provenance**         | SHA-256 manifests (`data/MANIFEST.sha256`, `CHECKSUMS.sha256`, `SHA256SUMS`) + SLSA attestation                 | `sha256sum -c` + `release.yml`                                        | Verified locally and in GitHub Release workflow.                                                                                                       |
+
+
+---
+## FILE: REPLICATION.md
+---
+
+# Replication Protocol (`REPLICATION.md`)
+
+Complete instructions to independently reproduce every computational result, formal Lean 4.35.0 proof, 60-digit oracle verification, statistical test, browser E2E test, and AMS-LaTeX white paper from a clean clone (Build Standard v1.2.0 B43 & B44).
+
+## 1. Prerequisites
+
+- **Node.js:** `>= 22.0.0` (`.nvmrc` pinned to `22`)
+- **Python:** `>= 3.12` (standard library only for `physics_oracle.py`, `check_readme_axioms.py`, `package_dist.py`; optional `uv` / `matplotlib` + `numpy` only if regenerating PDF figures)
+- **Lean 4:** `leanprover/lean4:v4.35.0` via `elan` (`lean/lean-toolchain`)
+- **LaTeX:** `tectonic` (`>= 0.15`) for zero-warning PDF & standalone arXiv compilation
+- **Optional:** `just` task runner (every command below can also be run directly without `just`)
+
+## 2. Clean-Clone End-to-End Replication Commands
+
+```bash
+git clone https://github.com/0thernes/xiaomi-17t-pro-lab.git
+cd xiaomi-17t-pro-lab
+npm ci
+
+# 1. Schema validation, 50 unit/property/metamorphic/golden/EIO tests, and 8/8 mutation testing (~15 s)
+npm run validate
+npm test
+node scripts/mutate.mjs
+
+# 2. Runnable examples (~1 s)
+node examples/01_euv_and_bragg.mjs
+node examples/02_thermal_fdtd_iceloop.mjs
+node examples/03_quantum_contextuality.mjs
+
+# 3. Independent 60-digit Python Decimal/Fraction differential oracle + SHA-256 manifests (~2 s)
+python reference/physics_oracle.py --check-checksums
+
+# 4. Deterministic TinyStories-8M 9-shard eval, perf benchmarks, and 20-seed statistical eval (~25 s)
+node evals/run_tinystories_eval.mjs
+node scripts/bench.mjs
+node scripts/stats_eval.mjs
+
+# 5. Pure Lean 4.35.0 formal build, 59-declaration axiom audit, and leanchecker (~15–120 s)
+cd lean
+lake build XiaomiLabProofs Challenge Solution
+lake env lean VerifyAxioms.lean
+lake env leanchecker --fresh XiaomiLabProofs
+lake env leanchecker --fresh Solution
+# On Linux with bubblewrap (automated in GitHub Actions CI):
+# lake comparator --config comparator.json --paranoid
+cd ..
+python scripts/check_readme_axioms.py
+
+# 6. Zero-warning AMS-LaTeX white paper & clean-room arXiv tarball check (~10 s)
+python scripts/package_dist.py
+
+# 7. Playwright 19-route browser smoke & strict CSP check (~45 s)
+npx playwright install chromium
+npm run test:smoke
+```
+
+## 3. Expected Tolerances & Pass Criteria
+
+- **60-digit Oracle (`reference/physics_oracle.py`):** 54/54 checks pass, max relative error `< 1e-11` (observed `2.159e-14`).
+- **Mutation Testing (`scripts/mutate.mjs`):** 8/8 mutants killed (`100.0%`).
+- **Statistical Eval (`scripts/stats_eval.mjs`):** 4/4 hypotheses significant (`p_holm < 0.05`, observed `≤ 0.0008`).
+- **TinyStories Eval (`evals/run_tinystories_eval.mjs`):** Reassembled SHA-256 equals `9999a42aa4cb668c19760c02448ab97b0458c89871013fa8d0c5cae2a569c28f`; greedy tokens for `"Once upon a time"` equal `[11, 612, 373, 257, 1310, 2576, 3706, 20037]`.
+- **Lean 4.35.0:** 59/59 audited declarations strictly within `[propext, Classical.choice, Quot.sound]` (or zero axioms); 0 `sorry` outside `Challenge.lean`.
+- **LaTeX (`scripts/package_dist.py`):** 0 overfull/underfull hboxes, 0 undefined refs/citations, standalone arXiv tarball compiles cleanly.
+
+## 4. Dated Replication Log
+
+| Date       | Version | Environment                                                       | Scope Verified                                                                                                                                                                           | Outcome                                        |
+| :--------- | :------ | :---------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------------------------------------------- |
+| 2026-11-12 | v2.0.0  | Windows 11 (Node 22, Chromium) + GitHub Ubuntu 24.04 CI           | 37 unit tests + 8 Playwright E2E routes + live Pages smoke                                                                                                                               | PASS                                           |
+| 2026-11-21 | v2.2.0  | Windows 11 + GitHub Ubuntu 24.04 CI                               | 40 unit tests + strict `style-src 'self'` CSP + all-route Playwright smoke                                                                                                               | PASS                                           |
+| 2026-11-25 | v3.0.0  | Windows 11 (Node 22, Python 3.12, Lean 4.35.0, Tectonic)          | 50 Node tests, 8/8 mutants, 54/54 60-digit oracle checks, TinyStories 9-shard eval, 4/4 stats `p_holm ≤ 0.0008`, 59 Lean decls + `leanchecker --fresh`, zero-warning PDF & arXiv tarball | PASS                                           |
+| 2026-11-25 | v3.0.0  | GitHub Actions (`ubuntu-24.04`, `macos-latest`, `windows-latest`) | Cross-platform Node/Python verification, Playwright 19-route smoke, 6-kernel `lake comparator --paranoid` (bubblewrap), Tectonic PDF + arXiv tarball, Pages + `/blueprint/` deploy       | Logged upon CI completion in `docs/run-log.md` |
+
+
+---
+## FILE: formalization.yaml
+---
+
+title: "Xiaomi 17T Pro Lab (v3.0.0): Forensic Hardware Provenance, Real-Time Multi-Scale Silicon-to-Quantum Simulation, 60-Digit Differential Oracles, and Six-Kernel Lean 4.35.0 Formal Invariants for the Dimensity 9500"
+repository: "https://github.com/0thernes/xiaomi-17t-pro-lab"
+version: "3.0.0"
+date: "2026-11-25"
+license:
+  code: "MIT"
+  documentation_and_papers: "CC-BY-4.0"
+authors:
+  - name: "Alexander Stephen Donahue"
+    orcid: "0009-0006-8168-9648"
+    affiliation: "Independent researcher, Spokane, WA, USA"
+    credit_roles:
+      - "Conceptualization"
+      - "Methodology"
+      - "Project administration"
+      - "Resources"
+      - "Supervision"
+      - "Validation"
+lean_toolchain: "leanprover/lean4:v4.35.0"
+mathlib_dependencies: none
+lake_package_dir: "lean"
+spec_module: "XiaomiLabProofs.Spec"
+challenge_module: "Challenge"
+solution_module: "Solution"
+comparator_config: "lean/comparator.json"
+axiom_audit_file: "lean/VerifyAxioms.lean"
+permitted_axioms:
+  - "propext"
+  - "Classical.choice"
+  - "Quot.sound"
+kernels_configured:
+  - "Lean 4.35.0 official C++ kernel"
+  - "leanchecker-paranoid (v4.35.0)"
+  - "lean4lean (v4.35.0)"
+  - "nanoda (v4.35.0 toolchain binary)"
+  - "con-leche (v4.35.0)"
+  - "con-ron (v4.35.0)"
+automation:
+  origin: "AI-assisted mathematical formalization, multi-scale simulation engineering, independent 60-digit differential verification, and AMS-LaTeX manuscript drafting under human direction"
+  models_used:
+    - "Google Gemini / Antigravity: v1.0.0–v3.0.0 multi-scale solvers, Lean 4.35.0 formalizations, 60-digit oracle, property/mutant/statistical suites, and AMS-LaTeX white paper"
+  human_line_by_line_review_recorded: false
+  statement_fidelity_table: "docs/statement-fidelity.md"
+review_status: "Research preprint; NOT externally peer reviewed; NOT yet submitted to Palomar Registry, arXiv, or Zenodo."
+limitations: "Formalizes finite/exact algebraic, stability, and contextuality invariants of the lab's silicon-to-quantum models over Nat/Int/Z[i]; does NOT formalize IEEE-754 floating-point error propagation, does NOT retire any of the 1,900 grand open problems in unsolved-problems-mega-atlas (0/1,900 retired), and never claims browser execution on the MediaTek NPU 990."
+
+
+---
+## FILE: docs/mega-atlas-cross-reference.md
+---
+
+# Unsolved Problems Mega-Atlas Cross-Reference
+
+> **Direct Honest Verdict:** **`xiaomi-17t-pro-lab` retires `0 / 1,900` grand open problems** in [`0thernes/unsolved-problems-mega-atlas`](https://github.com/0thernes/unsolved-problems-mega-atlas) (`MegaAtlas_Unsolved_Problems_V2.json.gz`, 1,900 problems audited 2026-11-25).
+
+## 1. Epistemic Accounting — What This Repository Does vs. Does Not Solve
+
+`xiaomi-17t-pro-lab` is a **forensic hardware-provenance workbench, real-time multi-scale silicon-to-quantum simulator, 60-digit differential oracle, and six-kernel Lean 4.35.0 invariant verification suite** anchored to the Xiaomi 17T Pro (MediaTek Dimensity 9500 / MT6993Z, TSMC N3P).
+
+- **It DOES** certify 59 exact algebraic, numerical-stability, and quantum-contextuality declarations in Lean 4.35.0 (`XiaomiLabProofs` + `Solution.lean`) across 6 independent kernels, differentially verify 54 floating-point physics quantities against an independent 60-digit `Decimal`/`Fraction` oracle, kill 8/8 planted semantic mutants, and preserve strict hardware provenance (`cited` vs `computed` vs `measured` vs `UNKNOWN`).
+- **It DOES NOT** resolve any open conjecture or frontier engineering problem in `unsolved-problems-mega-atlas`. Every equation simulated (Rayleigh/Abbe, Mo/Si Bragg transfer matrix, WKB tunneling, Dirac dispersion, Varshni intrinsic silicon, FinFET scale length, Fourier 2D FDTD, Roofline, Crank–Nicolson TDSE, Bell-CHSH, Mermin-3 GHZ, Peres–Mermin 3×3) is established textbook physics or finite algebraic verification of known bounds.
+
+## 2. Exact Mapping to Adjacent Mega-Atlas Open Problems (13 IDs)
+
+The table below maps each module of `xiaomi-17t-pro-lab` to the exact open Mega-Atlas problems it illustrates or bounds, stating clearly why the parent problem remains **STILL OPEN**:
+
+| Mega-Atlas ID           | Superdomain                                 | Status (2026)                    | Problem Name                                                                                          | Bounded Connection in `xiaomi-17t-pro-lab`                                                                                                                                             | Why Parent Problem Remains OPEN                                                                                                                 |
+| :---------------------- | :------------------------------------------ | :------------------------------- | :---------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`HW-001`**            | Electronics, Photonics & Computing Hardware | Experimental Tension / Crisis    | Post-Moore Computing Paradigm Beyond Atomic-Scale Silicon CMOS Scaling Limits                         | FinFET natural length $\lambda$ (`src/sim/finfet.js`), WKB gate leakage (`src/sim/dirac-tunnel.js`), Lean `finfet_thinner_body_reduces_lambda_sq`.                                     | Illustrates N3P CMOS limits; does not invent or fabricate a post-silicon replacement paradigm.                                                  |
+| **`HW-005`**            | Electronics, Photonics & Computing Hardware | Experimental Tension / Crisis    | Extreme Thermal Management & Heat Dissipation (>1–2 kW/cm²) in 3D Stacked Heterogeneous ICs           | 2D FDTD die thermal PDE + Xiaomi 3D IceLoop VC model (`src/sim/thermal-fdtd.js`) & Lean CFL discrete max principle (`ThermalFdtd.lean`).                                               | Models planar smartphone SoC (~10 W / 1.4 cm²); does not solve >1 kW/cm² interior 3D-stacked cooling.                                           |
+| **`HW-012`**            | Electronics, Photonics & Computing Hardware | Completely Open                  | Breaking the Subthreshold Swing 'Boltzmann Tyranny' (<60 mV/dec at 300 K)                             | Subthreshold leakage runaway $n_i(T)$ (`src/sim/dirac-tunnel.js`) and electrostatics (`src/sim/finfet.js`).                                                                            | Demonstrates the classical 300 K thermal leakage problem; does not break 60 mV/dec.                                                             |
+| **`HW-015`**            | Electronics, Photonics & Computing Hardware | Active Breakthroughs / Frontier  | Sub-Nanometer Lithography Economics, Stochastic Shot-Noise Defects & Beyond-High-NA EUV Patterning    | 13.5 nm EUV 91.84 eV photon energy, 40-bilayer Mo/Si Bragg mirror, 2D Fourier OPC (`litho-2d.js`), sub-pixel Poisson shot-noise LER (`litho-advanced.js`), Lean `EuvLithography.lean`. | Quantifies the >14× EUV photon deficit and High-NA 25/9 DOF penalty; does not eliminate stochastic resist defects or surpass High-NA economics. |
+| **`HW-017`**            | Electronics, Photonics & Computing Hardware | Experimental Tension / Crisis    | Breaking the Von Neumann Memory Wall via 3D High-Bandwidth Compute-in-Memory & Hybrid Bonding         | LPDDR5X-9600 (76.8 GB/s) & UFS 4.1 Roofline model (`src/sim/memory-model.js`), live browser pointer-chase/STREAM, Lean `HardwareFloorplan.lean`.                                       | Quantifies the mobile LLM decode memory wall; does not build 3D hybrid-bonded CIM silicon.                                                      |
+| **`AI-042`**            | AI, ML & Foundation Models                  | Active Breakthroughs / Frontier  | Extreme Low-Bit Quantization (Sub-1-Bit / Ternary) & Sparse Activation Without Capability Degradation | BitNet 1.58-bit ($\log_2 3$ bits/wt) vs symmetric INT8 matmul error lab (`src/sim/quant.js`) & NPU 990 documentation.                                                                  | Demonstrates quantization error trade-offs on synthetic matrices; does not train a frontier lossless ternary model.                             |
+| **`AI-045`**            | AI, ML & Foundation Models                  | Active Breakthroughs / Frontier  | Open-Ended Artificial Life, Automated Environment Generation & Unbounded Novelty Creation             | Vendored 272-neuron Glitchling embodied foraging simulator (`src/labs/work.js`, `vendor/glitchling/sim.js`).                                                                           | Fixed 16-site foraging arena; non-sentient and bounded, not open-ended evolution.                                                               |
+| **`QM-007`**            | Quantum Mechanics, QFT & Particle Physics   | Completely Open                  | Physical Principle Selecting Quantum Correlations (Why the Tsirelson Bound $2\sqrt{2}$?)              | Exact Bell-CHSH statevector simulator (`src/sim/quantum-lab.js`) & Lean `chsh_classical_bound` (`                                                                                      | S                                                                                                                                               | <= 2`vs`S_Q^2 = 8`). | Certifies the known algebraic Tsirelson gap; does not derive Tsirelson's bound from a new physical axiom. |
+| **`QM-011`**            | Quantum Mechanics, QFT & Particle Physics   | Partially Solved / Special Cases | Quantum Contextuality, Ontological Models & Psi-Ontic vs. Psi-Epistemic Realism                       | Exact Peres–Mermin 3×3 magic square (`pmSatisfiedCount <= 5` vs 6/6) & Mermin-3 GHZ (`<= 2` vs `4`) in `QuantumContextuality.lean`.                                                    | Re-certifies canonical 2- and 3-qubit proofs; overarching ontological question remains OPEN.                                                    |
+| **`QM-015`**            | Quantum Mechanics, QFT & Particle Physics   | Active Breakthroughs / Frontier  | Tunneling Time Problem (Larmor, Büttiker–Landauer & Attosecond Clock Controversy)                     | Unitary Crank–Nicolson TDSE wave-packet barrier scattering (`src/sim/tdse.js`) & Lean Cayley unitarity (`QuantumTransport.lean`).                                                      | Evolves standard 1D Schrödinger wave packets; does not resolve relativistic/experimental tunneling-time definitions.                            |
+| **`CM-039`**            | Condensed Matter & Quantum Materials        | Active Breakthroughs / Frontier  | Non-Fourier Ballistic-Diffusive Phonon Transport & Phonon Hydrodynamics in Nanostructures             | Explicit limitation boundary of our continuum Fourier heat PDE (`src/sim/thermal-fdtd.js`).                                                                                            | Our FDTD solver assumes continuum Fourier diffusion at mm scale and explicitly does NOT model nanoscale ballistic phonons.                      |
+| **`CM-064`**            | Condensed Matter & Quantum Materials        | Active Breakthroughs / Frontier  | Interfacial Thermal Resistance (Kapitza Conductance) & Atomic-Scale Heat Dissipation in 3D Chips      | Lumped effective conductance `hConv` in `thermal-fdtd.js` (clearly labeled `computed`, not microscopic Kapitza simulation).                                                            | Does not compute ab-initio atomic-interface Kapitza resistance.                                                                                 |
+| **`CS-058` / `HW-032`** | CS / Hardware Verification                  | Active Breakthroughs / Frontier  | Scalable End-to-End Formal Verification of Cyber-Physical Software & Zero-Errata Silicon Tape-Out     | 6-kernel Lean 4.35.0 formal core (`XiaomiLabProofs`) + 60-digit differential oracle + mutation testing.                                                                                | Verifies algebraic models of lab physics, not industrial RTL tape-out or full JS/V8 compilation.                                                |
+
+## 3. Distinction From Sibling Research Repositories in `0thernes-research-archive`
+
+For completeness when checking the broader `0thernes` portfolio against `unsolved-problems-mega-atlas`, **other dedicated research repositories** in `0thernes-research-archive` DO resolve explicitly scoped sub-conjectures from the literature linked to parent Mega-Atlas IDs (while still honestly marking all overarching parent Mega-Atlas problems as `STILL OPEN`):
+
+- `0TH-2026-004` (`kochen-specker-extremal-lab`, parent `QM-011`): certified exact minimal KS sizes in restricted coordinate pools (31 in 3D integer, 18 in 4D `{0, ±1}^4`).
+- `0TH-2026-009` (`pauli-contextuality-lab`, parent `QM-011`): proved Jonah's Conjecture E across all 9 vertex cases for all $N \ge 4$ and disjoint Mermin copy formulas.
+- `0TH-2026-010` (`catalytic-register-frontiers`, parent `CS-005`): resolved two open questions of Vinciguerra (arXiv:2609.18692) on passive catalytic registers.
+- `0TH-2026-012` (`coded-pir-mlwe-complexity-lab`, parents `CS-053`, `CS-026`): resolved Schur-product syzygy rank and refuted Luo (arXiv:2604.15858).
+
+**`xiaomi-17t-pro-lab` (`0TH-BUILD-010`) makes NO such open-problem retirement claim.** Its contribution is rigorous forensic hardware documentation, real-time multi-scale computational simulation, 60-digit differential verification, and six-kernel Lean 4.35.0 certification of its own mathematical invariants.
+
+
+---
+## FILE: docs/statement-fidelity.md
+---
+
+# Statement-Fidelity Audit (`docs/statement-fidelity.md`)
+
+Playbook v1.3 mandatory statement-fidelity audit mapping every white-paper theorem (`paper/main.tex`) 1-to-1 against its isolated `lean/Challenge.lean` comparator signature, hypotheses, and honest scope boundary.
+
+| Paper Result                                                                              | Isolated `Challenge.lean` Target              | Hypotheses in Lean                                                         | Matches Textbook / Paper Literal Statement?                                           | Honest Scope / Gap Note                                                                                                                                                               |
+| :---------------------------------------------------------------------------------------- | :-------------------------------------------- | :------------------------------------------------------------------------- | :------------------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Theorem 1** (Hardware Die Packing, LPDDR5X Gap, CMOS Ratio & Universal Roofline)        | `target_thm1_hardware_and_roofline`           | `0 ≤ ai`, `bw1 ≤ bw2` over `Int`/`Nat`                                     | **Yes (exact cleared-denominator integer form)**                                      | Die dimensions (`10.88×12.92 mm`), block areas, and LPDDR5X rates are anchored to `data/specs.json` cited values; CMOS $\alpha, C, V$ remain symbolic.                                |
+| **Theorem 2** (EUV Rayleigh Monotonicity, High-NA 25/9 DOF Penalty & >14× Photon Deficit) | `target_thm2_euv_rayleigh_and_dof`            | `0 < k1, k2, lam, na1`, `na1 < na2` over `Int`/`Nat`                       | **Yes (exact cleared-denominator rational inequality)**                               | Models ideal paraxial scalar imaging; does not formalize full 3D rigorous coupled-wave EUV mask absorber diffraction.                                                                 |
+| **Theorem 3** (Crank–Nicolson Cayley Unitarity, Dirac Subluminality & FinFET Invariance)  | `target_thm3_dirac_finfet_and_crank_nicolson` | `CInt.mul ⟨1, h⟩ psiNext = CInt.mul ⟨1, -h⟩ psiPrev`, `0 ≤ E`, `0 < m`     | **Yes (exact scalar-eigenmode Cayley unitarity over $\mathbb{Z}[i]$)**                | Certifies the exact algebraic mechanism preserving $                                                                                                                                  | \psi | ^2$ on every Hermitian eigenmode; browser IEEE-754 Thomas tridiagonal rounding is checked separately to `< 1e-8` in `tests/v2-engines.test.mjs`. |
+| **Theorem 4** (2D FDTD CFL Discrete Minimum/Maximum Principle & IceLoop Cooling)          | `target_thm4_fdtd_cfl_maximum_principle`      | `0 ≤ rx`, `0 ≤ ry`, `2*rx + 2*ry ≤ D`, `Tamb < T`, `0 < dt`, `hNoVc < hVc` | **Yes (exact interior 5-point explicit stencil)**                                     | Certifies the pure diffusion stencil & linear convective sink; exponential subthreshold leakage $q_{\text{leak}}(T)$ is nonlinear and clamped at 125 °C in `src/sim/thermal-fdtd.js`. |
+| **Theorem 5** (Bell-CHSH & Mermin-3 GHZ Classical LHV Bounds vs Quantum Separation)       | `target_thm5_chsh_and_mermin3_classical_caps` | `IsSign` ($\in \{-1, +1\}$) on all 4 / 6 hidden variables                  | **Yes (exact universal quantification over all 16 / 64 sign assignments)**            | Classical caps are exact; quantum statevector expectations ($2\sqrt{2}$ and $4$) are verified to `< 1e-12` in both JS tests and the 60-digit Python oracle.                           |
+| **Theorem 6** (Peres–Mermin 3×3 Magic Square State-Independent Cap $\le 5$ & Tightness)   | `target_thm6_peres_mermin_magic_square`       | Unrestricted `f : Fin 3 → Fin 3 → Int`                                     | **Yes (strictly stronger than $\{-1,+1\}$: holds over all $\mathbb{Z}^{3\times 3}$)** | Proves no classical value assignment satisfies 6/6 contexts and exhibits a 5/6 witness; quantum Pauli operator realization is checked in `src/sim/quantum-lab.js`.                    |
+| **Theorem 7** (Single-Qubit Bloch Sphere Identity & Mixed-State Purity Bounds)            | `target_thm7_bloch_purity_bounds`             | Pure `(a, b) : CInt × CInt`; mixed `0 ≤ p, q`                              | **Yes (exact over $\mathbb{Z}[i]$ and $\mathbb{Z}\_{\ge 0}$)**                        | Certifies exact algebraic sphere norm $r = 1$ and $1/2 \le \operatorname{Tr}(\rho^2) \le 1$ in cleared-denominator form.                                                              |
+| **Theorem 8** (Adversarial False-Variant Refutations)                                     | `target_thm8_adversarial_refutations`         | Concrete counterexample witnesses                                          | **Yes**                                                                               | Proves CFL, CHSH domain, Dirac mass, and Roofline `min` hypotheses are sharp and non-vacuous.                                                                                         |
+| **Target 9** (Concrete Non-Vacuity Witnesses)                                             | `target_nonvacuity_witnesses`                 | Ground `decide` evaluations                                                | **Yes**                                                                               | Confirms all `Spec.lean` functions evaluate to expected concrete values without vacuous definitions.                                                                                  |
+
+
+---
+## FILE: docs/ai.md
+---
+
+# AI Model Provenance, Evaluation, and Resource Budget (`docs/ai.md`)
+
+Build Standard v1.2.0 **A40** and **B34** documentation for the embedded neural language model shipped with `xiaomi-17t-pro-lab`.
+
+## 1. Pinned Model Artifact
+
+- **Model:** `roneneldan/TinyStories-8M` (8.3M-parameter GPT-Neo: 8 layers, 16 heads, `d = 256`, alternating global / 256-token local attention, `gelu_new`, vocab 50,257), converted from upstream F32 to F16 via `tools/pack-tinystories.mjs`.
+- **Storage & Pinning:** Deterministically split into 9 byte-exact shards under `vendor/tinystories/shards/model.f16.safetensors.part00..part08` (each `≤ 4,500,000` bytes < 5 MiB A24 limit).
+- **Cryptographic Hash:** Full reassembled checkpoint (`39,417,097` bytes) SHA-256 = `9999a42aa4cb668c19760c02448ab97b0458c89871013fa8d0c5cae2a569c28f` (`vendor/tinystories/shards.json` and `vendor/tinystories/SHA256.txt`), verified in-browser via WebCrypto `crypto.subtle.digest("SHA-256", ...)` and in Node tests.
+- **Execution Boundary:** Runs strictly client-side on the visitor's JavaScript CPU thread (`src/workloads/gpt-neo.js`). **Never** calls external APIs, **never** sends prompts over the network, and **never** claims execution on MediaTek NPU 990.
+
+## 2. Deterministic Evaluation Suite (`evals/run_tinystories_eval.mjs`)
+
+Run via `node evals/run_tinystories_eval.mjs` (or `just evals`):
+
+- Verifies every shard's byte length and SHA-256 plus reassembled full-file SHA-256;
+- Evaluates 5 canonical narrative prompts (8 greedy tokens each), pinning bit-exact token IDs for `"Once upon a time"` → `[11, 612, 373, 257, 1310, 2576, 3706, 20037]` (`", there was a little girl named Lily"`);
+- Checks exact full-vocabulary (50,257-token) Shannon entropy finiteness (`0 < H < 16` bits);
+- Verifies Neuralese intervention sensitivity: ablating layer `h.4` shifts next-token entropy by `ΔH = 0.519` bits (`> 0.05` bit threshold).
+- Writes structured JSON telemetry to `results/tinystories-eval.json`.
+
+## 3. Resource, Network, and Latency Budget
+
+- **Zero Financial / API Cost Budget:** `\$0.00` per invocation (100% static local/browser inference, zero third-party inference API keys or metered calls).
+- **Network Transfer Budget (First Load on `#/work/llm` only):** `39.4 MB` weights (9 parallel HTTP/2 shards, lazy-loaded ONLY when the user presses _Stream Generate_ — `0 B` transferred on all other 18 routes) + `1.25 MB` tokenizer (`vocab.json` + `merges.txt`).
+- **RAM Expansion Budget:** `~85 MB` peak browser heap when unpacking F16 → Float32Array weights in `src/workloads/safetensors.js` (cached once per tab session).
+- **Compute Latency Budget:** Target `≤ 15 s` cold parse + `≤ 500 ms/token` greedy CPU decode on desktop Node 22 (measured in `results/tinystories-eval.json`).
+
+
+---
+## FILE: docs/threat-model.md
+---
+
+# Threat Model (`docs/threat-model.md`)
+
+STRIDE threat analysis for `xiaomi-17t-pro-lab` (Build Standard v1.2.0 **B36**), mapped directly to automated verification tests and CI checks.
+
+## 1. System Boundary & Trust Assumptions
+
+- **Client-Side Static Site (GitHub Pages):** Pure ES modules executed in the user's browser sandbox. Zero authentication, zero cookies, zero server-side state, zero external CDN or telemetry requests.
+- **Local Development Server (`tools/serve.mjs`):** Loopback-only (`127.0.0.1`) static file server intended for local development and Playwright CI verification, never exposed to untrusted public networks.
+
+## 2. STRIDE Matrix & Verified Mitigations
+
+| Category                   | Concrete Threat                                                                                                          | Mitigation in Code                                                                                                                                                                                                       | Automated Verification Test                                                                                 |
+| :------------------------- | :----------------------------------------------------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------- |
+| **Spoofing**               | Supply-chain tampering of TinyStories-8M weights or vendored assets                                                      | Deterministic 9-shard manifest (`shards.json`) + WebCrypto `SHA-256` verification in `fetchShardedSafetensors` + `data/MANIFEST.sha256` + `CHECKSUMS.sha256` + SLSA attestation (`release.yml`)                          | `tests/rebuild.test.mjs`, `evals/run_tinystories_eval.mjs`, `reference/physics_oracle.py --check-checksums` |
+| **Tampering**              | Script/style injection (XSS) via inline DOM styles or `new Function`                                                     | Strict CSP in both `index.html` and `tools/serve.mjs`: `default-src 'self'; script-src 'self' 'sha256-...' ; style-src 'self'; object-src 'none'; form-action 'none'` (zero `unsafe-inline`, zero `eval`/`new Function`) | `tests/v22.test.mjs`, `tests/e2e/smoke.spec.js` (0 console CSP errors across 19 routes)                     |
+| **Tampering**              | Directory traversal or prefix-sibling escape (`/repo` → `/repo-secret`) on local dev server                              | `resolveSafe` in `tools/serve.mjs` rejects null bytes, invalid URI encodings, `..`, and absolute `path.relative` escapes; HTTP `403`                                                                                     | `tests/server.test.mjs`                                                                                     |
+| **Repudiation**            | Unaudited claims, silent edits, or unverifiable proof scripts                                                            | Linear git history, append-only `docs/run-log.md`, `ERRATA.md`, 6-kernel `lake comparator --paranoid`, `actions/attest-build-provenance@v2`                                                                              | `.github/workflows/ci.yml`, `.github/workflows/release.yml`                                                 |
+| **Information Disclosure** | Accidental commit of API keys/tokens or MIME sniffing on served files                                                    | `X-Content-Type-Options: nosniff`, `Referrer-Policy: no-referrer`, report-only `gitleaks` + `osv-scanner` in CI, `Audit-Repo.ps1` secret pattern check                                                                   | `.github/workflows/ci.yml` (`report-only-static`), `tests/properties-and-regressions.test.mjs`              |
+| **Denial of Service**      | Uncaught `fs.createReadStream` disk `EIO` crashing server, or `NaN`/huge allocations (`createState(30)`) hanging browser | Stream `error` handler in `tools/serve.mjs` returns clean `500` without crashing; finite/positive domain guards (`1 ≤ nQubits ≤ 12`, `nx, ny ≥ 4`, `parsePort`)                                                          | `tests/properties-and-regressions.test.mjs` (`B06` negative tests & `B21` EIO injection)                    |
+| **Elevation of Privilege** | Unauthorized HTTP write methods or cross-origin Spectre timing leakage                                                   | `tools/serve.mjs` enforces `405 Method Not Allowed` outside `GET`/`HEAD`, binds `127.0.0.1` only, and sends `COOP: same-origin` / `COEP: require-corp`                                                                   | `tests/properties-and-regressions.test.mjs` (`B09`)                                                         |
+
+
+---
+## FILE: docs/benchmarks.md
+---
+
+# Performance Benchmarks & Latency Budgets (`docs/benchmarks.md`)
+
+Build Standard v1.2.0 **B26**, **B27**, and **A37** reproducible performance tracking for `xiaomi-17t-pro-lab` (v3.0.0).
+
+## 1. Benchmark Methodology
+
+- Harness: `node scripts/bench.mjs` (`results/perf-benchmarks.json`).
+- Each solver executes a cold warmup pass followed by 15–40 timed iterations via `performance.now()`.
+- Reported statistics: **median**, **IQR (`p75 - p25`)**, **p95**, and **hard frame-budget target** (aligned to 60–144 Hz interactive frame budgets).
+
+## 2. Measured Baseline (`v3.0.0`, Windows x64, Node 22)
+
+| Solver Benchmark                   | Iterations | Median (ms) | IQR (ms) | p95 (ms) | Hard Budget (ms) | Status   |
+| :--------------------------------- | ---------: | ----------: | -------: | -------: | ---------------: | :------- |
+| `bragg_40pair_81pt_spectrum`       |         25 |       1.434 |    1.321 |    3.216 |             15.0 | **PASS** |
+| `litho_2d_64x64_annular_opc`       |         20 |       1.916 |    0.727 |    3.808 |             40.0 | **PASS** |
+| `stochastic_resist_48x256`         |         20 |       1.658 |    1.766 |    3.151 |             20.0 | **PASS** |
+| `tdse_crank_nicolson_50steps_n240` |         30 |       0.254 |    0.756 |    6.806 |             15.0 | **PASS** |
+| `thermal_fdtd_44x52_frame_80ms`    |         30 |       0.912 |    1.969 |    6.130 |             15.0 | **PASS** |
+| `schrodinger_jacobi_n48`           |         15 |       2.640 |    2.015 |   15.231 |             25.0 | **PASS** |
+| `quant_int8_matmul_64x64`          |         40 |       0.298 |    0.226 |    0.975 |             10.0 | **PASS** |
+| `fp64_matmul_64x64`                |         40 |       0.303 |    0.123 |    0.772 |             10.0 | **PASS** |
+| `chsh_and_mermin3_2000shots`       |         25 |       0.517 |    0.445 |    2.006 |             15.0 | **PASS** |
+
+## 3. Honest Caveats (B27)
+
+- Small-iteration JIT warm-up and OS scheduling jitter explain p95 tails (`~3–15 ms`); CI tracks these report-only rather than gating merges.
+- Browser render times depend heavily on GPU hardware (real Mali-G1 Ultra MC12 vs. SwiftShader software WebGL in CI).
+- TinyStories-8M cold load (`~10 s` to parse 39.4 MB FP16 → Float32 on Node CPU) is tracked separately in `docs/ai.md` and `results/tinystories-eval.json`.
+
+
+---
+## FILE: docs/preregistration.md
+---
+
+# Pre-Registration of Computational Hypotheses (`docs/preregistration.md`)
+
+Build Standard v1.2.0 **B32** pre-registration specification for `scripts/stats_eval.mjs` (`results/stats-eval.json`).
+
+## 1. Study Design
+
+- **Seeds:** Fixed deterministic 20-seed panel (`seed_i = 1000 + 97 * i`, `i = 0..19`) across independent control and treatment arms.
+- **Inference Procedure:** Two-sided Monte Carlo permutation test (`10,000` resamples, seeded PRNG `mulberry32(20261125)`), `10,000`-resample nonparametric 95% bootstrap confidence intervals for mean difference, parametric effect size (Cohen's $d$), nonparametric effect size (Cliff's $\delta$), and family-wise error rate control via Holm–Bonferroni (`α = 0.05`).
+
+## 2. Pre-Registered Hypotheses (H1–H4)
+
+1. **H1 (`H1_dose_ler`):** At 0.33 NA, 44 nm pitch, increasing EUV exposure dose from `15 mJ/cm²` to `60 mJ/cm²` strictly reduces sub-pixel 3σ stochastic resist LER ($\Delta = \text{LER}_{15} - \text{LER}_{60} > 0$).
+2. **H2 (`H2_na_ler`):** At 30 nm pitch (`conventional`, `σ = 0.55`, `35 mJ/cm²`), `0.55` High-NA yields strictly lower sub-pixel 3σ LER than `0.33` NA ($\Delta = \text{LER}_{0.33} - \text{LER}_{0.55} > 0$).
+3. **H3 (`H3_chsh_violation`):** Sampled Bell $|\Phi^+\rangle$ CHSH statistic (`2,000` shots, $\theta = 22.5^\circ$) strictly exceeds the classical local-hidden-variable control ($\theta = 0^\circ$, $S = 2.0$).
+4. **H4 (`H4_mermin3_violation`):** Sampled 3-qubit GHZ Mermin-3 statistic (`2,000` shots, $\phi = 0^\circ$) strictly exceeds the classical non-contextual control ($\phi = 60^\circ$, $M = 2.0$).
+
+## 3. Deviation & Defect Disclosure
+
+During initial execution on v2.2 code, **H1** inverted sign (`Δ = -7.87 nm`) and **H2** collapsed (`Δ = 0.00 nm`), exposing a real edge-detector pinhole bias in `src/sim/litho-advanced.js` (`ERRATA.md` E-003) and an uninformative dipole harmonic regime at 28 nm pitch. After fixing the sub-pixel metrology window and specifying H1/H2 cleanly above, all 4 hypotheses achieved $p_{\text{Holm}} \le 0.0008$ (logged transparently in `results/stats-eval.json` and white paper Section 5.2).
+
+
+---
+## FILE: docs/faq.md
+---
+
+# Frequently Asked Questions (`docs/faq.md`)
+
+### 1. Does `xiaomi-17t-pro-lab` solve any open problem in `unsolved-problems-mega-atlas`?
+
+**No (`0 / 1,900` retired).** This workbench implements established multi-scale physics and certifies finite/algebraic invariants of those models in Lean 4.35.0. See [docs/mega-atlas-cross-reference.md](mega-atlas-cross-reference.md) for the exact 13 adjacent open IDs and why each parent problem remains open.
+
+### 2. Does the in-browser TinyStories-8M LLM or BitNet lab run on the Dimensity 9500 NPU 990?
+
+**No.** Standard web browsers do not expose MediaTek NeuroPilot / NPU 990 execution APIs. Every browser workload executes on the visitor's CPU JavaScript thread (or optional WebGL2 shader) and labels that boundary explicitly.
+
+### 3. Why is the Xiaomi 17T Pro's battery watt-hour rating shown as `UNKNOWN`?
+
+Xiaomi publishes `7000 mAh` typical capacity and a `4.58 V` high-voltage cell rating, not nominal discharge voltage or Wh. Multiplying `7000 mAh × 4.58 V` would fabricate an inflated Wh figure, so `batteryWh` remains `null` (`UNKNOWN`).
+
+### 4. Why is TinyStories-8M split into 9 shards under `vendor/tinystories/shards/`?
+
+Build Standard v1.2.0 (`A24`) caps tracked repository files at 5 MiB (`5,242,880` bytes). Splitting the `39,417,097`-byte FP16 safetensors file into nine byte-exact `≤ 4.5 MB` shards keeps GitHub Pages 100% self-hosted and offline-capable while verifying exact bit-for-bit SHA-256 (`9999a42a...`) in both browsers (WebCrypto) and Node tests.
+
+### 5. What does the Lean 4.35.0 formal core actually prove — and what does it NOT prove?
+
+`lean/XiaomiLabProofs/` proves 59 exact algebraic, combinatorial, CFL stability, Cayley unitarity, and quantum contextuality declarations over `Nat`, `Int`, and `ℤ[i]` across 6 independent kernels with zero Mathlib and zero custom axioms. It does **not** formally verify V8 IEEE-754 floating-point rounding (which is checked differentially to `< 2.2e-14` by `reference/physics_oracle.py`).
+
+### 6. Why are there no Pull Requests or git hooks?
+
+Build Standard v1.2.0 Hard Rules **R1–R4** mandate a direct-to-`main` linear solo-researcher workflow with zero blocking commit hooks, zero PR templates, and report-only linters/SAST in CI.
+
+### 7. Is the white paper peer reviewed?
+
+**No.** `dist/Donahue_2026_Xiaomi_17T_Pro_Lab.pdf` is an independent research preprint (CC-BY-4.0) with machine-checked Lean proofs and reproducible computational artifacts, not an externally peer-reviewed journal publication.

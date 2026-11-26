@@ -1,10 +1,10 @@
 # Security
 
-Version 2.2.0. This is a static site. The dev server and `index.html` send a Content-Security-Policy. `script-src` is `'self'` plus the hash of the import map. `style-src` is `'self'` only. Chromium blocks `element.style` and `setProperty` without `'unsafe-inline'`; the slider fill is a `meter` value and the probe cursor is a class. Glitchling is imported as a module, so `script-src` does not allow `eval`. It has no accounts, no server-side secret, and no database. The TinyStories weights under `vendor/tinystories/` are a public model checkpoint, not a credential.
+Version 3.0.0. This is a zero-build static site. The loopback dev server (`tools/serve.mjs`) and `index.html` enforce a strict Content-Security-Policy (`script-src 'self'` plus import-map hash; `style-src 'self'` with zero `'unsafe-inline'`; `object-src 'none'`; `form-action 'none'`). Glitchling loads as a standard ES module (`eval` is disallowed). TinyStories-8M weights under `vendor/tinystories/shards/` are public FP16 model shards cryptographically verified via WebCrypto `SHA-256`, not credentials. See [docs/threat-model.md](docs/threat-model.md) for the full STRIDE matrix.
 
 ## Reporting
 
-Open a GitHub security advisory on `0thernes/xiaomi-17t-pro-lab`, or mail the maintainer listed on the repository if advisories are not enabled yet. Please describe the page, the browser, and a minimal reproduction. Give us a chance to fix it before writing about it in public.
+Open a GitHub security advisory on `0thernes/xiaomi-17t-pro-lab`, or email `0_0@0thernes.art` (Alexander Stephen Donahue, ORCID `0009-0006-8168-9648`). Please describe the route, browser/runtime version, and minimal reproduction.
 
 ## What is in scope
 

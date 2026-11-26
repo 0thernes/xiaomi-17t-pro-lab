@@ -1,0 +1,831 @@
+{
+  "standard_version": "1.2.0",
+  "repo": "xiaomi-17t-pro-lab",
+  "score": {
+    "structure_percent": 100.0,
+    "completion_percent": 100.0,
+    "core_completion_percent": 100.0,
+    "checked": 82,
+    "core_checked": 35
+  },
+  "counts": {
+    "pass": 82,
+    "partial": 0,
+    "fail": 0,
+    "na": 8,
+    "unknown": 0
+  },
+  "placeholder_files": 0,
+  "items": [
+    {
+      "id": "A01",
+      "tier": "core",
+      "result": "pass",
+      "source": "auto",
+      "applies": "always",
+      "name": "README with a one-line purpose",
+      "detail": "matched in README.md"
+    },
+    {
+      "id": "A02",
+      "tier": "recommended",
+      "result": "pass",
+      "source": "auto",
+      "applies": "public",
+      "name": "Badge ribbon",
+      "detail": "matched in README.md"
+    },
+    {
+      "id": "A03",
+      "tier": "core",
+      "result": "pass",
+      "source": "auto",
+      "applies": "always",
+      "name": "Quickstart that works from a clean clone",
+      "detail": "matched in README.md"
+    },
+    {
+      "id": "A04",
+      "tier": "core",
+      "result": "pass",
+      "source": "auto",
+      "applies": "always",
+      "name": "Usage examples",
+      "detail": "matched in README.md"
+    },
+    {
+      "id": "A05",
+      "tier": "recommended",
+      "result": "pass",
+      "source": "auto",
+      "applies": "visual",
+      "name": "Demo media",
+      "detail": "matched in README.md"
+    },
+    {
+      "id": "A06",
+      "tier": "core",
+      "result": "pass",
+      "source": "auto",
+      "applies": "always",
+      "name": "LICENSE",
+      "detail": "found: LICENSE"
+    },
+    {
+      "id": "A07",
+      "tier": "core",
+      "result": "pass",
+      "source": "auto",
+      "applies": "always",
+      "name": "CHANGELOG",
+      "detail": "matched in CHANGELOG.md"
+    },
+    {
+      "id": "A08",
+      "tier": "core",
+      "result": "pass",
+      "source": "auto",
+      "applies": "always",
+      "name": "Semantic version, tags and a single version source",
+      "detail": "VERSION 3.0.0 matches CHANGELOG and CITATION"
+    },
+    {
+      "id": "A09",
+      "tier": "core",
+      "result": "pass",
+      "source": "auto",
+      "applies": "always",
+      "name": "Automated tests that pass",
+      "detail": "test files found"
+    },
+    {
+      "id": "A10",
+      "tier": "core",
+      "result": "pass",
+      "source": "auto",
+      "applies": "always",
+      "name": "Informational CI",
+      "detail": "workflow runs on push"
+    },
+    {
+      "id": "A11",
+      "tier": "recommended",
+      "result": "pass",
+      "source": "auto",
+      "applies": "always",
+      "name": "Releases",
+      "detail": "matched in .github/workflows/release.yml"
+    },
+    {
+      "id": "A12",
+      "tier": "core",
+      "result": "pass",
+      "source": "auto",
+      "applies": "always",
+      "name": ".gitignore",
+      "detail": "found: .gitignore"
+    },
+    {
+      "id": "A13",
+      "tier": "recommended",
+      "result": "pass",
+      "source": "auto",
+      "applies": "always",
+      "name": ".gitattributes and .editorconfig",
+      "detail": "found: .gitattributes, .editorconfig"
+    },
+    {
+      "id": "A14",
+      "tier": "recommended",
+      "result": "pass",
+      "source": "auto",
+      "applies": "public",
+      "name": "CONTRIBUTING guide",
+      "detail": "found: CONTRIBUTING.md"
+    },
+    {
+      "id": "A15",
+      "tier": "recommended",
+      "result": "pass",
+      "source": "auto",
+      "applies": "public",
+      "name": "CODE_OF_CONDUCT",
+      "detail": "found: CODE_OF_CONDUCT.md"
+    },
+    {
+      "id": "A16",
+      "tier": "core",
+      "result": "pass",
+      "source": "auto",
+      "applies": "public",
+      "name": "SECURITY.md",
+      "detail": "found: SECURITY.md"
+    },
+    {
+      "id": "A17",
+      "tier": "recommended",
+      "result": "pass",
+      "source": "auto",
+      "applies": "public",
+      "name": "SUPPORT.md",
+      "detail": "found: SUPPORT.md"
+    },
+    {
+      "id": "A18",
+      "tier": "recommended",
+      "result": "pass",
+      "source": "auto",
+      "applies": "public",
+      "name": "Issue templates",
+      "detail": "issue forms present, no PR template"
+    },
+    {
+      "id": "A19",
+      "tier": "core",
+      "result": "pass",
+      "source": "declared",
+      "applies": "public",
+      "name": "About description and topics",
+      "detail": "declared done in repo.yaml"
+    },
+    {
+      "id": "A20",
+      "tier": "recommended",
+      "result": "pass",
+      "source": "auto",
+      "applies": "always",
+      "name": "docs/ folder",
+      "detail": "found: docs/architecture.md"
+    },
+    {
+      "id": "A21",
+      "tier": "recommended",
+      "result": "pass",
+      "source": "auto",
+      "applies": "always",
+      "name": "Architecture Decision Records",
+      "detail": "found: docs/adr/0001-zero-build.md"
+    },
+    {
+      "id": "A22",
+      "tier": "advanced",
+      "result": "pass",
+      "source": "auto",
+      "applies": "public",
+      "name": "CITATION.cff",
+      "detail": "found: CITATION.cff"
+    },
+    {
+      "id": "A23",
+      "tier": "core",
+      "result": "pass",
+      "source": "auto",
+      "applies": "always",
+      "name": "Clean history and correct identity",
+      "detail": "on main; author identities look real"
+    },
+    {
+      "id": "A24",
+      "tier": "core",
+      "result": "pass",
+      "source": "auto",
+      "applies": "always",
+      "name": "No secrets, build output or huge files committed",
+      "detail": "no big files, build output, .env or obvious secrets"
+    },
+    {
+      "id": "A25",
+      "tier": "recommended",
+      "result": "pass",
+      "source": "auto",
+      "applies": "always",
+      "name": "Cross-platform CI",
+      "detail": "matched in .github/workflows/ci.yml"
+    },
+    {
+      "id": "A26",
+      "tier": "recommended",
+      "result": "pass",
+      "source": "auto",
+      "applies": "public",
+      "name": "Social preview image",
+      "detail": "found: docs/media/social-preview.png"
+    },
+    {
+      "id": "A27",
+      "tier": "advanced",
+      "result": "pass",
+      "source": "auto",
+      "applies": "public",
+      "name": "Pages demo or docs site",
+      "detail": "matched in .github/workflows/pages.yml"
+    },
+    {
+      "id": "A28",
+      "tier": "recommended",
+      "result": "pass",
+      "source": "auto",
+      "applies": "package",
+      "name": "Package manifest",
+      "detail": "package manifest found"
+    },
+    {
+      "id": "A29",
+      "tier": "recommended",
+      "result": "pass",
+      "source": "auto",
+      "applies": "always",
+      "name": "ROADMAP.md",
+      "detail": "found: ROADMAP.md"
+    },
+    {
+      "id": "A30",
+      "tier": "recommended",
+      "result": "pass",
+      "source": "auto",
+      "applies": "public",
+      "name": "Labels for the finding classes",
+      "detail": "matched in .github/labels.tsv"
+    },
+    {
+      "id": "A31",
+      "tier": "core",
+      "result": "pass",
+      "source": "auto",
+      "applies": "always",
+      "name": "Task runner with one-word commands",
+      "detail": "found: justfile"
+    },
+    {
+      "id": "A32",
+      "tier": "core",
+      "result": "pass",
+      "source": "auto",
+      "applies": "always",
+      "name": "Agent entry points: AGENTS.md canonical, plus CLAUDE.md, GEMINI.md, Cursor rules, llms.txt",
+      "detail": "AGENTS.md canonical; pointers consistent; llms.txt present"
+    },
+    {
+      "id": "A33",
+      "tier": "core",
+      "result": "pass",
+      "source": "auto",
+      "applies": "always",
+      "name": "Environment and configuration documented",
+      "detail": "found: .env.example"
+    },
+    {
+      "id": "A34",
+      "tier": "recommended",
+      "result": "pass",
+      "source": "declared",
+      "applies": "service",
+      "name": "Observability basics: logs, errors, health",
+      "detail": "declared done in repo.yaml"
+    },
+    {
+      "id": "A35",
+      "tier": "recommended",
+      "result": "pass",
+      "source": "auto",
+      "applies": "always",
+      "name": "Data, migrations, backups and an offsite repo mirror",
+      "detail": "matched in docs/operations.md"
+    },
+    {
+      "id": "A36",
+      "tier": "recommended",
+      "result": "pass",
+      "source": "auto",
+      "applies": "deployed",
+      "name": "One-command deploy and rollback",
+      "detail": "matched in justfile"
+    },
+    {
+      "id": "A37",
+      "tier": "advanced",
+      "result": "pass",
+      "source": "declared",
+      "applies": "perf",
+      "name": "Performance budgets",
+      "detail": "declared done in repo.yaml"
+    },
+    {
+      "id": "A38",
+      "tier": "core",
+      "result": "pass",
+      "source": "declared",
+      "applies": "ui",
+      "name": "Accessibility and internationalization",
+      "detail": "declared done in repo.yaml"
+    },
+    {
+      "id": "A39",
+      "tier": "recommended",
+      "result": "pass",
+      "source": "auto",
+      "applies": "always",
+      "name": "Third-party licensing and attribution",
+      "detail": "found: THIRD_PARTY_NOTICES.md"
+    },
+    {
+      "id": "A40",
+      "tier": "core",
+      "result": "pass",
+      "source": "auto",
+      "applies": "ai",
+      "name": "AI components pinned, evaluated and budgeted",
+      "detail": "matched in docs/ai.md"
+    },
+    {
+      "id": "A41",
+      "tier": "advanced",
+      "result": "pass",
+      "source": "auto",
+      "applies": "package",
+      "name": "Deprecation and upgrade path",
+      "detail": "found: UPGRADING.md"
+    },
+    {
+      "id": "A42",
+      "tier": "recommended",
+      "result": "pass",
+      "source": "auto",
+      "applies": "public",
+      "name": "Maintenance status",
+      "detail": "matched in README.md"
+    },
+    {
+      "id": "A43",
+      "tier": "recommended",
+      "result": "pass",
+      "source": "auto",
+      "applies": "package",
+      "name": "examples/ directory",
+      "detail": "found: examples/"
+    },
+    {
+      "id": "A44",
+      "tier": "recommended",
+      "result": "pass",
+      "source": "auto",
+      "applies": "always",
+      "name": "FAQ and glossary",
+      "detail": "found: docs/faq.md, docs/glossary.md"
+    },
+    {
+      "id": "A45",
+      "tier": "core",
+      "result": "na",
+      "source": "declared",
+      "applies": "personal_data",
+      "name": "Privacy and personal-data handling",
+      "detail": "declared n/a in repo.yaml"
+    },
+    {
+      "id": "B01",
+      "tier": "core",
+      "result": "pass",
+      "source": "auto",
+      "applies": "always",
+      "name": "Reproducible build from a clean clone",
+      "detail": "matched in justfile"
+    },
+    {
+      "id": "B02",
+      "tier": "core",
+      "result": "pass",
+      "source": "auto",
+      "applies": "always",
+      "name": "Pinned toolchains and lockfiles",
+      "detail": "lockfile found"
+    },
+    {
+      "id": "B03",
+      "tier": "core",
+      "result": "pass",
+      "source": "declared",
+      "applies": "always",
+      "name": "Determinism checks",
+      "detail": "declared done in repo.yaml"
+    },
+    {
+      "id": "B04",
+      "tier": "core",
+      "result": "pass",
+      "source": "auto",
+      "applies": "always",
+      "name": "CLAIMS.md ledger",
+      "detail": "found: CLAIMS.md"
+    },
+    {
+      "id": "B05",
+      "tier": "core",
+      "result": "pass",
+      "source": "declared",
+      "applies": "always",
+      "name": "Falsifiable tests per claim",
+      "detail": "declared done in repo.yaml"
+    },
+    {
+      "id": "B06",
+      "tier": "core",
+      "result": "pass",
+      "source": "declared",
+      "applies": "always",
+      "name": "Negative tests",
+      "detail": "declared done in repo.yaml"
+    },
+    {
+      "id": "B07",
+      "tier": "core",
+      "result": "pass",
+      "source": "declared",
+      "applies": "always",
+      "name": "Regression test per fixed bug",
+      "detail": "declared done in repo.yaml"
+    },
+    {
+      "id": "B08",
+      "tier": "recommended",
+      "result": "pass",
+      "source": "declared",
+      "applies": "always",
+      "name": "Golden and snapshot tests",
+      "detail": "declared done in repo.yaml"
+    },
+    {
+      "id": "B09",
+      "tier": "recommended",
+      "result": "pass",
+      "source": "declared",
+      "applies": "api",
+      "name": "Contract and API tests",
+      "detail": "declared done in repo.yaml"
+    },
+    {
+      "id": "B10",
+      "tier": "core",
+      "result": "pass",
+      "source": "auto",
+      "applies": "always",
+      "name": "Property-based tests",
+      "detail": "evidence found in code or config"
+    },
+    {
+      "id": "B11",
+      "tier": "recommended",
+      "result": "pass",
+      "source": "declared",
+      "applies": "always",
+      "name": "Differential testing",
+      "detail": "declared done in repo.yaml"
+    },
+    {
+      "id": "B12",
+      "tier": "recommended",
+      "result": "pass",
+      "source": "declared",
+      "applies": "always",
+      "name": "Reference implementation as test oracle",
+      "detail": "declared done in repo.yaml"
+    },
+    {
+      "id": "B13",
+      "tier": "recommended",
+      "result": "pass",
+      "source": "auto",
+      "applies": "always",
+      "name": "Mutation testing",
+      "detail": "evidence found in code or config"
+    },
+    {
+      "id": "B14",
+      "tier": "advanced",
+      "result": "pass",
+      "source": "declared",
+      "applies": "always",
+      "name": "Metamorphic testing",
+      "detail": "declared done in repo.yaml"
+    },
+    {
+      "id": "B15",
+      "tier": "recommended",
+      "result": "na",
+      "source": "declared",
+      "applies": "native",
+      "name": "Fuzzing",
+      "detail": "declared n/a in repo.yaml"
+    },
+    {
+      "id": "B16",
+      "tier": "core",
+      "result": "na",
+      "source": "declared",
+      "applies": "native",
+      "name": "Sanitizers and runtime checkers",
+      "detail": "declared n/a in repo.yaml"
+    },
+    {
+      "id": "B17",
+      "tier": "recommended",
+      "result": "pass",
+      "source": "auto",
+      "applies": "always",
+      "name": "Static analysis and linters, report-only",
+      "detail": "evidence found in code or config"
+    },
+    {
+      "id": "B18",
+      "tier": "recommended",
+      "result": "pass",
+      "source": "auto",
+      "applies": "always",
+      "name": "Strict type checking",
+      "detail": "evidence found in code or config"
+    },
+    {
+      "id": "B19",
+      "tier": "advanced",
+      "result": "na",
+      "source": "declared",
+      "applies": "concurrent",
+      "name": "Concurrency and race testing",
+      "detail": "declared n/a in repo.yaml"
+    },
+    {
+      "id": "B20",
+      "tier": "advanced",
+      "result": "pass",
+      "source": "declared",
+      "applies": "numeric",
+      "name": "Numeric and floating-point stability",
+      "detail": "declared done in repo.yaml"
+    },
+    {
+      "id": "B21",
+      "tier": "advanced",
+      "result": "pass",
+      "source": "declared",
+      "applies": "service",
+      "name": "Failure injection",
+      "detail": "declared done in repo.yaml"
+    },
+    {
+      "id": "B22",
+      "tier": "advanced",
+      "result": "pass",
+      "source": "auto",
+      "applies": "formal",
+      "name": "Formal specification and proof",
+      "detail": "found: lean/"
+    },
+    {
+      "id": "B23",
+      "tier": "advanced",
+      "result": "na",
+      "source": "declared",
+      "applies": "formal",
+      "name": "Design model checking",
+      "detail": "declared n/a in repo.yaml"
+    },
+    {
+      "id": "B24",
+      "tier": "advanced",
+      "result": "na",
+      "source": "declared",
+      "applies": "formal",
+      "name": "Verified implementation language",
+      "detail": "declared n/a in repo.yaml"
+    },
+    {
+      "id": "B25",
+      "tier": "advanced",
+      "result": "na",
+      "source": "declared",
+      "applies": "formal",
+      "name": "Bounded model checking of real code",
+      "detail": "declared n/a in repo.yaml"
+    },
+    {
+      "id": "B26",
+      "tier": "core",
+      "result": "pass",
+      "source": "auto",
+      "applies": "perf",
+      "name": "Honest benchmarks",
+      "detail": "found: docs/benchmarks.md"
+    },
+    {
+      "id": "B27",
+      "tier": "advanced",
+      "result": "pass",
+      "source": "declared",
+      "applies": "perf",
+      "name": "Performance tracking over time, report-only",
+      "detail": "declared done in repo.yaml"
+    },
+    {
+      "id": "B28",
+      "tier": "core",
+      "result": "pass",
+      "source": "declared",
+      "applies": "experimental",
+      "name": "Controls and multiple seeds",
+      "detail": "declared done in repo.yaml"
+    },
+    {
+      "id": "B29",
+      "tier": "core",
+      "result": "pass",
+      "source": "declared",
+      "applies": "experimental",
+      "name": "Significance testing",
+      "detail": "declared done in repo.yaml"
+    },
+    {
+      "id": "B30",
+      "tier": "core",
+      "result": "pass",
+      "source": "declared",
+      "applies": "experimental",
+      "name": "Effect sizes and confidence intervals",
+      "detail": "declared done in repo.yaml"
+    },
+    {
+      "id": "B31",
+      "tier": "recommended",
+      "result": "pass",
+      "source": "declared",
+      "applies": "experimental",
+      "name": "Multiple-comparison correction",
+      "detail": "declared done in repo.yaml"
+    },
+    {
+      "id": "B32",
+      "tier": "advanced",
+      "result": "pass",
+      "source": "auto",
+      "applies": "experimental",
+      "name": "Pre-registration of hypotheses",
+      "detail": "found: docs/preregistration.md"
+    },
+    {
+      "id": "B33",
+      "tier": "core",
+      "result": "na",
+      "source": "declared",
+      "applies": "ml",
+      "name": "ML evaluation on held-out data",
+      "detail": "declared n/a in repo.yaml"
+    },
+    {
+      "id": "B34",
+      "tier": "core",
+      "result": "pass",
+      "source": "auto",
+      "applies": "ai",
+      "name": "AI hallucination and regression evals",
+      "detail": "found: evals/"
+    },
+    {
+      "id": "B35",
+      "tier": "recommended",
+      "result": "pass",
+      "source": "auto",
+      "applies": "always",
+      "name": "Security scanning, report-only, with optional SBOM",
+      "detail": "matched in .github/workflows/ci.yml"
+    },
+    {
+      "id": "B36",
+      "tier": "recommended",
+      "result": "pass",
+      "source": "auto",
+      "applies": "always",
+      "name": "Threat model",
+      "detail": "found: docs/threat-model.md"
+    },
+    {
+      "id": "B37",
+      "tier": "core",
+      "result": "pass",
+      "source": "auto",
+      "applies": "always",
+      "name": "Release hashes and checksums",
+      "detail": "matched in .github/workflows/release.yml"
+    },
+    {
+      "id": "B38",
+      "tier": "recommended",
+      "result": "pass",
+      "source": "auto",
+      "applies": "always",
+      "name": "Build provenance and attestations",
+      "detail": "matched in .github/workflows/ci.yml"
+    },
+    {
+      "id": "B39",
+      "tier": "recommended",
+      "result": "pass",
+      "source": "auto",
+      "applies": "experimental",
+      "name": "Data checksums and dataset versioning",
+      "detail": "found: data/MANIFEST.sha256"
+    },
+    {
+      "id": "B40",
+      "tier": "recommended",
+      "result": "pass",
+      "source": "auto",
+      "applies": "always",
+      "name": "Audit trail",
+      "detail": "found: docs/run-log.md"
+    },
+    {
+      "id": "B41",
+      "tier": "core",
+      "result": "pass",
+      "source": "auto",
+      "applies": "always",
+      "name": "Limitations and real-vs-metaphor",
+      "detail": "limitations documented"
+    },
+    {
+      "id": "B42",
+      "tier": "core",
+      "result": "pass",
+      "source": "auto",
+      "applies": "always",
+      "name": "What would prove us wrong",
+      "detail": "matched in CLAIMS.md"
+    },
+    {
+      "id": "B43",
+      "tier": "core",
+      "result": "pass",
+      "source": "auto",
+      "applies": "always",
+      "name": "Replication protocol",
+      "detail": "found: REPLICATION.md"
+    },
+    {
+      "id": "B44",
+      "tier": "advanced",
+      "result": "pass",
+      "source": "auto",
+      "applies": "public",
+      "name": "Independent replication",
+      "detail": "matched in REPLICATION.md"
+    },
+    {
+      "id": "B45",
+      "tier": "recommended",
+      "result": "pass",
+      "source": "auto",
+      "applies": "always",
+      "name": "Peer and red-team review",
+      "detail": "found: docs/reviews/2026-11-25-3-cycle-hardening-audit.md"
+    }
+  ]
+}

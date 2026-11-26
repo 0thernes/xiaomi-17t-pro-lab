@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { describe, it } from "node:test";
 import { chaseJumps } from "../src/sim/cache-curve.js";
@@ -10,7 +11,7 @@ import { boardPlacements, cameraModules } from "../src/graphics/board-layout.js"
 import { floorplan, getSpecs, npuCounts, openItems, parseDieMm, parsePackageMm, recordEntries } from "../src/specs.js";
 import { REFERENCES } from "../src/references.js";
 import { buildWeights, greedyTokens } from "../src/workloads/gpt-neo.js";
-import { parseSafetensors } from "../src/workloads/safetensors.js";
+import { assembleShards, parseSafetensors } from "../src/workloads/safetensors.js";
 import { GPT2Tokenizer } from "../src/workloads/tokenizer.js";
 
 describe("corrected geometry", () => {
@@ -120,16 +121,24 @@ describe("live models", () => {
 });
 
 describe("tinystories", () => {
-  it("greedy-decodes the pinned float16 checkpoint", () => {
-    const file = readFileSync(new URL("../vendor/tinystories/model.f16.safetensors", import.meta.url));
+  it("reassembles the 9 verified shards bit-for-bit and greedy-decodes the pinned float16 checkpoint", () => {
+    const manifest = JSON.parse(readFileSync(new URL("../vendor/tinystories/shards.json", import.meta.url), "utf8"));
     const recorded = readFileSync(new URL("../vendor/tinystories/SHA256.txt", import.meta.url), "utf8");
+    const chunks = manifest.shards.map((shard) => {
+      const buf = readFileSync(new URL(`../vendor/tinystories/${shard.path}`, import.meta.url));
+      assert.equal(buf.length, shard.bytes, shard.path);
+      assert.equal(createHash("sha256").update(buf).digest("hex"), shard.sha256, shard.path);
+      return buf;
+    });
+    const fullAb = assembleShards(chunks, manifest.totalBytes);
+    const fullSha = createHash("sha256").update(new Uint8Array(fullAb)).digest("hex");
+    assert.equal(fullSha, manifest.sha256);
+    assert.equal(fullSha, "9999a42aa4cb668c19760c02448ab97b0458c89871013fa8d0c5cae2a569c28f");
     const vocab = JSON.parse(readFileSync(new URL("../vendor/tinystories/vocab.json", import.meta.url), "utf8"));
     const merges = readFileSync(new URL("../vendor/tinystories/merges.txt", import.meta.url), "utf8");
     const tokenizer = new GPT2Tokenizer(vocab, merges);
     const prompt = tokenizer.encode("Once upon a time");
-    const weights = buildWeights(
-      parseSafetensors(file.buffer.slice(file.byteOffset, file.byteOffset + file.byteLength)).tensors,
-    );
+    const weights = buildWeights(parseSafetensors(fullAb).tensors);
     const tokens = greedyTokens(weights, prompt, 8);
     assert.deepEqual(tokens, [11, 612, 373, 257, 1310, 2576, 3706, 20037]);
     assert.equal(tokenizer.decode(tokens).includes("Lily"), true);

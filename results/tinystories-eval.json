@@ -1,0 +1,106 @@
+{
+  "model": "roneneldan/TinyStories-8M (FP16 sharded)",
+  "sha256": "9999a42aa4cb668c19760c02448ab97b0458c89871013fa8d0c5cae2a569c28f",
+  "totalBytes": 39417097,
+  "shards": 9,
+  "loadAndParseMs": 10271.62,
+  "neuraleseAblationL4EntropyDeltaBits": 0.519174,
+  "pass": true,
+  "cases": [
+    {
+      "id": "classic_story",
+      "prompt": "Once upon a time",
+      "tokens": [
+        11,
+        612,
+        373,
+        257,
+        1310,
+        2576,
+        3706,
+        20037
+      ],
+      "decoded": ", there was a little girl named Lily",
+      "top1Prob": 0.944807,
+      "exactEntropyBits": 0.332117,
+      "perplexity": 1.2589,
+      "avgMsPerToken": 48.63
+    },
+    {
+      "id": "small_dog",
+      "prompt": "One day, a little dog",
+      "tokens": [
+        3706,
+        5436,
+        13,
+        679,
+        373,
+        845,
+        6568,
+        284
+      ],
+      "decoded": " named Max. He was very excited to",
+      "top1Prob": 0.725026,
+      "exactEntropyBits": 2.055098,
+      "perplexity": 4.1557,
+      "avgMsPerToken": 42.3
+    },
+    {
+      "id": "sunny_park",
+      "prompt": "Tim went to the park",
+      "tokens": [
+        13,
+        679,
+        2497,
+        257,
+        1263,
+        11,
+        2266,
+        290
+      ],
+      "decoded": ". He saw a big, red and",
+      "top1Prob": 0.593051,
+      "exactEntropyBits": 2.190375,
+      "perplexity": 4.5642,
+      "avgMsPerToken": 71.72
+    },
+    {
+      "id": "rainy_day",
+      "prompt": "It was raining outside",
+      "tokens": [
+        13,
+        383,
+        6290,
+        2067,
+        284,
+        2121,
+        422,
+        262
+      ],
+      "decoded": ". The rain started to fall from the",
+      "top1Prob": 0.568785,
+      "exactEntropyBits": 2.566743,
+      "perplexity": 5.9247,
+      "avgMsPerToken": 82.41
+    },
+    {
+      "id": "red_ball",
+      "prompt": "She found a shiny red",
+      "tokens": [
+        1097,
+        13,
+        1375,
+        373,
+        845,
+        3049,
+        13,
+        198
+      ],
+      "decoded": " car. She was very fast.\n",
+      "top1Prob": 0.157036,
+      "exactEntropyBits": 6.386761,
+      "perplexity": 83.6771,
+      "avgMsPerToken": 73.41
+    }
+  ]
+}

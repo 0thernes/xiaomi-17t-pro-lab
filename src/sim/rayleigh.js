@@ -21,7 +21,9 @@ export function rayleighCd(k1, na, lambda = EUV_LAMBDA_NM) {
 
 /** k1 implied by a published resolution: k1 = CD · NA / λ. */
 export function impliedK1(cd, na, lambda = EUV_LAMBDA_NM) {
-  if (!(lambda > 0)) throw new Error("wavelength must be positive");
+  if (!(lambda > 0) || !(na > 0) || !(cd >= 0)) {
+    throw new RangeError("lambda and na must be positive; cd must be non-negative");
+  }
   return (cd * na) / lambda;
 }
 

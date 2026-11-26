@@ -38,6 +38,9 @@ export const UFS_PROFILES = {
  * Exact CS Roofline evaluation: achievable GFLOPS = min(peakGflops, ai * bwGBps).
  */
 export function rooflinePoint({ ai, peakGflops, bwGBps }) {
+  if (!Number.isFinite(ai) || ai < 0) throw new RangeError("arithmetic intensity ai must be finite and non-negative");
+  if (!Number.isFinite(peakGflops) || peakGflops <= 0) throw new RangeError("peakGflops must be finite and positive");
+  if (!Number.isFinite(bwGBps) || bwGBps <= 0) throw new RangeError("bwGBps must be finite and positive");
   const memCap = ai * bwGBps;
   const achievable = Math.min(peakGflops, memCap);
   const ridgeAi = peakGflops / bwGBps;

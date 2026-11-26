@@ -6,6 +6,9 @@ import { mulberry32 } from "./quant.js";
  */
 
 export function createState(nQubits) {
+  if (!Number.isInteger(nQubits) || nQubits < 1 || nQubits > 12) {
+    throw new RangeError("nQubits must be an integer in 1..12");
+  }
   const dim = 1 << nQubits;
   const re = new Float64Array(dim);
   const im = new Float64Array(dim);

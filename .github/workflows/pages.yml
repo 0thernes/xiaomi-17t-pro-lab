@@ -16,14 +16,17 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-      - name: Stage the files the browser loads
+      - name: Stage interactive lab, Lean 4.35.0 Blueprint, and white paper PDF
         run: |
-          mkdir -p _site
+          mkdir -p _site/dist
           cp index.html favicon.svg .nojekyll coi-serviceworker.js _site/
-          cp -a styles src vendor assets _site/
+          cp -a styles src vendor assets data blueprint _site/
+          if [ -f dist/Donahue_2026_Xiaomi_17T_Pro_Lab.pdf ]; then
+            cp dist/Donahue_2026_Xiaomi_17T_Pro_Lab.pdf _site/dist/
+          fi
       - uses: actions/upload-pages-artifact@v5
         with:
           path: _site
@@ -31,7 +34,7 @@ jobs:
 
   deploy:
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

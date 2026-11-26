@@ -1,0 +1,19 @@
+name: Independent Replication Report
+description: Log an independent clean-clone replication run for REPLICATION.md.
+title: "[replication] "
+labels: ["issue"]
+body:
+  - type: input
+    id: env
+    attributes:
+      label: OS & Toolchain Versions
+      placeholder: "e.g., Ubuntu 24.04, Node 22.14, Python 3.12, Lean 4.35.0, Tectonic 0.15"
+    validations:
+      required: true
+  - type: textarea
+    id: results
+    attributes:
+      label: Observed Output (just reproduce)
+      description: Paste test counts, oracle max relative error, Lean axiom audit count, and any discrepancies.
+    validations:
+      required: true

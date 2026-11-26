@@ -1,0 +1,45 @@
+title: "Xiaomi 17T Pro Lab (v3.0.0): Forensic Hardware Provenance, Real-Time Multi-Scale Silicon-to-Quantum Simulation, 60-Digit Differential Oracles, and Six-Kernel Lean 4.35.0 Formal Invariants for the Dimensity 9500"
+repository: "https://github.com/0thernes/xiaomi-17t-pro-lab"
+version: "3.0.0"
+date: "2026-11-25"
+license:
+  code: "MIT"
+  documentation_and_papers: "CC-BY-4.0"
+authors:
+  - name: "Alexander Stephen Donahue"
+    orcid: "0009-0006-8168-9648"
+    affiliation: "Independent researcher, Spokane, WA, USA"
+    credit_roles:
+      - "Conceptualization"
+      - "Methodology"
+      - "Project administration"
+      - "Resources"
+      - "Supervision"
+      - "Validation"
+lean_toolchain: "leanprover/lean4:v4.35.0"
+mathlib_dependencies: none
+lake_package_dir: "lean"
+spec_module: "XiaomiLabProofs.Spec"
+challenge_module: "Challenge"
+solution_module: "Solution"
+comparator_config: "lean/comparator.json"
+axiom_audit_file: "lean/VerifyAxioms.lean"
+permitted_axioms:
+  - "propext"
+  - "Classical.choice"
+  - "Quot.sound"
+kernels_configured:
+  - "Lean 4.35.0 official C++ kernel"
+  - "leanchecker-paranoid (v4.35.0)"
+  - "lean4lean (v4.35.0)"
+  - "nanoda (v4.35.0 toolchain binary)"
+  - "con-leche (v4.35.0)"
+  - "con-ron (v4.35.0)"
+automation:
+  origin: "AI-assisted mathematical formalization, multi-scale simulation engineering, independent 60-digit differential verification, and AMS-LaTeX manuscript drafting under human direction"
+  models_used:
+    - "Google Gemini / Antigravity: v1.0.0–v3.0.0 multi-scale solvers, Lean 4.35.0 formalizations, 60-digit oracle, property/mutant/statistical suites, and AMS-LaTeX white paper"
+  human_line_by_line_review_recorded: false
+  statement_fidelity_table: "docs/statement-fidelity.md"
+review_status: "Research preprint; NOT externally peer reviewed; NOT yet submitted to Palomar Registry, arXiv, or Zenodo."
+limitations: "Formalizes finite/exact algebraic, stability, and contextuality invariants of the lab's silicon-to-quantum models over Nat/Int/Z[i]; does NOT formalize IEEE-754 floating-point error propagation, does NOT retire any of the 1,900 grand open problems in unsolved-problems-mega-atlas (0/1,900 retired), and never claims browser execution on the MediaTek NPU 990."

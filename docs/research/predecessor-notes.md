@@ -12,17 +12,17 @@ The loading model is **26 classic deferred `<script>` tags in deterministic orde
 
 Documented module graph (`docs/ARCHITECTURE.md`):
 
-| Area | Paths |
-| :--- | :---- |
-| Entry | `index.html` / `computer-evolution-lab.html`, `styles/lab.css` |
-| Vendor | `vendor/three-bundle.js` (`THREE` + addons) |
-| Core / UI | `src/core/three-aliases.js`, `src/core/dom-ui.js` |
-| Graphics | `src/graphics/pbr-materials.js`, `kit-3d.js`, `studio-stage.js` (MSAA / HDR / CAD slicer) |
+| Area       | Paths                                                                                                              |
+| :--------- | :----------------------------------------------------------------------------------------------------------------- |
+| Entry      | `index.html` / `computer-evolution-lab.html`, `styles/lab.css`                                                     |
+| Vendor     | `vendor/three-bundle.js` (`THREE` + addons)                                                                        |
+| Core / UI  | `src/core/three-aliases.js`, `src/core/dom-ui.js`                                                                  |
+| Graphics   | `src/graphics/pbr-materials.js`, `kit-3d.js`, `studio-stage.js` (MSAA / HDR / CAD slicer)                          |
 | Simulators | `src/sim/core-simulators.js`, `riscv-modern-pc.js`, `enterprise-hpc-quantum-sims.js`, `hardwired-frontier-sims.js` |
-| Layers | `src/layers/layer-stack.js`, `layers-expansion.js`, `hardwired-gate-engine.js` |
-| App shell | `src/app/compare-modal.js`, `src/app/lab-main.js` (`window.LAB`) |
-| Machines | `src/machines/machines-*.js`, `machine-pc20.js` (one file group per circle) |
-| Audio | `assets/audio/sfx-clips.js`, `src/audio/cinematic-score.js` |
+| Layers     | `src/layers/layer-stack.js`, `layers-expansion.js`, `hardwired-gate-engine.js`                                     |
+| App shell  | `src/app/compare-modal.js`, `src/app/lab-main.js` (`window.LAB`)                                                   |
+| Machines   | `src/machines/machines-*.js`, `machine-pc20.js` (one file group per circle)                                        |
+| Audio      | `assets/audio/sfx-clips.js`, `src/audio/cinematic-score.js`                                                        |
 
 The modern PC (`pc20`) maps a tiny RV32IM CPU through L1I/L1D/L2 caches onto UART, PCIe-style GPU MMIO (`uniform vec4 uCPU` into a WebGL2 GLSL ES 3.0 shader), and NVMe-style DMA. Rendering is Three.js + 4-sample MSAA (High/Ultra), UnrealBloom, ACES Filmic, optional SMAA.
 
@@ -32,14 +32,14 @@ A native Windows x64 path exists under `desktop/`: .NET 10 + WebView2, built by 
 
 `package.json` (name `computer-evolution-lab`, version **5.0.0**, `private`, `engines.node >= 20`, no runtime `dependencies` block):
 
-| Script | Role |
-| :--- | :--- |
-| `start` / `dev` | `node tools/serve.mjs` (loopback `http://127.0.0.1:4173`) |
-| `test` | `node tools/run-tests.mjs` |
-| `test:ci` | `node tools/run-tests.mjs --ci-headless-optional` |
-| `audit:4k` | `node tools/render-4k-audit.mjs` |
-| `build:icon` / `build:exe` / `install:desktop` | desktop packaging |
-| `format` / `format:check` | Prettier on `html,css,js,mjs,json,md,yml` |
+| Script                                         | Role                                                      |
+| :--------------------------------------------- | :-------------------------------------------------------- |
+| `start` / `dev`                                | `node tools/serve.mjs` (loopback `http://127.0.0.1:4173`) |
+| `test`                                         | `node tools/run-tests.mjs`                                |
+| `test:ci`                                      | `node tools/run-tests.mjs --ci-headless-optional`         |
+| `audit:4k`                                     | `node tools/render-4k-audit.mjs`                          |
+| `build:icon` / `build:exe` / `install:desktop` | desktop packaging                                         |
+| `format` / `format:check`                      | Prettier on `html,css,js,mjs,json,md,yml`                 |
 
 Root tooling also includes `.prettierrc.json`, `.gitignore`, `.nojekyll` (GitHub Pages), `.gitattributes`, `LICENSE` (Cosmogonic Non-Commercial), `THIRD-PARTY-NOTICES.md`, `CHANGELOG.md`.
 
@@ -70,15 +70,15 @@ Single workflow: `.github/workflows/ci.yml`, name `CI`.
 
 `docs/INDEX.md` is the hub:
 
-| Document | Purpose |
-| :--- | :--- |
-| `docs/SUMMARY.md` | Executive summary |
-| `docs/ARCHITECTURE.md` | Script graph, campus topology, `pc20` bus, 4K HDR pipeline |
-| `docs/GLOSSARY.md` | Canonical terms |
-| `README.md` | Quickstart, machine matrix, shortcuts, tests |
-| `CHANGELOG.md` | Versioned history |
-| `THIRD-PARTY-NOTICES.md` | Three.js MIT, CC0 audio, citations |
-| `docs/badges/` | CI badge JSON |
+| Document                 | Purpose                                                    |
+| :----------------------- | :--------------------------------------------------------- |
+| `docs/SUMMARY.md`        | Executive summary                                          |
+| `docs/ARCHITECTURE.md`   | Script graph, campus topology, `pc20` bus, 4K HDR pipeline |
+| `docs/GLOSSARY.md`       | Canonical terms                                            |
+| `README.md`              | Quickstart, machine matrix, shortcuts, tests               |
+| `CHANGELOG.md`           | Versioned history                                          |
+| `THIRD-PARTY-NOTICES.md` | Three.js MIT, CC0 audio, citations                         |
+| `docs/badges/`           | CI badge JSON                                              |
 
 GitHub community files: `.github/CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, `ISSUE_TEMPLATE/`.
 
