@@ -39,7 +39,7 @@ public theorem chsh_classical_bound (a0 a1 b0 b1 : Int)
   rcases ha1 with rfl | rfl <;>
   rcases hb0 with rfl | rfl <;>
   rcases hb1 with rfl | rfl <;>
-  omega
+  decide
 
 /-- Tsirelson's quantum CHSH square (2*sqrt(2))^2 = 8 strictly exceeds the classical square 2^2 = 4. -/
 public theorem tsirelson_sq_strictly_exceeds_classical_sq : (2 : Nat) * 2 < 8 := by decide
@@ -57,7 +57,7 @@ public theorem mermin3_classical_bound (x1 x2 x3 y1 y2 y3 : Int)
   rcases hy1 with rfl | rfl <;>
   rcases hy2 with rfl | rfl <;>
   rcases hy3 with rfl | rfl <;>
-  omega
+  decide
 
 /-- GHZ quantum Mermin-3 value 4 strictly exceeds classical cap 2 (factor of 2 separation). -/
 public theorem mermin3_quantum_exceeds_classical : (2 : Nat) < 4 := by decide
@@ -154,6 +154,6 @@ public theorem qubit_purity_bounds (p q : Int) (hp : 0 ≤ p) (hq : 0 ≤ q) :
   have hadd : (p + q) * (p + q) = p * p + 2 * (p * q) + q * q := by
     rw [Int.add_mul, Int.mul_add, Int.mul_add, Int.mul_comm q p]; omega
   have hpq : 0 ≤ p * q := Int.mul_nonneg hp hq
-  omega
+  constructor <;> omega
 
 end XiaomiLab.Contextuality

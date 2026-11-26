@@ -1,6 +1,6 @@
 {
   "name": "xiaomi-17t-pro-lab",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "private": true,
   "description": "Phone-first interactive silicon-to-quantum hardware lab, 60-digit differential oracle, and pure Lean 4.35.0 six-kernel formal core for the Xiaomi 17T Pro and MediaTek Dimensity 9500.",
   "license": "MIT",

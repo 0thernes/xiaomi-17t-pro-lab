@@ -1,8 +1,8 @@
-# Xiaomi 17T Pro Lab (v3.0.0)
+# Xiaomi 17T Pro Lab (v3.1.0)
 
 [![CI](https://github.com/0thernes/xiaomi-17t-pro-lab/actions/workflows/ci.yml/badge.svg)](https://github.com/0thernes/xiaomi-17t-pro-lab/actions/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/version-3.0.0-38d4f2)](CHANGELOG.md)
-[![Lean 4.35.0](https://img.shields.io/badge/Lean%204.35.0-59%20audited%20decls%20%C2%B7%206%20kernels-4ade80)](lean/VerifyAxioms.lean)
+[![Version](https://img.shields.io/badge/version-3.1.0-38d4f2)](CHANGELOG.md)
+[![Lean 4.35.0](https://img.shields.io/badge/Lean%204.35.0-75%20constructive%20decls%20%C2%B7%200%20Choice%20%C2%B7%206%20kernels-4ade80)](lean/VerifyAxioms.lean)
 [![Oracle](https://img.shields.io/badge/60--digit%20oracle-54%2F54%20pass-0b6bcb)](reference/physics_oracle.py)
 [![License](https://img.shields.io/badge/license-MIT%20%2B%20CC--BY--4.0-a78bfa)](LICENSE)
 [![Status](https://img.shields.io/badge/status-active-2ea043)](ROADMAP.md)
@@ -52,7 +52,26 @@ lake env leanchecker --fresh Solution
 lake comparator --config comparator.json --paranoid
 ```
 
-All **59 audited declarations** (50 theorems across 6 modules + 9 isolated Palomar comparator targets) compile cleanly with zero Mathlib, zero `sorry` (outside statement-only `Challenge.lean`), zero `native_decide`, and axioms strictly within `[propext, Classical.choice, Quot.sound]`. See [docs/statement-fidelity.md](docs/statement-fidelity.md) and [formalization.yaml](formalization.yaml).
+All **75 constructive audited declarations** (65 exported theorems across 7 Palomar modules + 10 isolated Palomar comparator targets; 28 zero-axiom) compile cleanly with zero Mathlib, zero `sorry` (outside statement-only `Challenge.lean`), zero `native_decide`, and **zero `Classical.choice`** — strictly within `[propext, Quot.sound]`, paired with live negative kernel & comparator rejection (`scripts/test_negative_lean.py`). See [docs/statement-fidelity.md](docs/statement-fidelity.md), [docs/literature-search-log.md](docs/literature-search-log.md), and [formalization.yaml](formalization.yaml).
+
+### Verbatim Headline Comparator `#print axioms` Output (CI Drift-Checked)
+
+<!-- LEAN_AXIOMS_START -->
+
+```text
+'XiaomiLab.ComparatorTarget.target_thm1_hardware_and_roofline' depends on axioms: [propext, Quot.sound]
+'XiaomiLab.ComparatorTarget.target_thm2_euv_rayleigh_and_dof' depends on axioms: [propext, Quot.sound]
+'XiaomiLab.ComparatorTarget.target_thm3_dirac_finfet_and_crank_nicolson' depends on axioms: [propext, Quot.sound]
+'XiaomiLab.ComparatorTarget.target_thm4_fdtd_cfl_maximum_principle' depends on axioms: [propext, Quot.sound]
+'XiaomiLab.ComparatorTarget.target_thm5_chsh_and_mermin3_classical_caps' does not depend on any axioms
+'XiaomiLab.ComparatorTarget.target_thm6_peres_mermin_magic_square' depends on axioms: [propext, Quot.sound]
+'XiaomiLab.ComparatorTarget.target_thm7_bloch_purity_bounds' depends on axioms: [propext, Quot.sound]
+'XiaomiLab.ComparatorTarget.target_thm8_adversarial_refutations' does not depend on any axioms
+'XiaomiLab.ComparatorTarget.target_thm9_bragg_parseval_and_shards' depends on axioms: [propext, Quot.sound]
+'XiaomiLab.ComparatorTarget.target_nonvacuity_witnesses' does not depend on any axioms
+```
+
+<!-- LEAN_AXIOMS_END -->
 
 ## Usage
 
@@ -93,8 +112,8 @@ just audit       # Build Standard v1.2.0 90-item repository audit
 ## Verification & Research Artifacts
 
 - **Claims & Falsifiers:** [CLAIMS.md](CLAIMS.md) (`C01`–`C11`) · [VERIFICATION.md](VERIFICATION.md) · [REPLICATION.md](REPLICATION.md)
-- **Hardening & Reviews:** [HARDENING_LOG.md](HARDENING_LOG.md) · [docs/reviews/2026-11-25-3-cycle-hardening-audit.md](docs/reviews/2026-11-25-3-cycle-hardening-audit.md) · [ERRATA.md](ERRATA.md)
-- **Mega-Atlas Cross-Reference:** [docs/mega-atlas-cross-reference.md](docs/mega-atlas-cross-reference.md) (**0 / 1,900** grand open problems retired)
+- **Hardening & Reviews:** [HARDENING_LOG.md](HARDENING_LOG.md) · [docs/reviews/2026-11-26-round2-3-cycle-hardening-audit.md](docs/reviews/2026-11-26-round2-3-cycle-hardening-audit.md) · [docs/reviews/2026-11-25-3-cycle-hardening-audit.md](docs/reviews/2026-11-25-3-cycle-hardening-audit.md) · [ERRATA.md](ERRATA.md)
+- **Mega-Atlas & Literature:** [docs/mega-atlas-cross-reference.md](docs/mega-atlas-cross-reference.md) (**0 / 1,900** grand open problems retired) · [docs/literature-search-log.md](docs/literature-search-log.md) · [results/citation-audit.json](results/citation-audit.json) (12/12 DOIs non-retracted)
 - **Formal & Security Docs:** [docs/statement-fidelity.md](docs/statement-fidelity.md) · [docs/threat-model.md](docs/threat-model.md) · [docs/ai.md](docs/ai.md) · [docs/benchmarks.md](docs/benchmarks.md) · [docs/preregistration.md](docs/preregistration.md)
 
 ## Limitations

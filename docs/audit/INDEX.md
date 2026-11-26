@@ -66,7 +66,7 @@ Spine for the 2.1.0 hardening sweep. Baseline is `main` at `b76ca54` (v2.0.0), w
 | `docs/ADR-007-design-system.md`             |    17 |     612 |
 | `docs/ARCHITECTURE.md`                      |    47 |    2451 |
 | `docs/DATA-PROVENANCE.md`                   |    32 |    2468 |
-| `docs/GLOSSARY.md`                          |    16 |    1923 |
+| `docs/glossary.md`                          |    18 |    2397 |
 | `docs/INDEX.md`                             |    21 |     801 |
 | `docs/MEASUREMENTS.md`                      |    60 |    5348 |
 | `docs/RELEASE-0.1.0.md`                     |    31 |    1202 |

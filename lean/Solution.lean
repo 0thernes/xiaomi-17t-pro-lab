@@ -4,10 +4,11 @@ public import XiaomiLabProofs.Spec
 public import XiaomiLabProofs
 
 /-!
-  XIAOMI 17T PRO LAB (v3.0.0) — Sorry-Free Solution Module Matched Against `Challenge.lean`.
+  XIAOMI 17T PRO LAB (v3.1.0) — Sorry-Free Constructive Solution Module Matched Against `Challenge.lean`.
 
-  Proves all 9 targets in `XiaomiLab.ComparatorTarget` with ZERO `sorry`, ZERO `native_decide`,
-  ZERO custom axioms, and ZERO Mathlib dependencies, verified across 6 independent Lean kernels via:
+  Proves all 10 targets in `XiaomiLab.ComparatorTarget` with ZERO `sorry`, ZERO `native_decide`,
+  ZERO `Classical.choice`, ZERO custom axioms, and ZERO Mathlib dependencies, verified across
+  6 independent Lean kernels via:
       lake comparator --config comparator.json --paranoid
 -/
 
@@ -97,11 +98,32 @@ public theorem target_thm8_adversarial_refutations :
     (fdtdStencilNum 10 4 4 10 0 0 0 0 < 10 * min5 10 0 0 0 0) ∧
     (2 < chshExpr 2 2 2 0) ∧
     ((5 : Int) * 5 = 5 * 5 + 0 * 0 ∧ ¬ ((5 : Int) < 5)) ∧
-    (rooflineAchievable 5270 2 77 = 154 ∧ 154 < max 5270 (2 * 77)) :=
+    (rooflineAchievable 5270 2 77 = 154 ∧ 154 < max 5270 (2 * 77)) ∧
+    ((Mat2C.mul ⟨⟨2, 0⟩, CInt.zero, CInt.zero, CInt.one⟩ Mat2C.id).det ≠ CInt.one) ∧
+    ((dft2_0 CInt.one CInt.zero).normSq + (dft2_1 CInt.one CInt.zero).normSq ≠
+      (CInt.one.normSq + CInt.zero.normSq)) :=
   ⟨XiaomiLab.Adversarial.adv_fdtd_cfl_violation_undershoots,
    XiaomiLab.Adversarial.adv_chsh_relaxed_domain_breaks_bound,
    XiaomiLab.Adversarial.adv_massless_dirac_not_subluminal,
-   XiaomiLab.Adversarial.adv_roofline_max_violates_memory_wall⟩
+   XiaomiLab.Adversarial.adv_roofline_max_violates_memory_wall,
+   XiaomiLab.Adversarial.adv_bragg_non_unimodular_breaks_det_one,
+   XiaomiLab.Adversarial.adv_dft2_parseval_breaks_without_factor_2⟩
+
+public theorem target_thm9_bragg_parseval_and_shards :
+    (∀ A B : Mat2C, (Mat2C.mul A B).det = CInt.mul A.det B.det) ∧
+    (∀ A B : Mat2C, A.det = CInt.one → B.det = CInt.one → (Mat2C.mul A B).det = CInt.one) ∧
+    (∀ x0 x1 : CInt,
+      (dft2_0 x0 x1).normSq + (dft2_1 x0 x1).normSq = 2 * (x0.normSq + x1.normSq)) ∧
+    (∀ x0 x1 x2 x3 : CInt,
+      (dft4_0 x0 x1 x2 x3).normSq + (dft4_1 x0 x1 x2 x3).normSq +
+      (dft4_2 x0 x1 x2 x3).normSq + (dft4_3 x0 x1 x2 x3).normSq =
+      4 * (x0.normSq + x1.normSq + x2.normSq + x3.normSq)) ∧
+    (shardTotalBytes 8 4500000 3417097 = 39417097 ∧ 4500000 < 5242880 ∧ 3417097 < 5242880) :=
+  ⟨XiaomiLab.SpectralBragg.mat2c_det_mul,
+   XiaomiLab.SpectralBragg.bragg_unimodular_closed,
+   XiaomiLab.SpectralBragg.dft2_parseval_exact,
+   XiaomiLab.SpectralBragg.dft4_parseval_exact,
+   XiaomiLab.SpectralBragg.tinystories_9_shards_exact_total⟩
 
 public theorem target_nonvacuity_witnesses :
     fdtdStencilNum 100 15 15 80 40 40 40 40 = 5600 ∧
@@ -109,7 +131,9 @@ public theorem target_nonvacuity_witnesses :
     mermin3Expr 1 1 1 1 1 (-1) = 2 ∧
     (CInt.mul ⟨1, 3⟩ ⟨4, -2⟩).normSq = 200 ∧
     blochX ⟨1, 0⟩ ⟨0, 1⟩ = 0 ∧
-    blochY ⟨1, 0⟩ ⟨0, 1⟩ = 2 := by
-  decide
+    blochY ⟨1, 0⟩ ⟨0, 1⟩ = 2 ∧
+    Mat2C.id.det = CInt.one ∧
+    (dft4_0 CInt.one CInt.zero CInt.zero CInt.zero).normSq = 1 :=
+  ⟨by decide, by decide, by decide, by decide, by decide, by decide, rfl, by decide⟩
 
 end XiaomiLab.ComparatorTarget

@@ -44,4 +44,18 @@ public theorem adv_peres_mermin_without_minus_sign_is_classical :
 public theorem adv_roofline_max_violates_memory_wall :
     rooflineAchievable 5270 2 77 = 154 ∧ 154 < max 5270 (2 * 77) := by decide
 
+/-- Adv 6: A non-unimodular 2x2 transfer matrix (det = 2 != 1) breaks unimodular preservation under product. -/
+public theorem adv_bragg_non_unimodular_breaks_det_one :
+    (Mat2C.mul ⟨⟨2, 0⟩, CInt.zero, CInt.zero, CInt.one⟩ Mat2C.id).det ≠ CInt.one := by
+  intro h
+  have hre : ((Mat2C.mul ⟨⟨2, 0⟩, CInt.zero, CInt.zero, CInt.one⟩ Mat2C.id).det).re = CInt.one.re :=
+    congrArg CInt.re h
+  revert hre
+  decide
+
+/-- Adv 7: Dropping the factor of 2 in 2-point DFT Parseval breaks energy conservation on (1, 0). -/
+public theorem adv_dft2_parseval_breaks_without_factor_2 :
+    (dft2_0 CInt.one CInt.zero).normSq + (dft2_1 CInt.one CInt.zero).normSq ≠
+    (CInt.one.normSq + CInt.zero.normSq) := by decide
+
 end XiaomiLab.Adversarial

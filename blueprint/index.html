@@ -3,183 +3,38 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Xiaomi 17T Pro Lab — Lean 4.35.0 Formal Verification Blueprint</title>
-    <style>
-      :root {
-        --bg: #070a10;
-        --panel: #0e1420;
-        --border: #1e2a3f;
-        --ink: #ecf2fa;
-        --muted: #93a6c2;
-        --accent: #ff6900;
-        --cyan: #38d4f2;
-        --ok: #4ade80;
-        --violet: #a78bfa;
-      }
-      * {
-        box-sizing: border-box;
-      }
-      body {
-        margin: 0;
-        padding: 2rem clamp(1rem, 4vw, 3rem);
-        font-family:
-          system-ui,
-          -apple-system,
-          Segoe UI,
-          Roboto,
-          sans-serif;
-        background: var(--bg);
-        color: var(--ink);
-        line-height: 1.55;
-      }
-      header {
-        max-width: 1180px;
-        margin: 0 auto 2rem;
-        border-bottom: 1px solid var(--border);
-        padding-bottom: 1.25rem;
-      }
-      .pill {
-        display: inline-block;
-        padding: 0.2rem 0.65rem;
-        border-radius: 999px;
-        font-size: 0.78rem;
-        font-weight: 600;
-        letter-spacing: 0.04em;
-        background: rgba(74, 222, 128, 0.14);
-        color: var(--ok);
-        border: 1px solid rgba(74, 222, 128, 0.4);
-        margin-right: 0.5rem;
-      }
-      .pill.cyan {
-        background: rgba(56, 212, 242, 0.14);
-        color: var(--cyan);
-        border-color: rgba(56, 212, 242, 0.4);
-      }
-      .pill.accent {
-        background: rgba(255, 105, 0, 0.14);
-        color: var(--accent);
-        border-color: rgba(255, 105, 0, 0.4);
-      }
-      h1 {
-        margin: 0.6rem 0 0.4rem;
-        font-size: clamp(1.5rem, 2.8vw, 2.25rem);
-      }
-      .lede {
-        color: var(--muted);
-        max-width: 78ch;
-        margin: 0.35rem 0 0.85rem;
-      }
-      a {
-        color: var(--cyan);
-        text-decoration: none;
-      }
-      a:hover {
-        text-decoration: underline;
-      }
-      main {
-        max-width: 1180px;
-        margin: 0 auto;
-        display: grid;
-        gap: 1.5rem;
-      }
-      section {
-        background: var(--panel);
-        border: 1px solid var(--border);
-        border-radius: 14px;
-        padding: 1.35rem;
-      }
-      h2 {
-        margin: 0 0 0.85rem;
-        font-size: 1.15rem;
-        color: var(--ink);
-      }
-      svg.dag {
-        width: 100%;
-        height: auto;
-        display: block;
-        background: #06090f;
-        border-radius: 10px;
-        border: 1px solid var(--border);
-      }
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 0.9rem;
-      }
-      th,
-      td {
-        text-align: left;
-        padding: 0.6rem 0.75rem;
-        border-bottom: 1px solid var(--border);
-        vertical-align: top;
-      }
-      th {
-        color: var(--muted);
-        font-weight: 600;
-        font-size: 0.8rem;
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-      }
-      code {
-        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-        font-size: 0.85em;
-        color: var(--cyan);
-      }
-      .ok {
-        color: var(--ok);
-        font-weight: 600;
-      }
-      .grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        gap: 0.9rem;
-      }
-      .card {
-        background: #090e17;
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        padding: 0.95rem;
-      }
-      .card h3 {
-        margin: 0 0 0.35rem;
-        font-size: 0.95rem;
-        color: var(--accent);
-      }
-      .card p {
-        margin: 0;
-        font-size: 0.86rem;
-        color: var(--muted);
-      }
-      footer {
-        max-width: 1180px;
-        margin: 2rem auto 0;
-        color: var(--muted);
-        font-size: 0.85rem;
-        text-align: center;
-      }
-    </style>
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'self'; object-src 'none'"
+    />
+    <title>Xiaomi 17T Pro Lab — Lean 4.35.0 Formal Verification Blueprint (v3.1.0)</title>
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="blueprint.css" />
   </head>
   <body>
     <header>
       <div>
         <span class="pill">LEAN 4.35.0 · ZERO MATHLIB</span>
         <span class="pill cyan">6-KERNEL PALOMAR COMPARATOR</span>
-        <span class="pill accent">59 AUDITED DECLARATIONS · 0 SORRY</span>
+        <span class="pill accent">75 CONSTRUCTIVE DECLS · 0 SORRY</span>
+        <span class="pill violet">ZERO Classical.choice · LIVE NEGATIVE REJECTION</span>
       </div>
-      <h1>Xiaomi 17T Pro Lab — Formal Verification Blueprint</h1>
+      <h1>Xiaomi 17T Pro Lab (v3.1.0) — Formal Verification Blueprint</h1>
       <p class="lede">
-        Dependency graph and statement-fidelity blueprint for the pure Lean 4.35.0 formal core
+        Dependency graph and statement-fidelity blueprint for the constructive pure Lean 4.35.0 formal core
         (<code>XiaomiLabProofs</code>) certifying hardware packing, EUV Rayleigh/DOF limits, Crank–Nicolson Cayley
-        unitarity, 2D FDTD CFL discrete maximum principle, and Bell-CHSH / Mermin-3 / Peres–Mermin quantum contextuality
-        invariants.
-        <a href="../">← Return to Interactive Hardware Lab</a>
+        unitarity, 2D FDTD CFL discrete maximum principle, Bell–CHSH / Mermin-3 / Peres–Mermin quantum contextuality,
+        exact 2×2 unimodular Bragg transfer matrices, 2/4-point DFT Parseval energy conservation, and deterministic
+        9-shard TinyStories-8M byte-stream boundaries — with <strong>zero</strong> <code>Classical.choice</code>.
+        <a href="../">← Return to Interactive Hardware Lab</a> ·
+        <a href="../dist/Donahue_2026_Xiaomi_17T_Pro_Lab.pdf">Download White Paper PDF</a>
       </p>
     </header>
 
     <main>
       <section>
         <h2>Theorem Dependency DAG (Palomar <code>module</code> Isolation Architecture)</h2>
-        <svg class="dag" viewBox="0 0 1080 420" role="img" aria-label="Lean 4.35.0 proof dependency DAG">
+        <svg class="dag" viewBox="0 0 1180 430" role="img" aria-label="Lean 4.35.0 proof dependency DAG">
           <defs>
             <marker
               id="arrow"
@@ -195,106 +50,116 @@
           </defs>
           <!-- Edges from Spec -->
           <g stroke="#38d4f2" stroke-opacity="0.55" stroke-width="1.6" fill="none" marker-end="url(#arrow)">
-            <path d="M 540 68 L 100 142" />
-            <path d="M 540 68 L 275 142" />
-            <path d="M 540 68 L 455 142" />
-            <path d="M 540 68 L 635 142" />
-            <path d="M 540 68 L 815 142" />
-            <path d="M 540 68 L 980 142" />
-            <!-- QuantumTransport -> QuantumContextuality -->
-            <path d="M 535 178 L 735 178" stroke="#a78bfa" />
+            <path d="M 590 68 L 95 142" />
+            <path d="M 590 68 L 260 142" />
+            <path d="M 590 68 L 425 142" />
+            <path d="M 590 68 L 590 142" />
+            <path d="M 590 68 L 755 142" />
+            <path d="M 590 68 L 920 142" />
+            <path d="M 590 68 L 1085 142" />
+            <!-- QuantumTransport -> QuantumContextuality & SpectralBragg -->
+            <path d="M 500 178 L 680 178" stroke="#a78bfa" />
+            <path d="M 425 144 C 520 108, 825 108, 920 142" stroke="#a78bfa" />
             <!-- Modules -> Solution -->
-            <path d="M 100 212 L 500 282" />
-            <path d="M 275 212 L 515 282" />
-            <path d="M 455 212 L 530 282" />
-            <path d="M 635 212 L 550 282" />
-            <path d="M 815 212 L 565 282" />
-            <path d="M 980 212 L 580 282" />
+            <path d="M 95 214 L 530 286" />
+            <path d="M 260 214 L 548 286" />
+            <path d="M 425 214 L 566 286" />
+            <path d="M 590 214 L 584 286" />
+            <path d="M 755 214 L 602 286" />
+            <path d="M 920 214 L 620 286" />
+            <path d="M 1085 214 L 638 286" />
             <!-- Spec -> Challenge -> Comparator -->
-            <path d="M 460 52 C 180 52, 60 250, 175 304" stroke="#ff6900" stroke-dasharray="5,4" />
-            <path d="M 330 315 L 445 315" stroke="#4ade80" />
-            <path d="M 540 342 L 540 368" stroke="#4ade80" />
+            <path d="M 490 52 C 180 52, 50 250, 195 308" stroke="#ff6900" stroke-dasharray="5,4" />
+            <path d="M 365 318 L 485 318" stroke="#4ade80" />
+            <path d="M 590 348 L 590 374" stroke="#4ade80" />
           </g>
 
           <!-- Top node: Spec.lean -->
-          <rect x="390" y="18" width="300" height="50" rx="10" fill="#101a2c" stroke="#ff6900" stroke-width="2" />
-          <text x="540" y="39" text-anchor="middle" fill="#ecf2fa" font-size="13" font-weight="700">
+          <rect x="440" y="18" width="300" height="50" rx="10" fill="#101a2c" stroke="#ff6900" stroke-width="2" />
+          <text x="590" y="39" text-anchor="middle" fill="#ecf2fa" font-size="13" font-weight="700">
             XiaomiLabProofs.Spec
           </text>
-          <text x="540" y="57" text-anchor="middle" fill="#93a6c2" font-size="10.5">
+          <text x="590" y="57" text-anchor="middle" fill="#93a6c2" font-size="10.5">
             Pure definitions only · 0 proofs · 0 sorry
           </text>
 
-          <!-- 6 Proof Modules -->
+          <!-- 7 Proof Modules -->
           <g font-family="system-ui, sans-serif">
-            <rect x="20" y="144" width="160" height="68" rx="9" fill="#0d1828" stroke="#4ade80" stroke-width="1.6" />
-            <text x="100" y="167" text-anchor="middle" fill="#ecf2fa" font-size="12" font-weight="700">
+            <rect x="20" y="144" width="150" height="70" rx="9" fill="#0d1828" stroke="#4ade80" stroke-width="1.6" />
+            <text x="95" y="167" text-anchor="middle" fill="#ecf2fa" font-size="11.5" font-weight="700">
               HardwareFloorplan
             </text>
-            <text x="100" y="185" text-anchor="middle" fill="#93a6c2" font-size="10">12 theorems · Roofline</text>
-            <text x="100" y="201" text-anchor="middle" fill="#4ade80" font-size="10">Die, LPDDR5X, CMOS</text>
+            <text x="95" y="185" text-anchor="middle" fill="#93a6c2" font-size="10">12 theorems · Roofline</text>
+            <text x="95" y="201" text-anchor="middle" fill="#4ade80" font-size="9.5">Die, LPDDR5X, CMOS</text>
 
-            <rect x="195" y="144" width="160" height="68" rx="9" fill="#0d1828" stroke="#4ade80" stroke-width="1.6" />
-            <text x="275" y="167" text-anchor="middle" fill="#ecf2fa" font-size="12" font-weight="700">
+            <rect x="185" y="144" width="150" height="70" rx="9" fill="#0d1828" stroke="#4ade80" stroke-width="1.6" />
+            <text x="260" y="167" text-anchor="middle" fill="#ecf2fa" font-size="11.5" font-weight="700">
               EuvLithography
             </text>
-            <text x="275" y="185" text-anchor="middle" fill="#93a6c2" font-size="10">7 theorems · Rayleigh</text>
-            <text x="275" y="201" text-anchor="middle" fill="#4ade80" font-size="10">DOF 25/9, &gt;14× photons</text>
+            <text x="260" y="185" text-anchor="middle" fill="#93a6c2" font-size="10">7 theorems · Rayleigh</text>
+            <text x="260" y="201" text-anchor="middle" fill="#4ade80" font-size="9.5">DOF 25/9, &gt;14× photons</text>
 
-            <rect x="375" y="144" width="160" height="68" rx="9" fill="#0d1828" stroke="#4ade80" stroke-width="1.6" />
-            <text x="455" y="167" text-anchor="middle" fill="#ecf2fa" font-size="12" font-weight="700">
+            <rect x="350" y="144" width="150" height="70" rx="9" fill="#0d1828" stroke="#4ade80" stroke-width="1.6" />
+            <text x="425" y="167" text-anchor="middle" fill="#ecf2fa" font-size="11.5" font-weight="700">
               QuantumTransport
             </text>
-            <text x="455" y="185" text-anchor="middle" fill="#93a6c2" font-size="10">9 theorems · TDSE</text>
-            <text x="455" y="201" text-anchor="middle" fill="#4ade80" font-size="10">Cayley |ψ|², Dirac, FinFET</text>
+            <text x="425" y="185" text-anchor="middle" fill="#93a6c2" font-size="10">9 theorems · TDSE</text>
+            <text x="425" y="201" text-anchor="middle" fill="#4ade80" font-size="9.5">Cayley |ψ|², Dirac, FinFET</text>
 
-            <rect x="555" y="144" width="160" height="68" rx="9" fill="#0d1828" stroke="#4ade80" stroke-width="1.6" />
-            <text x="635" y="167" text-anchor="middle" fill="#ecf2fa" font-size="12" font-weight="700">
+            <rect x="515" y="144" width="150" height="70" rx="9" fill="#0d1828" stroke="#4ade80" stroke-width="1.6" />
+            <text x="590" y="167" text-anchor="middle" fill="#ecf2fa" font-size="11.5" font-weight="700">
               ThermalFdtd
             </text>
-            <text x="635" y="185" text-anchor="middle" fill="#93a6c2" font-size="10">7 theorems · 2D PDE</text>
-            <text x="635" y="201" text-anchor="middle" fill="#4ade80" font-size="10">CFL Max/Min, IceLoop</text>
+            <text x="590" y="185" text-anchor="middle" fill="#93a6c2" font-size="10">7 theorems · 2D PDE</text>
+            <text x="590" y="201" text-anchor="middle" fill="#4ade80" font-size="9.5">CFL Max/Min, IceLoop</text>
 
-            <rect x="735" y="144" width="160" height="68" rx="9" fill="#0d1828" stroke="#4ade80" stroke-width="1.6" />
-            <text x="815" y="167" text-anchor="middle" fill="#ecf2fa" font-size="12" font-weight="700">
+            <rect x="680" y="144" width="150" height="70" rx="9" fill="#0d1828" stroke="#4ade80" stroke-width="1.6" />
+            <text x="755" y="167" text-anchor="middle" fill="#ecf2fa" font-size="11.5" font-weight="700">
               QuantumContextuality
             </text>
-            <text x="815" y="185" text-anchor="middle" fill="#93a6c2" font-size="10">10 theorems · Bell/PM</text>
-            <text x="815" y="201" text-anchor="middle" fill="#4ade80" font-size="10">CHSH≤2, PM≤5, Bloch</text>
+            <text x="755" y="185" text-anchor="middle" fill="#93a6c2" font-size="10">10 theorems · Bell/PM</text>
+            <text x="755" y="201" text-anchor="middle" fill="#4ade80" font-size="9.5">CHSH≤2, PM≤5, Bloch</text>
 
-            <rect x="910" y="144" width="150" height="68" rx="9" fill="#0d1828" stroke="#a78bfa" stroke-width="1.6" />
-            <text x="985" y="167" text-anchor="middle" fill="#ecf2fa" font-size="12" font-weight="700">
+            <rect x="845" y="144" width="150" height="70" rx="9" fill="#0d1828" stroke="#38d4f2" stroke-width="1.6" />
+            <text x="920" y="167" text-anchor="middle" fill="#ecf2fa" font-size="11.5" font-weight="700">
+              SpectralBraggAndShards
+            </text>
+            <text x="920" y="185" text-anchor="middle" fill="#93a6c2" font-size="10">13 theorems · Z[i]</text>
+            <text x="920" y="201" text-anchor="middle" fill="#38d4f2" font-size="9.5">Bragg det, DFT4, Shards</text>
+
+            <rect x="1010" y="144" width="150" height="70" rx="9" fill="#0d1828" stroke="#a78bfa" stroke-width="1.6" />
+            <text x="1085" y="167" text-anchor="middle" fill="#ecf2fa" font-size="11.5" font-weight="700">
               AdversarialTests
             </text>
-            <text x="985" y="185" text-anchor="middle" fill="#93a6c2" font-size="10">5 refutations</text>
-            <text x="985" y="201" text-anchor="middle" fill="#a78bfa" font-size="10">Anti-vacuity sharpness</text>
+            <text x="1085" y="185" text-anchor="middle" fill="#93a6c2" font-size="10">7 refutations</text>
+            <text x="1085" y="201" text-anchor="middle" fill="#a78bfa" font-size="9.5">Anti-vacuity sharpness</text>
           </g>
 
           <!-- Challenge & Solution -->
-          <rect x="175" y="284" width="155" height="58" rx="9" fill="#181210" stroke="#ff6900" stroke-width="1.8" />
-          <text x="252" y="307" text-anchor="middle" fill="#ecf2fa" font-size="12" font-weight="700">
+          <rect x="195" y="288" width="170" height="60" rx="9" fill="#181210" stroke="#ff6900" stroke-width="1.8" />
+          <text x="280" y="311" text-anchor="middle" fill="#ecf2fa" font-size="12" font-weight="700">
             Challenge.lean
           </text>
-          <text x="252" y="325" text-anchor="middle" fill="#ff9345" font-size="10">9 statement targets only</text>
+          <text x="280" y="330" text-anchor="middle" fill="#ff9345" font-size="10">10 statement targets only</text>
 
-          <rect x="448" y="284" width="184" height="58" rx="9" fill="#0c1c16" stroke="#4ade80" stroke-width="2" />
-          <text x="540" y="307" text-anchor="middle" fill="#ecf2fa" font-size="12" font-weight="700">
+          <rect x="488" y="288" width="204" height="60" rx="9" fill="#0c1c16" stroke="#4ade80" stroke-width="2" />
+          <text x="590" y="311" text-anchor="middle" fill="#ecf2fa" font-size="12" font-weight="700">
             Solution.lean
           </text>
-          <text x="540" y="325" text-anchor="middle" fill="#4ade80" font-size="10">
-            9 sorry-free proofs · 0 axioms+
+          <text x="590" y="330" text-anchor="middle" fill="#4ade80" font-size="10">
+            10 sorry-free proofs · 0 Choice
           </text>
 
           <!-- 6-kernel bar -->
-          <rect x="190" y="370" width="700" height="36" rx="8" fill="#0c1524" stroke="#38d4f2" stroke-width="1.5" />
-          <text x="540" y="393" text-anchor="middle" fill="#38d4f2" font-size="11.5" font-weight="600">
+          <rect x="170" y="376" width="840" height="36" rx="8" fill="#0c1524" stroke="#38d4f2" stroke-width="1.5" />
+          <text x="590" y="399" text-anchor="middle" fill="#38d4f2" font-size="11.5" font-weight="600">
             6 Independent Kernels: Lean 4.35.0 C++ · leanchecker --paranoid · lean4lean · nanoda · con-leche · con-ron
           </text>
         </svg>
       </section>
 
       <section>
-        <h2>Isolated Comparator Targets (<code>lean/comparator.json</code>)</h2>
+        <h2>Isolated Comparator Targets (<code>lean/comparator.json</code> — Zero <code>Classical.choice</code>)</h2>
         <table>
           <thead>
             <tr>
@@ -374,7 +239,19 @@
               <td><code>AdversarialTests</code></td>
               <td>
                 Counterexamples proving hypothesis sharpness: CFL violation undershoots, relaxed CHSH exceeds 2,
-                massless Dirac hits |p|=E, Roofline max breaks memory wall.
+                massless Dirac hits |p|=E, Roofline max breaks memory wall, non-unimodular Bragg breaks det=1, dropped
+                factor-2 breaks DFT Parseval.
+              </td>
+              <td class="ok">Verified</td>
+            </tr>
+            <tr>
+              <td><code>target_thm9_bragg_parseval_and_shards</code></td>
+              <td><code>SpectralBraggAndShards</code></td>
+              <td>
+                Exact 2×2 complex Bragg transfer-matrix determinant multiplicativity
+                <code>det(A·B) = det(A)·det(B)</code> and unimodular closure over ℤ[i], exact 2-point &amp; 4-point DFT
+                Parseval energy conservation <code>∑|X_k|² = N∑|x_n|²</code>, and exact 9-shard TinyStories-8M byte
+                conservation (<code>39,417,097 B</code>, every shard <code>&lt; 5 MiB</code>).
               </td>
               <td class="ok">Verified</td>
             </tr>
@@ -392,17 +269,19 @@
         <h2>Honest Verification Boundaries</h2>
         <div class="grid">
           <div class="card">
-            <h3>What Lean Certifies</h3>
+            <h3>What Lean Certifies (Constructive, 0 Choice)</h3>
             <p>
-              Exact algebraic, combinatorial, stability, and inequality theorems over <code>Nat</code>,
-              <code>Int</code>, and <code>ℤ[i]</code> with zero Mathlib dependencies and zero custom axioms.
+              75 audited declarations across 7 Palomar modules and 10 isolated comparator targets over <code>Nat</code>,
+              <code>Int</code>, and <code>ℤ[i]</code> with zero Mathlib, zero <code>Classical.choice</code>, and live
+              negative kernel &amp; comparator rejection tests in CI.
             </p>
           </div>
           <div class="card">
             <h3>What Python 60-Digit Oracle Certifies</h3>
             <p>
               54 differential numerical checks comparing JavaScript IEEE-754 solver outputs against independent 60-digit
-              <code>Decimal</code>/<code>Fraction</code> arithmetic (max relative error &lt; 10⁻¹³).
+              <code>Decimal</code>/<code>Fraction</code> arithmetic (max relative error &lt; 10⁻¹³), plus 12/12 live
+              Crossref/arXiv non-retracted DOI checks and RFC 3161 + OpenTimestamps receipts.
             </p>
           </div>
           <div class="card">

@@ -49,7 +49,9 @@ public theorem cmos_power_ratio_cancels_alpha_C_V (K f1 f2 : Int) :
 public theorem roofline_bounded_by_peak_and_memory (peak ai bw : Int) :
     rooflineAchievable peak ai bw ≤ peak ∧ rooflineAchievable peak ai bw ≤ ai * bw := by
   unfold rooflineAchievable
-  split <;> omega
+  split
+  · exact ⟨‹_›, Int.le_refl _⟩
+  · exact ⟨Int.le_refl _, by omega⟩
 
 /-- Roofline regime classification: strictly below ridge point implies memory-bound equality. -/
 public theorem roofline_memory_bound_exact (peak ai bw : Int) (h : ai * bw ≤ peak) :

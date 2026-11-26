@@ -1,7 +1,7 @@
-title: "Xiaomi 17T Pro Lab (v3.0.0): Forensic Hardware Provenance, Real-Time Multi-Scale Silicon-to-Quantum Simulation, 60-Digit Differential Oracles, and Six-Kernel Lean 4.35.0 Formal Invariants for the Dimensity 9500"
+title: "Xiaomi 17T Pro Lab (v3.1.0): Forensic Hardware Provenance, Real-Time Multi-Scale Silicon-to-Quantum Simulation, 60-Digit Differential Oracles, and Six-Kernel Constructive Lean 4.35.0 Formal Invariants for the Dimensity 9500"
 repository: "https://github.com/0thernes/xiaomi-17t-pro-lab"
-version: "3.0.0"
-date: "2026-11-25"
+version: "3.1.0"
+date: "2026-11-26"
 license:
   code: "MIT"
   documentation_and_papers: "CC-BY-4.0"
@@ -26,8 +26,11 @@ comparator_config: "lean/comparator.json"
 axiom_audit_file: "lean/VerifyAxioms.lean"
 permitted_axioms:
   - "propext"
-  - "Classical.choice"
   - "Quot.sound"
+zero_classical_choice: true
+audited_declarations: 75
+isolated_comparator_targets: 10
+live_negative_kernel_rejection: "scripts/test_negative_lean.py"
 kernels_configured:
   - "Lean 4.35.0 official C++ kernel"
   - "leanchecker-paranoid (v4.35.0)"

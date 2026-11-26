@@ -1,0 +1,51 @@
+{
+  "version": "3.1.0",
+  "rfc3161_digicert": [
+    {
+      "target": "CHECKSUMS.sha256",
+      "target_sha256": "0030f19d1f691cb0c3d18c0b220811b40dc53ed64ccb34956f8e965182841c96",
+      "tsr_path": "proofs/CHECKSUMS.sha256.tsr",
+      "tsr_bytes": 6007,
+      "tsa_url": "http://timestamp.digicert.com",
+      "status": "Granted",
+      "timestamp": "Time stamp: Nov 26 10:42:47 2026 GMT",
+      "serial": "Serial number: 0x9F4E9CA15B568FFAE711CD037C6D7BA8"
+    },
+    {
+      "target": "dist/Donahue_2026_Xiaomi_17T_Pro_Lab.pdf",
+      "target_sha256": "95516faf4e6edd465ada92d89a57fdc752b11fc4b57cd1b08c091a1c814c8720",
+      "tsr_path": "proofs/Donahue_2026_Xiaomi_17T_Pro_Lab.pdf.tsr",
+      "tsr_bytes": 6007,
+      "tsa_url": "http://timestamp.digicert.com",
+      "status": "Granted",
+      "timestamp": "Time stamp: Nov 26 10:42:49 2026 GMT",
+      "serial": "Serial number: 0x748459B4B87C0018C3C9BC803FFC7C94"
+    }
+  ],
+  "opentimestamps_bitcoin": [
+    {
+      "target": "CHECKSUMS.sha256",
+      "target_sha256": "0030f19d1f691cb0c3d18c0b220811b40dc53ed64ccb34956f8e965182841c96",
+      "ots_path": "proofs/CHECKSUMS.sha256.ots",
+      "ots_bytes": 307,
+      "calendar_url": "https://a.pool.opentimestamps.org/digest",
+      "status": "Stamped (pending Bitcoin attestation)"
+    },
+    {
+      "target": "dist/Donahue_2026_Xiaomi_17T_Pro_Lab.pdf",
+      "target_sha256": "95516faf4e6edd465ada92d89a57fdc752b11fc4b57cd1b08c091a1c814c8720",
+      "ots_path": "proofs/Donahue_2026_Xiaomi_17T_Pro_Lab.pdf.ots",
+      "ots_bytes": 307,
+      "calendar_url": "https://a.pool.opentimestamps.org/digest",
+      "status": "Stamped (pending Bitcoin attestation)"
+    }
+  ],
+  "software_heritage": {
+    "endpoint": "https://archive.softwareheritage.org/api/1/origin/save/git/url/https://github.com/0thernes/xiaomi-17t-pro-lab/",
+    "http_status": 200,
+    "save_request_status": "accepted",
+    "save_task_status": "pending",
+    "visit_date": null,
+    "id": 2696412
+  }
+}

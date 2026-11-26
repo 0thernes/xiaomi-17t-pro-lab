@@ -1,7 +1,7 @@
 # Xiaomi 17T Pro Lab — deep dive (materials, lithography, bare metal, teardown, visualizations)
 
 **Compiled:** 12 November 2026, America/Los_Angeles  
-**Companion:** [`specs-dossier.md`](specs-dossier.md), [`specs.json`](specs.json), [`cpu-gpu-npu-deep.md`](cpu-gpu-npu-deep.md), [`taxonomy.json`](taxonomy.json).  
+**Companion:** [`specs-dossier.md`](specs-dossier.md), [`data/specs.json`](../../data/specs.json), [`cpu-gpu-npu-deep.md`](cpu-gpu-npu-deep.md), [`data/taxonomy.json`](../../data/taxonomy.json).  
 **Rule:** cited values only; unpublished items are **UNKNOWN** or **UNCONFIRMED**. Do not treat Dimensity 9500 / TSMC **N3P** as GAA — TSMC’s official 3 nm family is **FinFET**; **nanosheet GAA** is official on **N2**.
 
 The taxonomy zoom model is a **floor of about 10 levels, not a cap**. Branches follow real structure: some CPU/GPU/NPU paths go deeper (ISA → µarch → ports → SRAM/standard cell → lithography → band structure); others stop when published evidence stops. No filler levels.
@@ -167,7 +167,7 @@ COOP/COEP (or equivalent isolation) is required if the Lab uses `SharedArrayBuff
 
 ## 6. Taxonomy summary (navigation model)
 
-[`taxonomy.json`](taxonomy.json) is the app’s navigation model. It contains:
+[`data/taxonomy.json`](../../data/taxonomy.json) is the app’s navigation model. It contains:
 
 1. **`device_taxonomy`** — major hardware branches (SoC CPU, GPU, NPU, ISP, modem, memory, storage, display, battery/PMIC, cameras, RF/antennas, board/PCB, chassis/thermal). Zoom follows real structure from the phone in hand down to materials and quantum/electronic effects. Facets at each node: structure, function, materials, dimensions/scale, physics, data/signal paths, design trade-offs, failure modes, manufacturing. Official numbers are attached where they exist; otherwise `status: unknown`.
 

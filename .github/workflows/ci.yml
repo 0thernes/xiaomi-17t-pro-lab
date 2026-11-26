@@ -40,8 +40,11 @@ jobs:
         run: npm run evals
       - name: Run 60-digit independent Python oracle and verify SHA-256 manifests
         run: python reference/physics_oracle.py --check-checksums
-      - name: Run Lean forbidden-token & axiom log guard
-        run: python scripts/check_readme_axioms.py
+      - name: Run Lean constructive axiom guard, repo integrity & negative-kernel check
+        run: |
+          python scripts/check_readme_axioms.py
+          python scripts/check_repo_integrity.py
+          python scripts/test_negative_lean.py
       - name: Verify standard sha256sum manifests (Linux)
         if: runner.os == 'Linux'
         run: |
@@ -110,7 +113,7 @@ jobs:
         run: bash scripts/audit-repo.sh .
 
   lean4-six-kernel-audit:
-    name: Lean 4 (v4.35.0) 59-Decl Audit & 6-Kernel lake comparator --paranoid
+    name: Lean 4 (v4.35.0) 75-Decl Constructive (0 Choice) & 6-Kernel lake comparator --paranoid
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
@@ -121,7 +124,7 @@ jobs:
           toolchain="$(tr -d '[:space:]' < lean/lean-toolchain)"
           curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain "$toolchain"
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
-      - name: Clean-build XiaomiLabProofs, Challenge & Solution + audit 59 axioms + leanchecker
+      - name: Clean-build XiaomiLabProofs, Challenge & Solution + audit 75 zero-Choice decls + leanchecker
         working-directory: lean
         shell: bash
         run: |
@@ -133,11 +136,13 @@ jobs:
           lake env leanchecker --fresh Solution
           cd ..
           python3 scripts/check_readme_axioms.py
-      - name: Run 6-kernel lake comparator --config comparator.json --paranoid (bubblewrap sandbox)
+      - name: Run 6-kernel lake comparator --config comparator.json --paranoid & live negative rejection
         working-directory: lean
         run: |
           sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0 || true
           lake comparator --config comparator.json --paranoid
+          cd ..
+          python3 scripts/test_negative_lean.py --require-lake --check-comparator
       - name: SLSA build provenance attestation for Lean audit log
         uses: actions/attest-build-provenance@v2
         continue-on-error: true

@@ -1,6 +1,6 @@
 # Security
 
-Version 3.0.0. This is a zero-build static site. The loopback dev server (`tools/serve.mjs`) and `index.html` enforce a strict Content-Security-Policy (`script-src 'self'` plus import-map hash; `style-src 'self'` with zero `'unsafe-inline'`; `object-src 'none'`; `form-action 'none'`). Glitchling loads as a standard ES module (`eval` is disallowed). TinyStories-8M weights under `vendor/tinystories/shards/` are public FP16 model shards cryptographically verified via WebCrypto `SHA-256`, not credentials. See [docs/threat-model.md](docs/threat-model.md) for the full STRIDE matrix.
+Version 3.1.0. This is a zero-build static site. The loopback dev server (`tools/serve.mjs`), `index.html`, and `blueprint/index.html` enforce a strict Content-Security-Policy (`script-src 'self'` plus import-map hash; `style-src 'self'` with zero `'unsafe-inline'`; `object-src 'none'`; `form-action 'none'`). TinyStories-8M weights under `vendor/tinystories/shards/` are public FP16 model shards cryptographically verified via WebCrypto `SHA-256`, not credentials. See [docs/threat-model.md](docs/threat-model.md) for the full STRIDE matrix.
 
 ## Reporting
 

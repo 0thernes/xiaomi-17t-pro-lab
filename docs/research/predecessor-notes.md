@@ -74,7 +74,7 @@ Single workflow: `.github/workflows/ci.yml`, name `CI`.
 | :----------------------- | :--------------------------------------------------------- |
 | `docs/SUMMARY.md`        | Executive summary                                          |
 | `docs/ARCHITECTURE.md`   | Script graph, campus topology, `pc20` bus, 4K HDR pipeline |
-| `docs/GLOSSARY.md`       | Canonical terms                                            |
+| `docs/glossary.md`       | Canonical terms                                            |
 | `README.md`              | Quickstart, machine matrix, shortcuts, tests               |
 | `CHANGELOG.md`           | Versioned history                                          |
 | `THIRD-PARTY-NOTICES.md` | Three.js MIT, CC0 audio, citations                         |
@@ -89,7 +89,7 @@ These are the predecessor practices that map cleanly onto a phone-first, citatio
 1. **Zero-build browser entry** plus an identical HTTP path; keep two HTML entrypoints byte-identical if `file://` support is required.
 2. **No unsourced “cosmetic” hardware** — CONTRIBUTING’s rule (“every 3D machine must genuinely execute”) should become “every figure in the 3D/UI is cited or marked UNKNOWN.”
 3. **Layer-stack navigation** (hardware rungs with sub-lenses) is the right skeleton for the taxonomy in `taxonomy.json` (device → quantum).
-4. **Docs kit:** `docs/INDEX.md`, `ARCHITECTURE.md`, `GLOSSARY.md`, `SUMMARY.md`, `CHANGELOG.md`, plus a citations/sources page.
+4. **Docs kit:** `docs/INDEX.md`, `ARCHITECTURE.md`, `glossary.md`, `SUMMARY.md`, `CHANGELOG.md`, plus a citations/sources page.
 5. **Pre-commit / CI checklist** from CONTRIBUTING, adapted:
    - unit tests (`node --test`)
    - static audit (IDs, symbols, **and spec-citation integrity**)

@@ -289,7 +289,7 @@ Aggregator repeats of **1716 MHz GPU**, **100 TOPS**, **192 KB L1**, **4×16-bit
 
 ## 6. Companion files
 
-- Machine-readable fields: [`specs.json`](specs.json)
+- Machine-readable fields: [`data/specs.json`](../../data/specs.json)
 - Materials, lithography, ISA/boot, teardown list, visualization plan, taxonomy summary: [`deep-dive.md`](deep-dive.md)
-- App navigation model: [`taxonomy.json`](taxonomy.json)
+- App navigation model: [`data/taxonomy.json`](../../data/taxonomy.json)
 - Predecessor repo survey: [`predecessor-notes.md`](predecessor-notes.md)

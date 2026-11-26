@@ -87,7 +87,7 @@
       "source": "auto",
       "applies": "always",
       "name": "Semantic version, tags and a single version source",
-      "detail": "VERSION 3.0.0 matches CHANGELOG and CITATION"
+      "detail": "VERSION 3.1.0 matches CHANGELOG and CITATION"
     },
     {
       "id": "A09",

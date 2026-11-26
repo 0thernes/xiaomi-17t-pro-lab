@@ -38,11 +38,13 @@ def write_manifests() -> None:
         "results/lean4-audit.txt",
         "results/oracle-60digit.json",
         "results/stats-eval.json",
+        "results/citation-audit.json",
         "tests/golden/baseline-snapshot.json",
         "lean/comparator.json",
         "lean/Challenge.lean",
         "lean/Solution.lean",
         "lean/VerifyAxioms.lean",
+        "lean/XiaomiLabProofs/SpectralBraggAndShards.lean",
         "data/specs.json",
         "data/taxonomy.json",
         "vendor/tinystories/shards.json",
@@ -51,6 +53,7 @@ def write_manifests() -> None:
     ):
         normalize_lf(text_rel)
 
+    normalize_lf("results/build-standard-audit.json")
     data_files = [
         "data/specs.json",
         "data/taxonomy.json",
@@ -75,11 +78,13 @@ def write_manifests() -> None:
         "results/lean4-audit.txt",
         "results/oracle-60digit.json",
         "results/stats-eval.json",
+        "results/citation-audit.json",
         "tests/golden/baseline-snapshot.json",
         "lean/comparator.json",
         "lean/Challenge.lean",
         "lean/Solution.lean",
         "lean/VerifyAxioms.lean",
+        "lean/XiaomiLabProofs/SpectralBraggAndShards.lean",
     ]
     (ROOT / "CHECKSUMS.sha256").write_text(
         "\n".join(sha256_rel(rel) for rel in checksum_files) + "\n",
@@ -97,6 +102,8 @@ def write_manifests() -> None:
         "formalization.yaml",
         "docs/mega-atlas-cross-reference.md",
         "docs/statement-fidelity.md",
+        "docs/literature-search-log.md",
+        "docs/reviews/2026-11-26-round2-3-cycle-hardening-audit.md",
         "docs/ai.md",
         "docs/threat-model.md",
         "docs/benchmarks.md",

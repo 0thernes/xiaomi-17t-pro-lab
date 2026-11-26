@@ -26,29 +26,29 @@
 \newcommand{\N}{\mathbb{N}}
 \newcommand{\R}{\mathbb{R}}
 
-\title[Xiaomi 17T Pro Lab (v3.0.0): Hardware Provenance \& Lean 4 Invariants]{%
-  Xiaomi 17T Pro Lab (v3.0.0): Forensic Hardware Provenance, Real-Time Multi-Scale
+\title[Xiaomi 17T Pro Lab (v3.1.0): Hardware Provenance \& Constructive Lean 4 Invariants]{%
+  Xiaomi 17T Pro Lab (v3.1.0): Forensic Hardware Provenance, Real-Time Multi-Scale
   Silicon-to-Quantum Simulation, 60-Digit Differential Oracles, and Six-Kernel
-  Lean~4.35.0 Formal Invariants for the Dimensity~9500%
+  Constructive Lean~4.35.0 Formal Invariants for the Dimensity~9500%
 }
 
 \author{Alexander Stephen Donahue}
 \address{Independent Researcher, Spokane, WA, USA}
 \email{0\_0@0thernes.art}
 \thanks{ORCID: \href{https://orcid.org/0009-0006-8168-9648}{0009-0006-8168-9648}.
-Repository: \url{https://github.com/0thernes/xiaomi-17t-pro-lab} (Release v3.0.0).
+Repository: \url{https://github.com/0thernes/xiaomi-17t-pro-lab} (Release v3.1.0).
 Live interactive lab and Lean Blueprint: \url{https://0thernes.github.io/xiaomi-17t-pro-lab/}.
 Code is licensed under MIT; this manuscript, documentation, and figures are licensed under CC-BY-4.0.
 \emph{Research preprint; not externally peer reviewed.}}
 
-\date{November 25, 2026}
+\date{November 26, 2026}
 
 \begin{document}
 
 \begin{abstract}
 Consumer smartphone hardware analyses routinely blur vendor marketing claims,
 unverified teardown transcriptions, and stylized illustrations into a single
-unfalsifiable narrative. We present \code{xiaomi-17t-pro-lab} (v3.0.0), a
+unfalsifiable narrative. We present \code{xiaomi-17t-pro-lab} (v3.1.0), a
 zero-build static web workbench and formally audited computational research
 package anchored to the Xiaomi~17T~Pro and MediaTek Dimensity~9500 (MT6993Z,
 TSMC~N3P). Every hardware attribute in \code{data/specs.json} is schema-typed
@@ -63,19 +63,24 @@ Crank--Nicolson time-dependent Schr\"odinger wave packets, 2D FDTD silicon
 thermal diffusion with Xiaomi 3D~IceLoop vapor-chamber modeling, LPDDR5X-9600
 Roofline memory-wall limits, deterministic 9-shard TinyStories-8M FP16
 transformer inference, 272-neuron Glitchling artificial-life foraging, and
-Bell--CHSH / Mermin-3 / Peres--Mermin quantum contextuality. We establish three
-independent verification layers: (i)~a zero-Mathlib pure Lean~4.35.0 formal core
-(\code{XiaomiLabProofs}, 59 audited declarations across 9 isolated Palomar
-comparator targets, strictly within \code{[propext, Classical.choice, Quot.sound]}
-and verified via \texttt{leanchecker --fresh} and six-kernel Linux CI);
-(ii)~an independent 60-digit Python \code{Decimal}/\code{Fraction} oracle
-matching 54 differential checks to relative error $\le 2.16\times 10^{-14}$; and
-(iii)~semantic mutation testing (8/8 mutants killed), 2,500+ seeded property
-checks, and 20-seed Holm--Bonferroni statistical tests ($p_{\text{Holm}} \le 0.0008$).
-Our statistical suite uncovered and resolved a genuine pinhole-detection defect
-in the v2.2 stochastic LER estimator that had inverted dose scaling. Finally, we
-audit the work against the 1,900-problem \code{unsolved-problems-mega-atlas}
-and report transparently that \textbf{0/1,900 grand open problems are retired}.
+Bell--CHSH / Mermin-3 / Peres--Mermin quantum contextuality. We establish four
+independent verification layers: (i)~a 100\% constructive zero-Mathlib Lean~4.35.0
+formal core (\code{XiaomiLabProofs}, 75 audited declarations across 7 modules
+and 10 isolated Palomar comparator targets, strictly within
+\texttt{[propext, Quot.sound]} with \textbf{zero} \code{Classical.choice},
+verified via \texttt{leanchecker --fresh}, six-kernel Linux CI, and live
+negative kernel/comparator rejection tests); (ii)~an independent 60-digit Python
+\code{Decimal}/\code{Fraction} oracle matching 54 differential checks to
+relative error $\le 2.16\times 10^{-14}$; (iii)~semantic mutation testing
+(8/8 mutants killed), 2,500+ seeded property checks, and 20-seed
+Holm--Bonferroni statistical tests ($p_{\text{Holm}} \le 0.0008$); and
+(iv)~live Crossref/arXiv non-retracted DOI auditing (12/12 DOIs), dual
+cryptographic timestamps (DigiCert RFC~3161 and Bitcoin OpenTimestamps), and
+Sigstore SLSA build provenance. Our statistical and visual audits uncovered and
+resolved genuine pinhole-LER and 30~s DVFS bang-bang defects in v2.2. Finally,
+we audit the work against all 1,900 problems in
+\code{unsolved-problems-mega-atlas} and report transparently that
+\textbf{0/1,900 grand open problems are retired}.
 \end{abstract}
 
 \maketitle
@@ -89,7 +94,7 @@ unknown GPU clock frequencies), (2)~decorative animations masquerading as
 numerical physics, and (3)~unverified floating-point implementations lacking
 independent oracles or formal invariant proofs.
 
-Release~v3.0.0 of \code{xiaomi-17t-pro-lab} addresses all three defects for
+Release~v3.1.0 of \code{xiaomi-17t-pro-lab} addresses all three defects for
 the Xiaomi~17T~Pro (MediaTek Dimensity~9500 / MT6993Z, Mali-G1 Ultra MC12,
 NPU~990, SK~hynix LPDDR5X-9600, SK~hynix UFS~4.1, TSMC~N3P) while adhering to
 the Build Standard for LLMs~v1.2.0 and the Defensible Independent AI Research
@@ -104,21 +109,26 @@ Playbook~v1.3.
   are explicitly retained as \code{null} (\code{UNKNOWN}) rather than
   interpolated. All 22 cross-source conflicts carry documented precedence rules.
   \item \textbf{Real-Time Multi-Scale Physics and Operational Workloads.}
-  Nineteen zero-build ES-module routes simulate silicon-to-quantum physics live
-  in the browser under strict Content-Security-Policy (\texttt{style-src 'self'},
-  no \code{unsafe-inline}) and deterministic 9-shard safetensors delivery
-  ($\le 4.5$~MB per tracked shard, WebCrypto SHA-256 verified against the
-  39,417,097-byte FP16 checkpoint of Eldan and Li~\cite{eldan2023tinystories}).
-  \item \textbf{Pure Lean~4.35.0 Six-Kernel Formal Core.} Fifty-nine audited
-  declarations across six proof modules and nine isolated Palomar comparator
-  targets certify exact algebraic, numerical-stability, and quantum-contextuality
-  invariants without Mathlib, \code{sorry}, \code{native_decide}, or custom
-  axioms.
-  \item \textbf{Multi-Layer Independent Falsification.} An independent 60-digit
-  Python \code{Decimal}/\code{Fraction} oracle (54 checks, max relative
-  error $2.16\times 10^{-14}$), 50 Node unit, property, metamorphic, and EIO tests,
-  8/8 killed semantic mutants, and pre-registered 20-seed Holm--Bonferroni
-  statistical evaluations~\cite{holm1979simple}.
+  Nineteen zero-build ES-module routes plus the Lean Blueprint simulate
+  silicon-to-quantum physics live in the browser under strict
+  Content-Security-Policy (\texttt{style-src 'self'}, zero \code{unsafe-inline})
+  and deterministic 9-shard safetensors delivery ($\le 4.5$~MB per tracked shard,
+  WebCrypto SHA-256 verified against the 39,417,097-byte FP16 checkpoint of
+  Eldan and Li~\cite{eldan2023tinystories}).
+  \item \textbf{Constructive Pure Lean~4.35.0 Six-Kernel Formal Core.}
+  Seventy-five audited declarations across seven proof modules and ten isolated
+  Palomar comparator targets certify exact algebraic, numerical-stability,
+  Bragg transfer-matrix, DFT Parseval, shard-conservation, and quantum-contextuality
+  invariants without Mathlib, \code{sorry}, \code{native_decide}, custom axioms,
+  or \code{Classical.choice}, paired with live negative kernel and comparator
+  rejection tests.
+  \item \textbf{Multi-Layer Independent Falsification and Cryptographic Provenance.}
+  An independent 60-digit Python \code{Decimal}/\code{Fraction} oracle (54 checks,
+  max relative error $2.16\times 10^{-14}$), 50 Node unit, property, metamorphic,
+  and EIO tests, 8/8 killed semantic mutants, pre-registered 20-seed
+  Holm--Bonferroni statistical evaluations~\cite{holm1979simple}, 12/12 live
+  Crossref/arXiv non-retracted DOI verification, and dual DigiCert RFC~3161 +
+  OpenTimestamps cryptographic timestamp receipts.
 \end{enumerate}
 
 \subsection{Explicit Non-Claims and Mega-Atlas Verdict}
@@ -267,17 +277,23 @@ quantization precisions.}
 \label{fig:roofline}
 \end{figure}
 
-\section{Pure Lean 4.35.0 Formal Verification Core}
+\section{Constructive Pure Lean 4.35.0 Formal Verification Core}
 
-We formalize the exact algebraic, stability, and contextuality invariants of the
-workbench in pure Lean~4.35.0 (\code{lean/XiaomiLabProofs/}) with zero Mathlib
-dependencies, Palomar \code{module} isolation, \texttt{autoImplicit = false},
-and an isolated statement-only \code{Challenge.lean} matched against sorry-free
+We formalize the exact algebraic, stability, spectral, and contextuality
+invariants of the workbench in constructive pure Lean~4.35.0
+(\code{lean/XiaomiLabProofs/}) with zero Mathlib dependencies, Palomar
+\code{module} isolation, \texttt{autoImplicit = false}, and an isolated
+statement-only \code{Challenge.lean} matched against sorry-free
 \code{Solution.lean} via \texttt{lake comparator --config comparator.json --paranoid}
 across six independent kernels (\code{lean}, \texttt{leanchecker --paranoid},
 \code{lean4lean}, \code{nanoda}, \code{con-leche}, and \code{con-ron}).
-All 59 audited declarations depend strictly on subsets of
-\texttt{[propext, Classical.choice, Quot.sound]} (or zero axioms).
+All \textbf{75 audited declarations} (65 exported theorems across seven proof
+modules plus 10 isolated comparator targets; 28 zero-axiom) depend strictly on
+subsets of \texttt{[propext, Quot.sound]} with \textbf{zero}
+\code{Classical.choice}. In addition, \code{scripts/test_negative_lean.py}
+executes live negative rejection tests in CI proving that both the Lean~4.35.0
+kernel and \texttt{lake comparator --paranoid} actively reject false theorems
+and tampered comparator targets.
 
 \begin{theorem}[Hardware Packing, CMOS Cancellation, and Universal Roofline]
 \label{thm:hardware}
@@ -345,11 +361,36 @@ $T - \Delta t\, h_{\mathrm{VC}}(T - T_{\mathrm{amb}}) < T - \Delta t\, h_{\mathr
 \end{enumerate}
 \end{theorem}
 
+\begin{theorem}[Unimodular Bragg Transfer Matrices, 2/4-Point DFT Parseval, and 9-Shard Bounds]
+\label{thm:bragg-parseval}
+\textup{(\code{target_thm9_bragg_parseval_and_shards})}
+Over the Gaussian integers $\Z[i]$:
+\begin{enumerate}
+  \item For all $A, B \in M_2(\Z[i])$, $\det(AB) = \det(A)\det(B)$; hence
+  unimodular optical characteristic matrices ($\det(A) = \det(B) = 1$) are
+  closed under layer composition ($\det(AB) = 1$).
+  \item For all $x_0, x_1, x_2, x_3 \in \Z[i]$, the unnormalized 2-point and
+  4-point discrete Fourier transforms satisfy exact Plancherel--Parseval energy
+  conservation:
+  \[
+    |x_0+x_1|^2 + |x_0-x_1|^2 = 2(|x_0|^2 + |x_1|^2), \qquad
+    \sum_{k=0}^{3} |X_k|^2 = 4 \sum_{n=0}^{3} |x_n|^2,
+  \]
+  proved constructively via radix-2 Cooley--Tukey parallelogram reduction.
+  \item The deterministic 9-shard TinyStories-8M split satisfies exact byte
+  conservation $8 \times 4{,}500{,}000 + 3{,}417{,}097 = 39{,}417{,}097$ with
+  every shard strictly below the $5~\text{MiB} = 5{,}242{,}880\text{-byte}$
+  Build Standard~A24 cap.
+\end{enumerate}
+\end{theorem}
+
 In addition, \code{AdversarialTests.lean} (\code{target_thm8}) certifies
-five sharp false-variant counterexamples (e.g., violating CFL $2r_x + 2r_y > D$
-produces $-60 < 0$ undershoot; relaxing CHSH to $\{-2,+2\}$ achieves $S = 8 > 2$),
-and \code{target_nonvacuity_witnesses} verifies concrete ground evaluations.
-Full statement-fidelity alignment is recorded in \code{docs/statement-fidelity.md}.
+seven sharp false-variant counterexamples (violating CFL $2r_x + 2r_y > D$
+produces $-60 < 0$ undershoot; relaxing CHSH to $\{-2,+2\}$ achieves $S = 8 > 2$;
+non-unimodular $M_2(\Z[i])$ breaks $\det = 1$; dropping the factor of~$2$
+breaks 2-point DFT Parseval), and \code{target_nonvacuity_witnesses} verifies
+eight concrete ground evaluations. Full statement-fidelity alignment is
+recorded in \code{docs/statement-fidelity.md}.
 
 \section{Differential Oracle, Mutation Testing, and Statistical Discovery}
 
@@ -447,16 +488,22 @@ Tectonic, the full verification pipeline executes via \texttt{just reproduce}:
 \begin{verbatim}
 npm run validate && npm test && node scripts/mutate.mjs
 python reference/physics_oracle.py --check-checksums
+python scripts/check_repo_integrity.py && python scripts/check_citations.py
 node evals/run_tinystories_eval.mjs && node scripts/bench.mjs
 node scripts/stats_eval.mjs
 cd lean && lake build XiaomiLabProofs Challenge Solution
 lake env lean VerifyAxioms.lean && cd ..
-python scripts/check_readme_axioms.py && python scripts/package_dist.py
+python scripts/check_readme_axioms.py && python scripts/test_negative_lean.py
+python scripts/package_dist.py
 \end{verbatim}
 }
 Cryptographic SHA-256 manifests (\code{data/MANIFEST.sha256},
 \code{CHECKSUMS.sha256}, and \code{vendor/tinystories/SHA256.txt}) pin all
-data files, model shards, Lean logs, and frozen release artifacts.
+data files, model shards, Lean logs, and frozen release artifacts, reinforced
+by live Sigstore SLSA build provenance attestations, dual cryptographic
+timestamp proofs (DigiCert RFC~3161 \code{.tsr} and Bitcoin OpenTimestamps
+\code{.ots} under \code{proofs/}), live Crossref/arXiv non-retracted DOI
+auditing (\code{results/citation-audit.json}), and Software Heritage archival.
 
 \subsection{CRediT Authorship, AI-Assistance Disclosure, and COI}
 \textbf{Author:} Alexander Stephen Donahue (ORCID
@@ -476,7 +523,7 @@ automated tests; all responsibility for errors rests with the human author.
 interests and no commercial affiliation with Xiaomi Corporation, MediaTek Inc.,
 TSMC, Arm Ltd., ASML Holding N.V., or SK~hynix Inc.
 
-\bibliographystyle{plain}
+\bibliographystyle{plainurl}
 \bibliography{refs}
 
 \end{document}

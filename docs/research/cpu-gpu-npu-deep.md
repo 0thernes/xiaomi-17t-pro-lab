@@ -1,6 +1,6 @@
 # CPU, GPU, and NPU deep dive — Xiaomi 17T Pro / Dimensity 9500
 
-**Companion to** [`specs-dossier.md`](specs-dossier.md), [`specs.json`](specs.json), [`deep-dive.md`](deep-dive.md), and the machine-readable stacks in [`taxonomy.json`](taxonomy.json) (`cpu`, `gpu`, `npu`).  
+**Companion to** [`specs-dossier.md`](specs-dossier.md), [`data/specs.json`](../../data/specs.json), [`deep-dive.md`](deep-dive.md), and the machine-readable stacks in [`data/taxonomy.json`](../../data/taxonomy.json) (`cpu`, `gpu`, `npu`).  
 **Compiled 12 November 2026, America/Los_Angeles.**
 
 Rules are the same as the dossier: official Arm / MediaTek / Xiaomi / Khronos / TSMC / NIST / ASML first; reputable silicon write-ups second; **UNKNOWN** when a number is unpublished. Depth follows real structure (ten zoom levels are a **floor**, not a cap). Extra branches are added only where there is something citable to hang on them. **TSMC N3P is FinFET**, not GAA; GAA/nanosheet is the public TSMC **N2** contrast, never this SoC.

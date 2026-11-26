@@ -24,13 +24,14 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Verify full Node + Python + SHA-256 suite prior to publishing
+      - name: Verify full Node + Python + SHA-256 + integrity suite prior to publishing
         run: |
           npm ci
           npm run verify:all
           npm run evals
           python reference/physics_oracle.py --check-checksums
           python scripts/check_readme_axioms.py
+          python scripts/check_repo_integrity.py
       - name: Stage release artifacts and compute SHA256SUMS
         run: |
           mkdir -p release-assets
@@ -41,7 +42,9 @@ jobs:
           cp results/tinystories-eval.json release-assets/
           cp results/perf-benchmarks.json release-assets/
           cp results/stats-eval.json release-assets/
+          cp results/citation-audit.json release-assets/
           cp CHECKSUMS.sha256 release-assets/
+          cp proofs/*.tsr proofs/*.ots proofs/provenance-receipts.json release-assets/ 2>/dev/null || true
           (cd release-assets && sha256sum * > SHA256SUMS)
           cat release-assets/SHA256SUMS
       - name: Generate SLSA build provenance attestation for release artifacts

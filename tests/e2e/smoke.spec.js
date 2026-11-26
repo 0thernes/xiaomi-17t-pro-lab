@@ -163,3 +163,26 @@ test("desktop layout places nav sidebar beside main without overlap", async ({ p
   expect(navBox.width).toBeLessThanOrEqual(260);
   expect(mainBox.x).toBeGreaterThanOrEqual(navBox.x + navBox.width - 1);
 });
+
+test("Lean 4.35.0 Blueprint renders with strict CSP, zero 404s, SVG DAG, and 10 comparator targets", async ({
+  page,
+}) => {
+  const errors = [];
+  const failedReqs = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  page.on("console", (msg) => {
+    if (msg.type() === "error") errors.push(msg.text());
+  });
+  page.on("response", (res) => {
+    if (res.status() >= 400) failedReqs.push(`${res.status()} ${res.url()}`);
+  });
+  await page.goto("/blueprint/");
+  await expect(page.locator("h1")).toContainText("Formal Verification Blueprint");
+  await expect(page.locator("svg.dag")).toBeVisible();
+  await expect(page.locator("tbody tr")).toHaveCount(10);
+  const csp = await page.locator('meta[http-equiv="Content-Security-Policy"]').getAttribute("content");
+  expect(csp).toContain("style-src 'self'");
+  expect(csp).not.toContain("unsafe-inline");
+  expect(failedReqs).toEqual([]);
+  expect(errors).toEqual([]);
+});

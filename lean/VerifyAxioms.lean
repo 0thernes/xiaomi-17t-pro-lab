@@ -4,12 +4,13 @@ public import XiaomiLabProofs
 public import Solution
 
 /-!
-  XIAOMI 17T PRO LAB (v3.0.0) — Standalone Kernel Axiom Audit (`v4.35.0`, Palomar `module`)
+  XIAOMI 17T PRO LAB (v3.1.0) — Standalone Constructive Kernel Axiom Audit (`v4.35.0`, Palomar `module`)
 
-  Audits all 44 exported theorems across all six proof modules plus all 9 isolated
-  Palomar comparator targets (53 total audited declarations) via `#print axioms`.
-  Every theorem must depend strictly on a subset of `[propext, Classical.choice, Quot.sound]`
-  (or zero axioms) with zero `sorryAx`, zero `native_decide`, and zero custom axioms.
+  Audits all 65 exported theorems across all seven proof modules (12 + 7 + 9 + 7 + 10 + 13 + 7)
+  plus all 10 isolated Palomar comparator targets (75 total audited declarations) via `#print axioms`.
+  Every single declaration is 100% CONSTRUCTIVE: strictly within `[propext, Quot.sound]`
+  (or zero axioms) with ZERO `Classical.choice`, ZERO `sorryAx`, ZERO `native_decide`, and
+  ZERO custom axioms.
 -/
 
 -- Module 1: Hardware Floorplan, Bandwidth Algebra & Roofline Optimality (12 theorems)
@@ -55,7 +56,7 @@ public import Solution
 #print axioms XiaomiLab.Thermal.code_cfl_cap_strictly_subcritical
 #print axioms XiaomiLab.Thermal.sustained_clock_exact_20min
 
--- Module 5: Quantum Contextuality, Bell-CHSH, Mermin-3 GHZ, Peres-Mermin & Bloch Purity (9 theorems)
+-- Module 5: Quantum Contextuality, Bell-CHSH, Mermin-3 GHZ, Peres-Mermin & Bloch Purity (10 theorems)
 #print axioms XiaomiLab.Contextuality.chsh_classical_bound
 #print axioms XiaomiLab.Contextuality.tsirelson_sq_strictly_exceeds_classical_sq
 #print axioms XiaomiLab.Contextuality.mermin3_classical_bound
@@ -67,14 +68,31 @@ public import Solution
 #print axioms XiaomiLab.Contextuality.bloch_pure_state_sphere_identity
 #print axioms XiaomiLab.Contextuality.qubit_purity_bounds
 
--- Module 6: Adversarial False-Variant Refutations (5 theorems)
+-- Module 6: Unimodular 2x2 Bragg Transfer Matrices, 2/4-Point DFT Parseval & 9-Shard Conservation (13 theorems)
+#print axioms XiaomiLab.SpectralBragg.cint_add_comm
+#print axioms XiaomiLab.SpectralBragg.cint_mul_comm
+#print axioms XiaomiLab.SpectralBragg.cint_mul_one
+#print axioms XiaomiLab.SpectralBragg.mat2c_det_id
+#print axioms XiaomiLab.SpectralBragg.mat2c_det_mul
+#print axioms XiaomiLab.SpectralBragg.bragg_unimodular_closed
+#print axioms XiaomiLab.SpectralBragg.bragg_40_bilayer_layer_count
+#print axioms XiaomiLab.SpectralBragg.cint_mulNegI_normSq
+#print axioms XiaomiLab.SpectralBragg.cint_parallelogram
+#print axioms XiaomiLab.SpectralBragg.dft2_parseval_exact
+#print axioms XiaomiLab.SpectralBragg.dft4_parseval_exact
+#print axioms XiaomiLab.SpectralBragg.tinystories_9_shards_exact_total
+#print axioms XiaomiLab.SpectralBragg.shard_total_monotone
+
+-- Module 7: Adversarial False-Variant Refutations (7 theorems)
 #print axioms XiaomiLab.Adversarial.adv_fdtd_cfl_violation_undershoots
 #print axioms XiaomiLab.Adversarial.adv_chsh_relaxed_domain_breaks_bound
 #print axioms XiaomiLab.Adversarial.adv_massless_dirac_not_subluminal
 #print axioms XiaomiLab.Adversarial.adv_peres_mermin_without_minus_sign_is_classical
 #print axioms XiaomiLab.Adversarial.adv_roofline_max_violates_memory_wall
+#print axioms XiaomiLab.Adversarial.adv_bragg_non_unimodular_breaks_det_one
+#print axioms XiaomiLab.Adversarial.adv_dft2_parseval_breaks_without_factor_2
 
--- Isolated Palomar Comparator Targets (9 targets)
+-- Isolated Palomar Comparator Targets (10 targets)
 #print axioms XiaomiLab.ComparatorTarget.target_thm1_hardware_and_roofline
 #print axioms XiaomiLab.ComparatorTarget.target_thm2_euv_rayleigh_and_dof
 #print axioms XiaomiLab.ComparatorTarget.target_thm3_dirac_finfet_and_crank_nicolson
@@ -83,4 +101,5 @@ public import Solution
 #print axioms XiaomiLab.ComparatorTarget.target_thm6_peres_mermin_magic_square
 #print axioms XiaomiLab.ComparatorTarget.target_thm7_bloch_purity_bounds
 #print axioms XiaomiLab.ComparatorTarget.target_thm8_adversarial_refutations
+#print axioms XiaomiLab.ComparatorTarget.target_thm9_bragg_parseval_and_shards
 #print axioms XiaomiLab.ComparatorTarget.target_nonvacuity_witnesses

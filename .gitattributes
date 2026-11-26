@@ -7,3 +7,5 @@
 *.pdf binary
 *.gz binary
 *.part* binary
+*.tsr binary
+*.ots binary

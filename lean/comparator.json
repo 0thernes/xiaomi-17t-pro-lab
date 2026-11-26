@@ -10,11 +10,11 @@
     "XiaomiLab.ComparatorTarget.target_thm6_peres_mermin_magic_square",
     "XiaomiLab.ComparatorTarget.target_thm7_bloch_purity_bounds",
     "XiaomiLab.ComparatorTarget.target_thm8_adversarial_refutations",
+    "XiaomiLab.ComparatorTarget.target_thm9_bragg_parseval_and_shards",
     "XiaomiLab.ComparatorTarget.target_nonvacuity_witnesses"
   ],
   "permitted_axioms": [
     "propext",
-    "Classical.choice",
     "Quot.sound"
   ]
 }

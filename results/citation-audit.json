@@ -1,0 +1,119 @@
+{
+  "total_references": 14,
+  "dois_verified_live": 12,
+  "retracted_count": 0,
+  "references": [
+    {
+      "key": "tiesinga2021codata",
+      "resolver": "Crossref",
+      "identifier": "10.1103/RevModPhys.93.025010",
+      "http_status": 200,
+      "retracted": false,
+      "resolved_title": "CODATA recommended values of the fundamental physical constants: 2018"
+    },
+    {
+      "key": "henke1993xray",
+      "resolver": "Crossref",
+      "identifier": "10.1006/adnd.1993.1013",
+      "http_status": 200,
+      "retracted": false,
+      "resolved_title": "X-Ray Interactions: Photoabsorption, Scattering, Transmission, and Reflection at E = 50-30,000 eV, Z = 1-92"
+    },
+    {
+      "key": "yan1992scaling",
+      "resolver": "Crossref",
+      "identifier": "10.1109/16.141237",
+      "http_status": 200,
+      "retracted": false,
+      "resolved_title": "Scaling the Si MOSFET: from bulk to SOI to bulk"
+    },
+    {
+      "key": "varshni1967temperature",
+      "resolver": "Crossref",
+      "identifier": "10.1016/0031-8914(67)90062-6",
+      "http_status": 200,
+      "retracted": false,
+      "resolved_title": "Temperature dependence of the energy gap in semiconductors"
+    },
+    {
+      "key": "sze2007physics",
+      "resolver": "ISBN",
+      "identifier": "978-0-471-14323-9",
+      "http_status": 200,
+      "retracted": false,
+      "resolved_title": "Physics of Semiconductor Devices (3rd ed., Wiley-Interscience)"
+    },
+    {
+      "key": "crank1947practical",
+      "resolver": "Crossref",
+      "identifier": "10.1017/S0305004100023197",
+      "http_status": 200,
+      "retracted": false,
+      "resolved_title": "A practical method for numerical evaluation of solutions of partial differential equations of the heat-conduction type"
+    },
+    {
+      "key": "williams2009roofline",
+      "resolver": "Crossref",
+      "identifier": "10.1145/1498765.1498785",
+      "http_status": 200,
+      "retracted": false,
+      "resolved_title": "Roofline"
+    },
+    {
+      "key": "clauser1969chsh",
+      "resolver": "Crossref",
+      "identifier": "10.1103/PhysRevLett.23.880",
+      "http_status": 200,
+      "retracted": false,
+      "resolved_title": "Proposed Experiment to Test Local Hidden-Variable Theories"
+    },
+    {
+      "key": "cirelson1980quantum",
+      "resolver": "Crossref",
+      "identifier": "10.1007/BF00417500",
+      "http_status": 200,
+      "retracted": false,
+      "resolved_title": "Quantum generalizations of Bell's inequality"
+    },
+    {
+      "key": "mermin1990extreme",
+      "resolver": "Crossref",
+      "identifier": "10.1103/PhysRevLett.65.1838",
+      "http_status": 200,
+      "retracted": false,
+      "resolved_title": "Extreme quantum entanglement in a superposition of macroscopically distinct states"
+    },
+    {
+      "key": "peres1990incompatible",
+      "resolver": "Crossref",
+      "identifier": "10.1016/0375-9601(90)90172-K",
+      "http_status": 200,
+      "retracted": false,
+      "resolved_title": "Incompatible results of quantum measurements"
+    },
+    {
+      "key": "eldan2023tinystories",
+      "resolver": "arXiv",
+      "identifier": "10.48550/arXiv.2305.07759",
+      "http_status": 200,
+      "retracted": false,
+      "resolved_title": "TinyStories: How Small Can Language Models Be and Still Speak Coherent English?"
+    },
+    {
+      "key": "ma2024bitnet",
+      "resolver": "arXiv",
+      "identifier": "10.48550/arXiv.2402.17764",
+      "http_status": 200,
+      "retracted": false,
+      "resolved_title": "The Era of 1-bit LLMs: All Large Language Models are in 1.58 Bits"
+    },
+    {
+      "key": "holm1979simple",
+      "resolver": "URL",
+      "identifier": "https://www.jstor.org/stable/4615733",
+      "http_status": 200,
+      "retracted": false,
+      "resolved_title": "Scandinavian Journal of Statistics 6(2):65-70 (JSTOR)"
+    }
+  ]
+}

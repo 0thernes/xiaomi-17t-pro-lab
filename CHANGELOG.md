@@ -4,6 +4,26 @@ All notable changes to this project are documented here. The format is based on 
 
 ## [Unreleased]
 
+## [3.1.0] - 2026-11-26
+
+Round 2 full 3-cycle forensic hardening & Playbook v1.3 Gold Standard elevation: 100% constructive zero-`Classical.choice` Lean 4.35.0 core (75 audited declarations, 10 isolated Palomar comparator targets), live negative kernel & comparator rejection in CI, strict-CSP zero-404 Blueprint, 0 broken Markdown links, live Crossref/arXiv non-retracted DOI audit, and dual RFC 3161 + OpenTimestamps cryptographic proofs.
+
+### Added
+
+- **Constructive Zero-`Classical.choice` Lean 4.35.0 Core (`lean/XiaomiLabProofs/SpectralBraggAndShards.lean`, 75 audited declarations):** Eliminated `Classical.choice` from all 5 remaining theorems so all **75/75** audited declarations (28 zero-axiom, 47 `[propext, Quot.sound]`) are 100% constructive; added Module 6 (`SpectralBraggAndShards`, 13 theorems) proving exact 2×2 Bragg transfer-matrix determinant multiplicativity $\det(AB)=\det(A)\det(B)$ and unimodular closure over $\mathbb{Z}[i]$, exact 2-point & 4-point DFT Plancherel–Parseval energy conservation via radix-2 Cooley–Tukey reduction, and exact 9-shard TinyStories-8M A24 byte conservation; added 2 adversarial refutations (7 total) and isolated Palomar comparator target `target_thm9_bragg_parseval_and_shards` (10 targets total).
+- **Live Negative Lean Kernel & Comparator Rejection Harness (`scripts/test_negative_lean.py`):** Compiles 3 deliberately false theorems live against `XiaomiLabProofs.Spec` and a tampered `comparator.json` target, asserting non-zero rejection by both Lean 4.35.0 and `lake comparator --paranoid` in CI.
+- **Repository Forensic Integrity & Live Citation Audits (`scripts/check_repo_integrity.py`, `scripts/check_citations.py`, `results/citation-audit.json`, `docs/literature-search-log.md`):** Automated CI enforcement of 0 broken/case-mismatch Markdown links, 0 CRLF text files, 0 unformed LLC assertions, 100% BibTeX coverage, strict CSP + favicon on both HTML entrypoints, verbatim `README.md` `#print axioms` drift check, and 12/12 live Crossref/arXiv non-retracted DOI verification.
+- **Dual Cryptographic Timestamps & Software Heritage Receipt (`scripts/timestamp_artifacts.py`, `proofs/`):** Independently verifiable DigiCert RFC 3161 `.tsr` timestamp tokens + Bitcoin OpenTimestamps `.ots` calendar proof + live Software Heritage Save Code Now archival receipt.
+- **Blueprint Playwright E2E Spec (`tests/e2e/smoke.spec.js`):** Enforces strict CSP (`style-src 'self'`, zero `unsafe-inline`), zero 404 responses, zero console errors, visible SVG DAG, and all 10 comparator targets on `/blueprint/`.
+
+### Fixed
+
+- **Blueprint HTTP 404 & Missing CSP (`blueprint/index.html`, `blueprint/blueprint.css`):** Extracted inline styles to external `blueprint/blueprint.css`, added `<link rel="icon" href="../favicon.svg" />` (eliminating live `/favicon.ico` 404), and added strict `Content-Security-Policy` meta header.
+- **7 Broken Relative Markdown Links & 3 Stale `GLOSSARY.md` Refs (`docs/research/*.md`, `docs/audit/INDEX.md`):** Repaired `specs.json` → `../../data/specs.json`, `taxonomy.json` → `../../data/taxonomy.json`, and `docs/GLOSSARY.md` → `docs/glossary.md`.
+- **Broken Table Pipe in `docs/statement-fidelity.md` Row 3 & Stale Comment Counts in `lean/VerifyAxioms.lean` & `HARDENING_LOG.md`:** Escaped `\|\psi\|^2` in Row 3, corrected `VerifyAxioms.lean` header count (`75` total), and updated `F-29` archive ID (`0TH-BUILD-012`).
+- **CRLF in `results/build-standard-audit.json`:** Normalized to LF and added `*.tsr` / `*.ots` binary rules to `.gitattributes`.
+- **Clickable Bibliography DOIs (`paper/main.tex`, `paper/refs.bib`):** Switched to `\bibliographystyle{plainurl}` and added JSTOR URL for Holm (1979).
+
 ## [3.0.0] - 2026-11-25
 
 Full 3-cycle hardening release upgrading `xiaomi-17t-pro-lab` to **Build Standard for LLMs v1.2.0** and **Defensible Independent AI Research Playbook v1.3**, adding a pure Lean 4.35.0 six-kernel formal core, an independent 60-digit differential physics oracle, and a publication-grade AMS-LaTeX white paper.

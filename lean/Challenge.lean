@@ -3,11 +3,11 @@ module
 public import XiaomiLabProofs.Spec
 
 /-!
-  XIAOMI 17T PRO LAB (v3.0.0) — Isolated Statement-Only Challenge File (`Challenge.lean`).
+  XIAOMI 17T PRO LAB (v3.1.0) — Isolated Statement-Only Challenge File (`Challenge.lean`).
 
   Imports ONLY `XiaomiLabProofs.Spec` (pure definitions, ZERO proofs, ZERO `sorry`) and NONE of
-  the six proof modules (`HardwareFloorplan`, `EuvLithography`, `QuantumTransport`, `ThermalFdtd`,
-  `QuantumContextuality`, `AdversarialTests`).
+  the seven proof modules (`HardwareFloorplan`, `EuvLithography`, `QuantumTransport`, `ThermalFdtd`,
+  `QuantumContextuality`, `SpectralBraggAndShards`, `AdversarialTests`).
 
   Every `sorry` in this file is intentional — matched strictly against sorry-free `Solution.lean`
   across 6 independent Lean 4.35.0 kernels via:
@@ -86,17 +86,35 @@ public theorem target_thm8_adversarial_refutations :
     (fdtdStencilNum 10 4 4 10 0 0 0 0 < 10 * min5 10 0 0 0 0) ∧
     (2 < chshExpr 2 2 2 0) ∧
     ((5 : Int) * 5 = 5 * 5 + 0 * 0 ∧ ¬ ((5 : Int) < 5)) ∧
-    (rooflineAchievable 5270 2 77 = 154 ∧ 154 < max 5270 (2 * 77)) := by
+    (rooflineAchievable 5270 2 77 = 154 ∧ 154 < max 5270 (2 * 77)) ∧
+    ((Mat2C.mul ⟨⟨2, 0⟩, CInt.zero, CInt.zero, CInt.one⟩ Mat2C.id).det ≠ CInt.one) ∧
+    ((dft2_0 CInt.one CInt.zero).normSq + (dft2_1 CInt.one CInt.zero).normSq ≠
+      (CInt.one.normSq + CInt.zero.normSq)) := by
   sorry
 
-/-- Target 9 (Concrete Non-Vacuity Witnesses Across Hardware, Litho, TDSE, Thermal & Quantum): -/
+/-- Target 9 (2x2 Bragg Transfer Matrix Unimodularity, 2/4-Point DFT Parseval & 9-Shard A24 Conservation): -/
+public theorem target_thm9_bragg_parseval_and_shards :
+    (∀ A B : Mat2C, (Mat2C.mul A B).det = CInt.mul A.det B.det) ∧
+    (∀ A B : Mat2C, A.det = CInt.one → B.det = CInt.one → (Mat2C.mul A B).det = CInt.one) ∧
+    (∀ x0 x1 : CInt,
+      (dft2_0 x0 x1).normSq + (dft2_1 x0 x1).normSq = 2 * (x0.normSq + x1.normSq)) ∧
+    (∀ x0 x1 x2 x3 : CInt,
+      (dft4_0 x0 x1 x2 x3).normSq + (dft4_1 x0 x1 x2 x3).normSq +
+      (dft4_2 x0 x1 x2 x3).normSq + (dft4_3 x0 x1 x2 x3).normSq =
+      4 * (x0.normSq + x1.normSq + x2.normSq + x3.normSq)) ∧
+    (shardTotalBytes 8 4500000 3417097 = 39417097 ∧ 4500000 < 5242880 ∧ 3417097 < 5242880) := by
+  sorry
+
+/-- Target 10 (Concrete Non-Vacuity Witnesses Across Hardware, Litho, TDSE, Thermal, Bragg, DFT & Quantum): -/
 public theorem target_nonvacuity_witnesses :
     fdtdStencilNum 100 15 15 80 40 40 40 40 = 5600 ∧
     chshExpr 1 1 1 (-1) = 2 ∧
     mermin3Expr 1 1 1 1 1 (-1) = 2 ∧
     (CInt.mul ⟨1, 3⟩ ⟨4, -2⟩).normSq = 200 ∧
     blochX ⟨1, 0⟩ ⟨0, 1⟩ = 0 ∧
-    blochY ⟨1, 0⟩ ⟨0, 1⟩ = 2 := by
+    blochY ⟨1, 0⟩ ⟨0, 1⟩ = 2 ∧
+    Mat2C.id.det = CInt.one ∧
+    (dft4_0 CInt.one CInt.zero CInt.zero CInt.zero).normSq = 1 := by
   sorry
 
 end XiaomiLab.ComparatorTarget

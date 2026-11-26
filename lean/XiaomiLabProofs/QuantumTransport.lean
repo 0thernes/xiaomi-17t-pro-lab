@@ -83,7 +83,14 @@ public theorem crank_nicolson_cayley_factor_norm_eq (h : Int) :
   dsimp only
   have hsq : 0 ≤ h * h := int_sq_nonneg h
   have hneg : (-h) * (-h) = h * h := by simp [Int.neg_mul, Int.mul_neg]
-  omega
+  constructor <;> omega
+
+private theorem int_cancel_pos_mul_left {k a b : Int} (hk : 0 < k) (heq : k * a = k * b) : a = b := by
+  have hsub : k * (a - b) = 0 := by
+    rw [Int.mul_sub, heq, Int.sub_self]
+  cases Int.mul_eq_zero.mp hsub with
+  | inl hk0 => exact absurd hk0 (by omega)
+  | inr hab => omega
 
 /-- Exact Unitary Conservation Theorem for Crank-Nicolson TDSE:
     Whenever (1 + i*h) * psi_next = (1 - i*h) * psi_prev for any real/integer eigen-step h,
@@ -96,8 +103,8 @@ public theorem crank_nicolson_exact_unitarity (h : Int) (psiPrev psiNext : CInt)
   rw [cint_normSq_mul, cint_normSq_mul] at hnorm
   have hfac := crank_nicolson_cayley_factor_norm_eq h
   rw [← hfac.1] at hnorm
-  have hne : (CInt.mk 1 h).normSq ≠ 0 := by omega
-  exact Int.eq_of_mul_eq_mul_left hne hnorm
+  have hpos : 0 < (CInt.mk 1 h).normSq := by omega
+  exact int_cancel_pos_mul_left hpos hnorm
 
 /-- Relativistic Dirac dispersion invariant: if E^2 = p^2 + m^2, then E^2 - p^2 = m^2,
     and for any strictly positive rest mass m > 0 and E >= 0, we have strictly subluminal |p| < E. -/
