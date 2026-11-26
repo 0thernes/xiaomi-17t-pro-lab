@@ -6,7 +6,7 @@
 ## Context
 
 1. Build Standard v1.2.0 (`A24`) forbids tracking single files larger than 5 MiB (`5,242,880` bytes), whereas `vendor/tinystories/model.f16.safetensors` is `39,417,097` bytes. Moving weights to an external host would break 100% self-hosted offline GitHub Pages operation.
-2. Playbook v1.3 (`B22`) requires machine-checked formal verification of core mathematical invariants without brittle multi-gigabyte Mathlib caches, audited across six independent Lean 4.35.0 kernels via Palomar `module` isolation.
+2. Playbook v1.3 (`B22`) requires machine-checked formal verification of core mathematical invariants without brittle multi-gigabyte Mathlib caches, checked by 6 kernel checks (5 distinct implementations) via Palomar `module` isolation.
 
 ## Decision
 
@@ -16,4 +16,4 @@
 ## Consequences
 
 - Every tracked repository file stays under 5 MiB (`A24 PASS`) while `#/work/llm` remains 100% offline/self-hosted and loads faster via parallel HTTP/2 fetches.
-- Lean builds complete in `< 6 s` from scratch with zero external package downloads and full 6-kernel verification in GitHub Actions.
+- Lean builds complete in `< 6 s` from scratch with zero external package downloads and 6 kernel checks of the 10 comparator targets in GitHub Actions.

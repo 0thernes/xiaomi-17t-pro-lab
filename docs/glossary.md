@@ -4,7 +4,7 @@ Canonical technical glossary for `xiaomi-17t-pro-lab` (Build Standard v1.2.0 **A
 
 - **CFL (Courant–Friedrichs–Lewy) Condition:** Explicit finite-difference stability criterion $\alpha \Delta t (\Delta x^{-2} + \Delta y^{-2}) \le 1/2$ in 2D; proved in Lean (`ThermalFdtd.lean`) to guarantee the Discrete Minimum/Maximum Principle.
 - **CHSH Inequality:** Clauser–Horne–Shimony–Holt Bell inequality; classical local hidden-variable models obey $|S| \le 2$ (Lean Theorem 5), whereas entangled Bell states reach Tsirelson's bound $2\sqrt{2} \approx 2.8284$.
-- **Crank–Nicolson Method:** Implicit second-order time integrator $(I + i\frac{\Delta t}{2\hbar}H)\psi^{n+1} = (I - i\frac{\Delta t}{2\hbar}H)\psi^n$ whose Cayley transform is strictly unitary (Lean Theorem 3).
+- **Crank–Nicolson Method:** Implicit second-order time integrator $(I + i\frac{\Delta t}{2\hbar}H)\psi^{n+1} = (I - i\frac{\Delta t}{2\hbar}H)\psi^n$ whose Cayley transform is unitary; Lean Theorem 3 proves only the scalar case (one factor `(1 + ih)ψ₁ = (1 - ih)ψ₀` with integer `h` over ℤ[i]), not the full operator.
 - **CXRO / Henke Constants:** X-ray and EUV complex refractive index optical constants $n = 1 - \delta + i\beta$ used in our 40-bilayer Mo/Si Bragg mirror transfer-matrix solver.
 - **DOF (Depth of Focus):** Optical focus latitude $\mathrm{DOF} = k_2 \lambda / \mathrm{NA}^2$; moving from `0.33 NA` to `0.55 High-NA` shrinks DOF by exact factor `25/9` (Lean Theorem 2).
 - **DVFS (Dynamic Voltage and Frequency Scaling):** Thermal control loop reducing SoC clocks when junction temperature exceeds the `84 °C` knee.

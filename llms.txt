@@ -1,6 +1,6 @@
 # Xiaomi 17T Pro Lab (`xiaomi-17t-pro-lab`)
 
-> Phone-first zero-build silicon-to-quantum interactive hardware lab, 60-digit differential physics oracle, pure Lean 4.35.0 six-kernel formal verification core, and AMS-LaTeX white paper for the Xiaomi 17T Pro & MediaTek Dimensity 9500 (MT6993Z, TSMC N3P).
+> Phone-first zero-build silicon-to-quantum interactive hardware lab, 60-digit differential physics oracle, a constructive Lean 4.35.0 invariant suite for the workbench's mathematical models, and AMS-LaTeX white paper for the Xiaomi 17T Pro & MediaTek Dimensity 9500 (MT6993Z, TSMC N3P).
 
 - Live interactive lab: https://0thernes.github.io/xiaomi-17t-pro-lab/
 - Live Lean 4.35.0 Proof Blueprint: https://0thernes.github.io/xiaomi-17t-pro-lab/blueprint/
