@@ -48,7 +48,7 @@ def audit_bib(bib_path: Path) -> list[dict[str, Any]]:
                     title = " ".join(tm.group(1).split()) if tm else ""
                     records.append(
                         {
-                            "key": key,
+                            "bib_id": key,
                             "resolver": "arXiv",
                             "identifier": doi,
                             "http_status": resp.status,
@@ -68,7 +68,7 @@ def audit_bib(bib_path: Path) -> list[dict[str, Any]]:
                         raise RuntimeError(f"RETRACTED citation detected: {key} ({doi})")
                     records.append(
                         {
-                            "key": key,
+                            "bib_id": key,
                             "resolver": "Crossref",
                             "identifier": doi,
                             "http_status": resp.status,
@@ -80,7 +80,7 @@ def audit_bib(bib_path: Path) -> list[dict[str, Any]]:
             u = m_url.group(1).strip()
             records.append(
                 {
-                    "key": key,
+                    "bib_id": key,
                     "resolver": "URL",
                     "identifier": u,
                     "http_status": 200,
@@ -92,7 +92,7 @@ def audit_bib(bib_path: Path) -> list[dict[str, Any]]:
             isbn = m_isbn.group(1).strip()
             records.append(
                 {
-                    "key": key,
+                    "bib_id": key,
                     "resolver": "ISBN",
                     "identifier": isbn,
                     "http_status": 200,
