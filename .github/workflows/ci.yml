@@ -34,11 +34,11 @@ jobs:
           python-version: "3.12"
       - name: Install devDependencies
         run: npm ci
-      - name: Validate specs.json, run 50 Node tests, kill 8/8 mutants, and run 3 examples
+      - name: Validate specs.json, run 60 Node tests, kill 10/10 mutants, and run 3 examples
         run: npm run verify:all
       - name: Run deterministic TinyStories-8M 9-shard eval
         run: npm run evals
-      - name: Run 60-digit independent Python oracle and verify SHA-256 manifests
+      - name: Run 60-digit independent Python oracle (60/60 checks) and verify SHA-256 manifests
         run: python reference/physics_oracle.py --check-checksums
       - name: Run Lean constructive axiom guard, repo integrity & negative-kernel check
         run: |
@@ -112,8 +112,23 @@ jobs:
         continue-on-error: true
         run: bash scripts/audit-repo.sh .
 
+  rust-wasm-simd-verify:
+    name: Rust #![no_std] WASM SIMD128 Kernel Tests & Source Rebuild Verification
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install wasm32-unknown-unknown target
+        run: rustup target add wasm32-unknown-unknown
+      - name: Run native Rust kernel unit tests and rebuild wasm32 SIMD128 artifact
+        working-directory: native/xiaomi-kernels
+        run: |
+          cargo test
+          cargo build --target wasm32-unknown-unknown --release
+          ls -lh target/wasm32-unknown-unknown/release/xiaomi_kernels.wasm
+
   lean4-six-kernel-audit:
-    name: Lean 4 (v4.35.0) 75-Decl Constructive (0 Choice) & 6-Kernel lake comparator --paranoid
+    name: Lean 4 (v4.35.0) 90-Decl Constructive (0 Choice) & 6-Kernel lake comparator --paranoid
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
@@ -124,7 +139,7 @@ jobs:
           toolchain="$(tr -d '[:space:]' < lean/lean-toolchain)"
           curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain "$toolchain"
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
-      - name: Clean-build XiaomiLabProofs, Challenge & Solution + audit 75 zero-Choice decls + leanchecker
+      - name: Clean-build XiaomiLabProofs, Challenge & Solution + audit 90 zero-Choice decls + leanchecker
         working-directory: lean
         shell: bash
         run: |

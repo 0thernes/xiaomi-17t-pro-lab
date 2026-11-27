@@ -317,9 +317,19 @@ def run_differential_oracle() -> list[dict[str, Any]]:
     checks.append(check_close("mermin3_ghz_exact", js["contextuality"]["mermin3Exact"], Decimal(4), rel_tol=1e-12))
     checks.append(check_close("bell_entanglement_bits", js["contextuality"]["bellEntropy"], Decimal(1), rel_tol=1e-12))
 
-    # 6. BitNet 1.58-bit exact information bound log2(3)
+    # 6. BitNet 1.58-bit exact information bound log2(3) & IEEE-754 binary16 extremes
     log2_3 = Decimal(3).ln() / Decimal(2).ln()
     checks.append(check_close("bitnet_log2_3_bits", js["quant"]["ternaryBits"], log2_3, rel_tol=1e-14))
+    checks.append(check_close("fp16_min_subnormal_2m24", js["quant"]["fp16MinSubnormal"], Decimal(2) ** Decimal(-24), rel_tol=1e-14))
+    checks.append(check_close("fp16_max_normal_65504", js["quant"]["fp16MaxNormal"], Decimal(65504), rel_tol=1e-14))
+
+    # 7. Exact CP^1 Fubini-Study Quantum Geometric Tensor at theta = pi/3 & NIST SP 800-90B RCT cutoff
+    sin_pi3 = Decimal(3).sqrt() / Decimal(2)
+    q_pi3 = js["qgtl"]["piOver3"]
+    checks.append(check_close("qgtl_g_theta_theta", q_pi3["gThetaTheta"], Decimal("0.25"), rel_tol=1e-14))
+    checks.append(check_close("qgtl_g_phi_phi_pi3", q_pi3["gPhiPhi"], Decimal("0.25") * sin_pi3 * sin_pi3, rel_tol=1e-14))
+    checks.append(check_close("qgtl_berry_curv_pi3", q_pi3["berryCurvature"], Decimal("-0.5") * sin_pi3, rel_tol=1e-14))
+    checks.append(check_close("nist_sp80090b_rct_cutoff_H1", float(js["qgtl"]["rctCutoffH1"]), Decimal(21), rel_tol=1e-14))
 
     return checks
 
@@ -346,21 +356,20 @@ def main() -> int:
     if args.json_out:
         out_path = Path(args.json_out)
         out_path.parent.mkdir(parents=True, exist_ok=True)
-        out_path.write_text(
-            json.dumps(
-                {
-                    "oracle_precision_digits": 60,
-                    "checks_passed": len(checks),
-                    "max_relative_error": max_rel,
-                    "manifests_verified": manifest_summary,
-                    "checks": checks,
-                },
-                indent=2,
+        with out_path.open("w", encoding="utf-8", newline="\n") as fh:
+            fh.write(
+                json.dumps(
+                    {
+                        "oracle_precision_digits": 60,
+                        "checks_passed": len(checks),
+                        "max_relative_error": max_rel,
+                        "manifests_verified": manifest_summary,
+                        "checks": checks,
+                    },
+                    indent=2,
+                )
+                + "\n"
             )
-            + "\n",
-            encoding="utf-8",
-            newline="\n",
-        )
     return 0
 
 

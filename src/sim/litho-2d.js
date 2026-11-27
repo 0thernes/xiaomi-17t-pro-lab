@@ -1,5 +1,6 @@
 import { EUV_LAMBDA_NM } from "./constants.js";
 import { fftRadix2 } from "./fft.js";
+import { getFastKernelsSync } from "./wasm.js";
 
 /**
  * True 2D Fourier Optics Partial-Coherence EUV Mask-to-Wafer Simulator + OPC
@@ -15,32 +16,67 @@ import { fftRadix2 } from "./fft.js";
  *   5. Resist print threshold & corner-fidelity / Edge-Placement Error (EPE) metric.
  */
 
-export function fft2d(re, im, n, inverse = false) {
-  const rowR = new Float64Array(n);
-  const rowI = new Float64Array(n);
+// Reusable catalytic 1D line scratch buffers (zero per-fft2d TypedArray allocations)
+let _fftScratchN = 0;
+let _rowR = null;
+let _rowI = null;
+let _colR = null;
+let _colI = null;
+
+function ensureFftScratch(n) {
+  if (_fftScratchN === n) return;
+  _fftScratchN = n;
+  _rowR = new Float64Array(n);
+  _rowI = new Float64Array(n);
+  _colR = new Float64Array(n);
+  _colI = new Float64Array(n);
+}
+
+export function fft2d(re, im, n, inverse = false, { useWasm = true } = {}) {
+  if (useWasm && n >= 32) {
+    const fk = getFastKernelsSync();
+    if (fk?.exports?.fft2d_f64 && fk.arena) {
+      const total = n * n;
+      const arena = fk.arena;
+      const saved = arena.mark();
+      try {
+        const reS = arena.allocFloat64(total);
+        const imS = arena.allocFloat64(total);
+        const colRS = arena.allocFloat64(n);
+        const colIS = arena.allocFloat64(n);
+        reS.view().set(re);
+        imS.view().set(im);
+        fk.exports.fft2d_f64(reS.ptr, imS.ptr, colRS.ptr, colIS.ptr, n, inverse ? 1 : 0);
+        re.set(reS.view());
+        im.set(imS.view());
+      } finally {
+        arena.rewind(saved);
+      }
+      return;
+    }
+  }
+  ensureFftScratch(n);
   for (let y = 0; y < n; y++) {
     const off = y * n;
     for (let x = 0; x < n; x++) {
-      rowR[x] = re[off + x];
-      rowI[x] = im[off + x];
+      _rowR[x] = re[off + x];
+      _rowI[x] = im[off + x];
     }
-    fftRadix2(rowR, rowI, inverse);
+    fftRadix2(_rowR, _rowI, inverse);
     for (let x = 0; x < n; x++) {
-      re[off + x] = rowR[x];
-      im[off + x] = rowI[x];
+      re[off + x] = _rowR[x];
+      im[off + x] = _rowI[x];
     }
   }
-  const colR = new Float64Array(n);
-  const colI = new Float64Array(n);
   for (let x = 0; x < n; x++) {
     for (let y = 0; y < n; y++) {
-      colR[y] = re[y * n + x];
-      colI[y] = im[y * n + x];
+      _colR[y] = re[y * n + x];
+      _colI[y] = im[y * n + x];
     }
-    fftRadix2(colR, colI, inverse);
+    fftRadix2(_colR, _colI, inverse);
     for (let y = 0; y < n; y++) {
-      re[y * n + x] = colR[y];
-      im[y * n + x] = colI[y];
+      re[y * n + x] = _colR[y];
+      im[y * n + x] = _colI[y];
     }
   }
 }

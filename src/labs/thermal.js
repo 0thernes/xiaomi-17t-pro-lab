@@ -8,6 +8,7 @@ import {
   DIE_HEAT_ZONES,
   THERMAL_PROFILES,
   createDieThermalGrid,
+  ironbowFillRgba,
   ironbowRgb,
   simulateSustainedThrottle,
 } from "../sim/thermal-fdtd.js";
@@ -31,20 +32,27 @@ export async function mount(main, { cap, audio }) {
   thermalTex.magFilter = THREE.LinearFilter;
 
   function syncThermalTexture() {
-    const t = sim.temp;
-    const d = texImg.data;
-    for (let k = 0; k < t.length; k++) {
-      const [r, g, b] = ironbowRgb(t[k], 24, 108);
-      const p = k * 4;
-      d[p] = r;
-      d[p + 1] = g;
-      d[p + 2] = b;
-      d[p + 3] = 255;
-    }
+    ironbowFillRgba(sim.temp, texImg.data, 24, 108);
     texCtx.putImageData(texImg, 0, 0);
     thermalTex.needsUpdate = true;
   }
   syncThermalTexture();
+
+  // Pre-render the vertical Ironbow thermal legend bar ONCE (eliminates ~270 line() calls/frame)
+  const barCanvas = document.createElement("canvas");
+  barCanvas.width = 1;
+  barCanvas.height = 256;
+  const barCtx = barCanvas.getContext("2d");
+  const barImg = barCtx.createImageData(1, 256);
+  for (let k = 0; k < 256; k++) {
+    const [r, g, b] = ironbowRgb(108 - (k / 255) * (108 - 24), 24, 108);
+    const o = k * 4;
+    barImg.data[o] = r;
+    barImg.data[o + 1] = g;
+    barImg.data[o + 2] = b;
+    barImg.data[o + 3] = 255;
+  }
+  barCtx.putImageData(barImg, 0, 0);
 
   // Live KPI value spans
   const peakVal = el("span", { class: "v-cyan" }, ["—"]);
@@ -230,18 +238,12 @@ export async function mount(main, { cap, audio }) {
       }
       const ox = margin + (availW - drawW) / 2;
       const oy = margin + (availH - drawH) / 2;
-      const cw = drawW / sim.nx;
-      const ch = drawH / sim.ny;
 
-      // Paint ironbow PDE field
-      p.noStroke();
-      for (let j = 0; j < sim.ny; j++) {
-        for (let i = 0; i < sim.nx; i++) {
-          const [r, g, b] = ironbowRgb(sim.temp[j * sim.nx + i], 24, 108);
-          p.fill(r, g, b);
-          p.rect(ox + i * cw, oy + j * ch, cw + 0.6, ch + 0.6);
-        }
-      }
+      // Single-blit GPU ImageData transfer (replaces 2,288 per-frame p.rect() calls)
+      if (!view || view.stats.paused) syncThermalTexture();
+      const ctx2d = p.drawingContext;
+      ctx2d.imageSmoothingEnabled = false;
+      ctx2d.drawImage(texCanvas, ox, oy, drawW, drawH);
 
       // Draw Kurnal block outlines & live zone temperatures
       const st = sim.stats();
@@ -262,14 +264,10 @@ export async function mount(main, { cap, audio }) {
         p.text(`${z.label} ${(st.zonePeaks[z.id] || 25).toFixed(1)}°C`, zx + 6, zy + 14);
       }
 
-      // Right-hand Ironbow thermal scale bar (24°C -> 108°C)
+      // Right-hand Ironbow thermal scale bar (1 GPU blit instead of 270 line calls)
       const barX = ox + drawW + 14;
-      for (let k = 0; k < drawH; k++) {
-        const temp = 108 - (k / drawH) * (108 - 24);
-        const [r, g, b] = ironbowRgb(temp, 24, 108);
-        p.stroke(r, g, b);
-        p.line(barX, oy + k, barX + 12, oy + k);
-      }
+      ctx2d.imageSmoothingEnabled = true;
+      ctx2d.drawImage(barCanvas, barX, oy, 12, drawH);
       p.noStroke();
       p.fill("#9fb0c8");
       p.textSize(9);
@@ -381,8 +379,9 @@ export async function mount(main, { cap, audio }) {
   }
   refreshSustainedChart();
 
-  // Live telemetry readout ticker
+  // Live telemetry readout ticker (auto-pauses when browser tab is hidden)
   const ticker = window.setInterval(() => {
+    if (document.hidden) return;
     if (!view) sim.step(0.08, 4);
     const st = sim.stats();
     peakVal.textContent = st.peakC.toFixed(1);

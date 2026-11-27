@@ -7,4 +7,5 @@ public import XiaomiLabProofs.QuantumTransport
 public import XiaomiLabProofs.ThermalFdtd
 public import XiaomiLabProofs.QuantumContextuality
 public import XiaomiLabProofs.SpectralBraggAndShards
+public import XiaomiLabProofs.CatalyticArena
 public import XiaomiLabProofs.AdversarialTests

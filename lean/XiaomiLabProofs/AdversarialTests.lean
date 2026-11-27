@@ -58,4 +58,16 @@ public theorem adv_dft2_parseval_breaks_without_factor_2 :
     (dft2_0 CInt.one CInt.zero).normSq + (dft2_1 CInt.one CInt.zero).normSq ≠
     (CInt.one.normSq + CInt.zero.normSq) := by decide
 
+/-- Adv 8: Dropping the range bound `b < m` in catalytic modular shear breaks restoration
+    (borrowing byte value 256 modulo 256 collapses to 0 != 256, proving `m >= 257` is necessary). -/
+public theorem adv_catalytic_shear_out_of_range_fails :
+    catalyticShearSub (catalyticShearAdd 256 17 256) 17 256 ≠ 256 := by decide
+
+/-- Adv 9: Overlapping linear-memory slices `[100, 132)` and `[120, 152)` violate disjointness
+    at concrete witness `i = 20, j = 0` (`100 + 20 = 120 + 0`). -/
+public theorem adv_arena_overlap_collides :
+    ¬ arenaSliceDisjoint 100 32 120 32 := by
+  intro h
+  exact h 20 0 (by decide) (by decide) rfl
+
 end XiaomiLab.Adversarial

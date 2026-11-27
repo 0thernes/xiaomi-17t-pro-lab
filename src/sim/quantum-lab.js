@@ -285,3 +285,84 @@ export function buildPresetState(preset) {
   }
   return { state: createState(2), gates: [] };
 }
+
+/**
+ * Exact 1-Qubit Fubini-Study Quantum Geometric Tensor on the Bloch sphere CP^1:
+ *   |psi(theta, phi)> = cos(theta/2)|0> + e^{i*phi} sin(theta/2)|1>
+ *   Metric tensor g = diag(1/4, (1/4) * sin^2(theta)),
+ *   Berry curvature Omega_{theta,phi} = -(1/2) * sin(theta).
+ * Inspired by `0thernes/quantum_geometric_tensor` (closed-form browser-native subset;
+ * full multi-parameter projective manifolds require the native C QGTL library).
+ */
+export function fubiniStudyMetric1Qubit(thetaRad, phiRad = 0) {
+  if (!Number.isFinite(thetaRad) || !Number.isFinite(phiRad)) {
+    throw new RangeError("Bloch angles thetaRad and phiRad must be finite");
+  }
+  const s = Math.sin(thetaRad);
+  const gThetaTheta = 0.25;
+  const gPhiPhi = 0.25 * s * s;
+  const gThetaPhi = 0;
+  const berryCurvature = -0.5 * s;
+  const determinant = gThetaTheta * gPhiPhi - gThetaPhi * gThetaPhi;
+  return { thetaRad, phiRad, gThetaTheta, gPhiPhi, gThetaPhi, berryCurvature, determinant };
+}
+
+/**
+ * NIST SP 800-90B Section 4.4 Continuous Entropy Health Tests (RCT + APT).
+ * Inspired by `0thernes/quantum_rng` (applied honestly here to verify statistical
+ * health of browser PRNG/CSPRNG Born-rule bitstreams — NOT physical QRNG hardware).
+ *
+ * - Repetition Count Test (RCT): cutoff C = 1 + ceil(-log2(alpha) / H), alpha = 2^-20.
+ * - Adaptive Proportion Test (APT): window W = 1024 (binary) or 512 (non-binary),
+ *   checks whether any symbol repeats more than the cutoff in the window.
+ */
+export function nistSp80090bHealthTest(samples, { minEntropyBits = 1.0, binary = true } = {}) {
+  if (!samples || samples.length === 0) {
+    throw new RangeError("samples must be a non-empty array or typed array");
+  }
+  if (!Number.isFinite(minEntropyBits) || minEntropyBits <= 0) {
+    throw new RangeError("minEntropyBits must be finite and positive");
+  }
+  // RCT cutoff for false-positive rate alpha = 2^-20 (NIST SP 800-90B 4.4.1)
+  const rctCutoff = 1 + Math.ceil(20 / minEntropyBits);
+  let maxRun = 1;
+  let curRun = 1;
+  for (let i = 1; i < samples.length; i++) {
+    if (samples[i] === samples[i - 1]) {
+      curRun += 1;
+      if (curRun > maxRun) maxRun = curRun;
+    } else {
+      curRun = 1;
+    }
+  }
+  const rctPass = maxRun < rctCutoff;
+
+  // APT window (NIST SP 800-90B 4.4.2): W = 1024 for binary, 512 otherwise.
+  // Track max symbol frequency across the window so bias is caught regardless of starting symbol.
+  const windowSize = Math.min(samples.length, binary ? 1024 : 512);
+  const counts = new Map();
+  let aptCount = 0;
+  for (let i = 0; i < windowSize; i++) {
+    const next = (counts.get(samples[i]) || 0) + 1;
+    counts.set(samples[i], next);
+    if (next > aptCount) aptCount = next;
+  }
+  // Conservative binomial upper tail cutoff for p = 2^(-H)
+  const p = Math.min(0.999999, Math.pow(2, -minEntropyBits));
+  const mean = windowSize * p;
+  const std = Math.sqrt(Math.max(1e-9, windowSize * p * (1 - p)));
+  const aptCutoff = Math.ceil(mean + 4.8 * std);
+  const aptPass = aptCount <= aptCutoff;
+
+  return {
+    samplesChecked: samples.length,
+    rctMaxRun: maxRun,
+    rctCutoff,
+    rctPass,
+    aptWindow: windowSize,
+    aptCount,
+    aptCutoff,
+    aptPass,
+    pass: rctPass && aptPass,
+  };
+}

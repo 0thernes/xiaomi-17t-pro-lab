@@ -18,7 +18,7 @@ from physics_oracle import strip_lean_comments_and_strings  # noqa: E402
 
 ALLOWED_AXIOMS = {"propext", "Quot.sound"}
 FORBIDDEN_TOKENS = re.compile(r"\b(sorry|admit|axiom|native_decide|unsafe|implemented_by)\b|@\[extern")
-EXPECTED_MIN_DECLS = 75
+EXPECTED_MIN_DECLS = 90
 
 
 def normalize_audit_lines(raw_text: str) -> list[str]:
@@ -92,7 +92,8 @@ def main() -> int:
 
     print(
         f"PASS: All {count} constructive Lean 4.35.0 declarations ({zero_ax} zero-axiom) use strictly "
-        f"{sorted(ALLOWED_AXIOMS)} (ZERO Classical.choice); README.md verbatim comparator block matches 10/10."
+        f"{sorted(ALLOWED_AXIOMS)} (ZERO Classical.choice); README.md verbatim comparator block matches "
+        f"{len(comparator_lines)}/{len(comparator_lines)}."
     )
     return 0
 

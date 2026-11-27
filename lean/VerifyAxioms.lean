@@ -4,10 +4,10 @@ public import XiaomiLabProofs
 public import Solution
 
 /-!
-  XIAOMI 17T PRO LAB (v3.1.0) — Standalone Constructive Kernel Axiom Audit (`v4.35.0`, Palomar `module`)
+  XIAOMI 17T PRO LAB (v4.0.0) — Standalone Constructive Kernel Axiom Audit (`v4.35.0`, Palomar `module`)
 
-  Audits all 65 exported theorems across all seven proof modules (12 + 7 + 9 + 7 + 10 + 13 + 7)
-  plus all 10 isolated Palomar comparator targets (75 total audited declarations) via `#print axioms`.
+  Audits all 79 exported theorems across all eight proof modules (12 + 7 + 9 + 7 + 10 + 13 + 12 + 9)
+  plus all 11 isolated Palomar comparator targets (90 total audited declarations) via `#print axioms`.
   Every single declaration is 100% CONSTRUCTIVE: strictly within `[propext, Quot.sound]`
   (or zero axioms) with ZERO `Classical.choice`, ZERO `sorryAx`, ZERO `native_decide`, and
   ZERO custom axioms.
@@ -83,7 +83,21 @@ public import Solution
 #print axioms XiaomiLab.SpectralBragg.tinystories_9_shards_exact_total
 #print axioms XiaomiLab.SpectralBragg.shard_total_monotone
 
--- Module 7: Adversarial False-Variant Refutations (7 theorems)
+-- Module 7: Catalytic Zero-Allocation Arena, Byte-Vault Reversibility & SIMD Partitioning (12 theorems)
+#print axioms XiaomiLab.Catalytic.catalytic_xor_byte_involution
+#print axioms XiaomiLab.Catalytic.catalytic_xor_bytes_restoration
+#print axioms XiaomiLab.Catalytic.catalytic_shear_int_restoration
+#print axioms XiaomiLab.Catalytic.catalytic_shear_mod_restoration
+#print axioms XiaomiLab.Catalytic.catalytic_shear_mod_range
+#print axioms XiaomiLab.Catalytic.arena_bump_slices_disjoint
+#print axioms XiaomiLab.Catalytic.arena_align16_preserves_order
+#print axioms XiaomiLab.Catalytic.arena_mark_rewind_exact
+#print axioms XiaomiLab.Catalytic.simd4_lane_reassociation_exact
+#print axioms XiaomiLab.Catalytic.fp16_lut_covers_all_bit_patterns
+#print axioms XiaomiLab.Catalytic.demand_idle_zero_gpu_work
+#print axioms XiaomiLab.Catalytic.fubini_study_metric_nonneg
+
+-- Module 8: Adversarial False-Variant Refutations (9 theorems)
 #print axioms XiaomiLab.Adversarial.adv_fdtd_cfl_violation_undershoots
 #print axioms XiaomiLab.Adversarial.adv_chsh_relaxed_domain_breaks_bound
 #print axioms XiaomiLab.Adversarial.adv_massless_dirac_not_subluminal
@@ -91,8 +105,10 @@ public import Solution
 #print axioms XiaomiLab.Adversarial.adv_roofline_max_violates_memory_wall
 #print axioms XiaomiLab.Adversarial.adv_bragg_non_unimodular_breaks_det_one
 #print axioms XiaomiLab.Adversarial.adv_dft2_parseval_breaks_without_factor_2
+#print axioms XiaomiLab.Adversarial.adv_catalytic_shear_out_of_range_fails
+#print axioms XiaomiLab.Adversarial.adv_arena_overlap_collides
 
--- Isolated Palomar Comparator Targets (10 targets)
+-- Isolated Palomar Comparator Targets (11 targets)
 #print axioms XiaomiLab.ComparatorTarget.target_thm1_hardware_and_roofline
 #print axioms XiaomiLab.ComparatorTarget.target_thm2_euv_rayleigh_and_dof
 #print axioms XiaomiLab.ComparatorTarget.target_thm3_dirac_finfet_and_crank_nicolson
@@ -102,4 +118,5 @@ public import Solution
 #print axioms XiaomiLab.ComparatorTarget.target_thm7_bloch_purity_bounds
 #print axioms XiaomiLab.ComparatorTarget.target_thm8_adversarial_refutations
 #print axioms XiaomiLab.ComparatorTarget.target_thm9_bragg_parseval_and_shards
+#print axioms XiaomiLab.ComparatorTarget.target_thm10_catalytic_arena_and_simd
 #print axioms XiaomiLab.ComparatorTarget.target_nonvacuity_witnesses

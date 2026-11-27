@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-26T02:39:20.991Z",
+  "generatedAt": "2026-11-27T00:11:55.787Z",
   "nodeVersion": "v25.8.2",
   "platform": "win32-x64",
   "cpuModel": "Intel(R) Core(TM) Ultra 9 275HX",
@@ -9,81 +9,99 @@
     {
       "name": "bragg_40pair_81pt_spectrum",
       "iterations": 25,
-      "medianMs": 1.4336,
-      "iqrMs": 1.3213,
-      "p95Ms": 3.2165,
+      "medianMs": 0.3718,
+      "iqrMs": 1.0714,
+      "p95Ms": 2.0829,
       "budgetMs": 15,
       "withinBudget": true
     },
     {
       "name": "litho_2d_64x64_annular_opc",
       "iterations": 20,
-      "medianMs": 1.9156,
-      "iqrMs": 0.7273,
-      "p95Ms": 3.8079,
+      "medianMs": 2.5736,
+      "iqrMs": 1.9361,
+      "p95Ms": 5.7642,
       "budgetMs": 40,
       "withinBudget": true
     },
     {
       "name": "stochastic_resist_48x256",
       "iterations": 20,
-      "medianMs": 1.6576,
-      "iqrMs": 1.7655,
-      "p95Ms": 3.1506,
+      "medianMs": 1.3569,
+      "iqrMs": 2.2356,
+      "p95Ms": 5.2479,
       "budgetMs": 20,
       "withinBudget": true
     },
     {
       "name": "tdse_crank_nicolson_50steps_n240",
       "iterations": 30,
-      "medianMs": 0.2542,
-      "iqrMs": 0.7562,
-      "p95Ms": 6.8063,
+      "medianMs": 0.1031,
+      "iqrMs": 0.0716,
+      "p95Ms": 2.5359,
       "budgetMs": 15,
       "withinBudget": true
     },
     {
       "name": "thermal_fdtd_44x52_frame_80ms",
       "iterations": 30,
-      "medianMs": 0.9124,
-      "iqrMs": 1.9694,
-      "p95Ms": 6.13,
+      "medianMs": 0.32,
+      "iqrMs": 0.0456,
+      "p95Ms": 2.5735,
       "budgetMs": 15,
       "withinBudget": true
     },
     {
       "name": "schrodinger_jacobi_n48",
       "iterations": 15,
-      "medianMs": 2.6403,
-      "iqrMs": 2.0147,
-      "p95Ms": 15.2314,
+      "medianMs": 2.7615,
+      "iqrMs": 2.9055,
+      "p95Ms": 17.2426,
       "budgetMs": 25,
       "withinBudget": true
     },
     {
       "name": "quant_int8_matmul_64x64",
       "iterations": 40,
-      "medianMs": 0.2984,
-      "iqrMs": 0.2259,
-      "p95Ms": 0.9746,
+      "medianMs": 0.1264,
+      "iqrMs": 0.1879,
+      "p95Ms": 1.3536,
       "budgetMs": 10,
       "withinBudget": true
     },
     {
       "name": "fp64_matmul_64x64",
       "iterations": 40,
-      "medianMs": 0.3032,
-      "iqrMs": 0.123,
-      "p95Ms": 0.7717,
+      "medianMs": 0.2798,
+      "iqrMs": 0.1718,
+      "p95Ms": 1.5841,
       "budgetMs": 10,
       "withinBudget": true
     },
     {
       "name": "chsh_and_mermin3_2000shots",
       "iterations": 25,
-      "medianMs": 0.5167,
-      "iqrMs": 0.4446,
-      "p95Ms": 2.0056,
+      "medianMs": 0.4454,
+      "iqrMs": 0.2629,
+      "p95Ms": 3.0456,
+      "budgetMs": 15,
+      "withinBudget": true
+    },
+    {
+      "name": "catalytic_xor_64kib_simd128",
+      "iterations": 40,
+      "medianMs": 0.0172,
+      "iqrMs": 0.0026,
+      "p95Ms": 0.0808,
+      "budgetMs": 5,
+      "withinBudget": true
+    },
+    {
+      "name": "fp16_lut_decode_262k_weights",
+      "iterations": 25,
+      "medianMs": 0.5356,
+      "iqrMs": 0.3462,
+      "p95Ms": 1.7088,
       "budgetMs": 15,
       "withinBudget": true
     }

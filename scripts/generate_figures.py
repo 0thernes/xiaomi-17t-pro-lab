@@ -229,14 +229,14 @@ def make_social_preview(data: dict) -> None:
     ax_top = fig.add_subplot(gs[0, :])
     ax_top.set_facecolor("#06080c")
     ax_top.axis("off")
-    ax_top.text(0.0, 0.78, "XIAOMI 17T PRO LAB  ·  v3.0.0", color="#ff6900", fontsize=15, fontweight="bold")
-    ax_top.text(0.0, 0.42, "Dimensity 9500 Silicon-to-Quantum Workbench & Six-Kernel Lean 4.35.0 Formal Core", color="#eef3fa", fontsize=19, fontweight="bold")
+    ax_top.text(0.0, 0.78, "XIAOMI 17T PRO LAB  ·  v4.0.0", color="#ff6900", fontsize=15, fontweight="bold")
+    ax_top.text(0.0, 0.42, "Dimensity 9500 Catalytic WASM SIMD128 Workbench & 90-Decl Lean 4.35.0 Formal Core", color="#eef3fa", fontsize=18.5, fontweight="bold")
     ax_top.text(
         0.0,
         0.10,
-        "19 Live Routes · 59 Audited Lean Declarations · 60-Digit Differential Oracle · 8/8 Mutants Killed · 0/1,900 Mega-Atlas Overclaims",
+        "19 Routes · 90 Constructive Lean Decls (0 Choice) · 9.4 KiB Rust WASM SIMD128 · 60-Digit Oracle (60/60) · 10/10 Mutants Killed",
         color="#38d4f2",
-        fontsize=11.5,
+        fontsize=11.0,
     )
 
     ax_l = fig.add_subplot(gs[1, 0])

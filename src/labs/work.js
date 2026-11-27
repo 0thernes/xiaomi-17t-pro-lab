@@ -156,7 +156,7 @@ async function mountGame(host, cap, audio) {
   );
 
   try {
-    view = await mountView(canvas, cap);
+    view = await mountView(canvas, cap, { uncapped: true });
   } catch (error) {
     status.textContent = error.message;
     return () => scope.dispose();
@@ -316,7 +316,10 @@ async function mountLlm(host, audio) {
         sub: "Alternating global / 256-win local",
       }),
       readout("Phone NPU Ref", "28 / 1600+", "tok/s", { tone: "ok", sub: "Gemma 3n E2B on MT6993 LiteRT" }),
-      readout("Browser Runtime", "JS CPU", "not NPU", { tone: "warn", sub: "Live weight hacking in browser" }),
+      readout("Browser Runtime", "WASM SIMD128", "CPU · not NPU", {
+        tone: "warn",
+        sub: "Catalytic Arena + Rust f32x4",
+      }),
     ]),
     el("div", { class: "grid cols-2" }, [
       panel(
@@ -688,9 +691,47 @@ async function mountLife(host, audio) {
   const glcHist = [];
   const atpHist = [];
   let alive = true;
+  let rafId = 0;
+  let lastDraw = 0;
+  let tabVisible = !document.hidden;
+  let inViewport = true;
 
-  function frame() {
+  function syncLifeLoop() {
     if (!alive) return;
+    if (!tabVisible || !inViewport) {
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = 0;
+      }
+      return;
+    }
+    if (!rafId) rafId = requestAnimationFrame(frame);
+  }
+  function onLifeVisibility() {
+    tabVisible = !document.hidden;
+    syncLifeLoop();
+  }
+  document.addEventListener("visibilitychange", onLifeVisibility);
+  let lifeIo = null;
+  if (typeof IntersectionObserver !== "undefined") {
+    lifeIo = new IntersectionObserver(
+      (entries) => {
+        inViewport = entries.some((e) => e.isIntersecting);
+        syncLifeLoop();
+      },
+      { rootMargin: "60px", threshold: 0.01 },
+    );
+    lifeIo.observe(arenaCanvas);
+  }
+
+  function frame(now = performance.now()) {
+    rafId = 0;
+    if (!alive || !tabVisible || !inViewport) return;
+    if (now - lastDraw < 15.5) {
+      rafId = requestAnimationFrame(frame);
+      return;
+    }
+    lastDraw = now;
     const steps = Number(speedCtrl.input.value);
     for (let i = 0; i < steps; i++) creature.step();
     if (creature.rewards > lastRewards) {
@@ -867,11 +908,14 @@ async function mountLife(host, audio) {
         ),
       );
     }
-    requestAnimationFrame(frame);
+    rafId = requestAnimationFrame(frame);
   }
-  frame();
+  rafId = requestAnimationFrame(frame);
   return () => {
     alive = false;
+    if (rafId) cancelAnimationFrame(rafId);
+    document.removeEventListener("visibilitychange", onLifeVisibility);
+    lifeIo?.disconnect();
   };
 }
 
@@ -1388,7 +1432,7 @@ async function mountBrowser(host, cap, audio) {
           ),
           kv(
             "Origin Sandbox",
-            "Concept shell inspired by 0thernes/gigachad-browser; the full desktop multi-process app is not bundled.",
+            "Concept shell inspired by an internal desktop sovereign-browser prototype; the full desktop multi-process app is not bundled.",
           ),
         ]),
     ],
@@ -1425,6 +1469,11 @@ async function mountBrowser(host, cap, audio) {
   const GY = 22;
   const pheroTask = new Float32Array(GX * GY);
   const pheroThreat = new Float32Array(GX * GY);
+  const pheroCanvas = document.createElement("canvas");
+  pheroCanvas.width = GX;
+  pheroCanvas.height = GY;
+  const pheroCtx = pheroCanvas.getContext("2d");
+  const pheroImg = pheroCtx.createImageData(GX, GY);
 
   const agents = Array.from({ length: 80 }, (_, i) => ({
     caste: i % 5,
@@ -1461,31 +1510,31 @@ async function mountBrowser(host, cap, audio) {
     swarmHost,
     (p) => {
       p.background("#06080c");
-      const cw = p.width / GX;
-      const ch = p.height / GY;
 
-      // Evaporate pheromone grid & paint glowing trail heatmap
+      // Evaporate pheromone grid & single-blit ImageData heatmap (replaces up to 1,056 p.rect() calls/frame)
       let totalFlux = 0;
-      p.noStroke();
-      for (let j = 0; j < GY; j++) {
-        for (let i = 0; i < GX; i++) {
-          const idx = j * GX + i;
-          pheroTask[idx] *= 0.965;
-          pheroThreat[idx] *= 0.955;
-          const pt = pheroTask[idx];
-          const pr = pheroThreat[idx];
-          totalFlux += pt + pr;
-          if (pt > 0.03 || pr > 0.03) {
-            p.fill(
-              Math.min(255, Math.round(pr * 245 + pt * 45)),
-              Math.min(255, Math.round(pt * 175 + pr * 30)),
-              Math.min(255, Math.round(pt * 225 + pr * 60)),
-              Math.min(130, Math.round((pt + pr) * 140)),
-            );
-            p.rect(i * cw, j * ch, cw + 0.5, ch + 0.5);
-          }
+      const pd = pheroImg.data;
+      const totalCells = GX * GY;
+      for (let idx = 0; idx < totalCells; idx++) {
+        const pt = pheroTask[idx] * 0.965;
+        const pr = pheroThreat[idx] * 0.955;
+        pheroTask[idx] = pt;
+        pheroThreat[idx] = pr;
+        totalFlux += pt + pr;
+        const o = idx << 2;
+        if (pt > 0.03 || pr > 0.03) {
+          pd[o] = Math.min(255, Math.round(pr * 245 + pt * 45));
+          pd[o + 1] = Math.min(255, Math.round(pt * 175 + pr * 30));
+          pd[o + 2] = Math.min(255, Math.round(pt * 225 + pr * 60));
+          pd[o + 3] = Math.min(130, Math.round((pt + pr) * 140));
+        } else {
+          pd[o + 3] = 0;
         }
       }
+      pheroCtx.putImageData(pheroImg, 0, 0);
+      const sctx = p.drawingContext;
+      sctx.imageSmoothingEnabled = true;
+      sctx.drawImage(pheroCanvas, 0, 0, p.width, p.height);
 
       // Draw permanent cortex hubs
       for (const n of nodes) {

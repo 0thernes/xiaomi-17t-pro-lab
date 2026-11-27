@@ -5,11 +5,13 @@
  * PDE: dT/dt = alpha_eff * Laplacian(T) + q_block(x, y) + q_leak(T) - h_eff * (T - T_amb)
  * Explicit Forward-Euler with automatic CFL sub-stepping (r = alpha*dt/dx^2 <= 0.22).
  *
- * Note: Thermal resistances and block wattage splits are COMPUTED physical-model
- * parameters (not vendor-leaked die telemetry); die dimensions (10.88 x 12.92 mm),
- * block areas (CPU 28.75, GPU 24.23, NPU 12.60, SLC 8.92 mm²), cooling area
- * (5500 mm²), and battery capacity (7000 mAh) come from specs.json.
+ * v4.0.0 Catalytic + Rust WASM SIMD128 acceleration:
+ *   - Multi-step explicit stencil runs inside `fast-kernels.wasm` (`fdtd_thermal_step_f64`)
+ *     using zero-allocation Catalytic Arena mark/rewind slicing (transparent JS fallback).
+ *   - Eliminates redundant full-grid `stats()` calls inside `stepOnce()` and precomputes
+ *     a 256-entry Ironbow RGBA LUT (`ironbowFillRgba`) for zero-GC FLIR rendering.
  */
+import { getFastKernelsSync } from "./wasm.js";
 
 export const THERMAL_PROFILES = {
   idle: {
@@ -53,27 +55,54 @@ export const DIE_HEAT_ZONES = [
   { id: "modem", label: "ISP / Modem / PHY", areaMm2: 22.0, x: 0.6, y: 9.55, w: 9.68, h: 2.77 },
 ];
 
+const IRONBOW_STOPS = [
+  [0.0, 6, 8, 22],
+  [0.18, 28, 16, 86],
+  [0.36, 110, 22, 134],
+  [0.54, 198, 48, 82],
+  [0.72, 245, 114, 24],
+  [0.88, 255, 206, 64],
+  [1.0, 255, 252, 232],
+];
+
 /** Smooth scientific FLIR Ironbow colormap (0..1 -> [r, g, b] 0..255). */
 export function ironbowRgb(tempC, minC = 25, maxC = 105) {
   const u = Math.max(0, Math.min(1, (tempC - minC) / Math.max(1e-6, maxC - minC)));
-  const stops = [
-    [0.0, 6, 8, 22],
-    [0.18, 28, 16, 86],
-    [0.36, 110, 22, 134],
-    [0.54, 198, 48, 82],
-    [0.72, 245, 114, 24],
-    [0.88, 255, 206, 64],
-    [1.0, 255, 252, 232],
-  ];
-  for (let i = 1; i < stops.length; i++) {
-    if (u <= stops[i][0]) {
-      const [u0, r0, g0, b0] = stops[i - 1];
-      const [u1, r1, g1, b1] = stops[i];
+  for (let i = 1; i < IRONBOW_STOPS.length; i++) {
+    if (u <= IRONBOW_STOPS[i][0]) {
+      const [u0, r0, g0, b0] = IRONBOW_STOPS[i - 1];
+      const [u1, r1, g1, b1] = IRONBOW_STOPS[i];
       const t = (u - u0) / (u1 - u0);
       return [Math.round(r0 + (r1 - r0) * t), Math.round(g0 + (g1 - g0) * t), Math.round(b0 + (b1 - b0) * t)];
     }
   }
   return [255, 252, 232];
+}
+
+// Precomputed 256-entry Ironbow RGBA lookup table (zero per-cell array allocations)
+const IRONBOW_LUT = new Uint8ClampedArray(256 * 3);
+for (let i = 0; i < 256; i++) {
+  const [r, g, b] = ironbowRgb(i, 0, 255);
+  IRONBOW_LUT[i * 3] = r;
+  IRONBOW_LUT[i * 3 + 1] = g;
+  IRONBOW_LUT[i * 3 + 2] = b;
+}
+
+/** Zero-allocation fill of an RGBA ImageData buffer from a temperature field. */
+export function ironbowFillRgba(temp, rgbaOut, minC = 24, maxC = 108) {
+  const scale = 255 / Math.max(1e-6, maxC - minC);
+  const n = temp.length;
+  for (let k = 0; k < n; k++) {
+    let idx = Math.round((temp[k] - minC) * scale);
+    if (idx < 0) idx = 0;
+    else if (idx > 255) idx = 255;
+    const l = idx * 3;
+    const p = k << 2;
+    rgbaOut[p] = IRONBOW_LUT[l];
+    rgbaOut[p + 1] = IRONBOW_LUT[l + 1];
+    rgbaOut[p + 2] = IRONBOW_LUT[l + 2];
+    rgbaOut[p + 3] = 255;
+  }
 }
 
 export function createDieThermalGrid({
@@ -84,6 +113,7 @@ export function createDieThermalGrid({
   ambientC = 25,
   vcEnabled = true,
   profileId = "gaming_nomad",
+  useWasm = true,
 } = {}) {
   if (!Number.isInteger(nx) || nx < 4 || !Number.isInteger(ny) || ny < 4) {
     throw new RangeError("thermal grid dimensions nx, ny must be integers >= 4");
@@ -102,6 +132,8 @@ export function createDieThermalGrid({
   const dxMm = widthMm / nx;
   const dyMm = heightMm / ny;
   const cellAreaMm2 = dxMm * dyMm;
+  const invDx2 = 1 / (dxMm * dxMm);
+  const invDy2 = 1 / (dyMm * dyMm);
 
   // Map each cell to its Kurnal heat zone index (-1 = perimeter silicon)
   const zoneMap = new Int8Array(size).fill(-1);
@@ -121,68 +153,137 @@ export function createDieThermalGrid({
     }
   }
 
+  // Reusable catalytic buffers (zero per-step allocations)
+  const zonePowerDensity = new Float64Array(DIE_HEAT_ZONES.length);
+  const zoneInvAreas = new Float64Array(DIE_HEAT_ZONES.length);
+  for (let z = 0; z < DIE_HEAT_ZONES.length; z++) {
+    zoneInvAreas[z] = 1 / Math.max(1, zoneCounts[z] * cellAreaMm2);
+  }
+  const zonePeakArr = new Float64Array(DIE_HEAT_ZONES.length);
+
   let simTime = 0;
   let vc = vcEnabled;
   let ambient = ambientC;
   let profile = THERMAL_PROFILES[profileId] || THERMAL_PROFILES.gaming_nomad;
+  let profileBaseWatts = sumWatts(profile.watts);
   let throttleScale = 1;
+  let hasPulse = false;
+
+  function sumWatts(w) {
+    let s = 0;
+    for (let z = 0; z < DIE_HEAT_ZONES.length; z++) s += w[DIE_HEAT_ZONES[z].id] || 0;
+    return s;
+  }
+
+  function scanPeakAndMean() {
+    let peak = -Infinity;
+    let sum = 0;
+    for (let k = 0; k < size; k++) {
+      const t = temp[k];
+      sum += t;
+      if (t > peak) peak = t;
+    }
+    return { peak, mean: sum / size };
+  }
 
   function stepOnce(dtSec, subSteps) {
-    // Effective lateral thermal spreading (3D IceLoop two-phase copper VC spreads hotspots across the die)
-    const meanPrev = stats().meanC;
-    const alpha = vc ? (meanPrev > 42 ? 1.9 : 1.35) : 0.42; // mm^2/s effective lateral diffusivity
-    const hConv = vc ? 0.28 : 0.125; // effective cooling conductance to IceLoop/chassis (1/s)
-    const invDx2 = 1 / (dxMm * dxMm);
-    const invDy2 = 1 / (dyMm * dyMm);
+    const { peak: peakNow, mean: meanPrev } = scanPeakAndMean();
+    const alpha = vc ? (meanPrev > 42 ? 1.9 : 1.35) : 0.42;
+    const hConv = vc ? 0.28 : 0.125;
     // Automatic CFL stability guarantee: alpha * dt * (1/dx^2 + 1/dy^2) <= 0.32 < 0.5
     const cflSteps = Math.max(subSteps, Math.ceil((dtSec * alpha * (invDx2 + invDy2)) / 0.32));
     const dt = dtSec / cflSteps;
-    // Thinned silicon + interposer effective areal heat capacity (J / (K * mm^2))
-    const heatCapPerMm2 = vc ? 0.016 : 0.013;
+    const invHeatCap = 1 / (vc ? 0.016 : 0.013);
 
     // Closed-loop smooth DVFS thermal controller (Tj > 84 C ramps DVFS smoothly down to 52%)
-    const peakNow = stats().peakC;
     const targetThrottle = peakNow > 84 ? Math.max(0.52, 1 - (peakNow - 84) * 0.022) : 1;
     throttleScale += (targetThrottle - throttleScale) * Math.min(0.45, dtSec * 0.5);
 
-    // Precompute power density per zone (W / mm^2)
-    const zonePowerDensity = new Float64Array(DIE_HEAT_ZONES.length);
     for (let z = 0; z < DIE_HEAT_ZONES.length; z++) {
       const id = DIE_HEAT_ZONES[z].id;
-      const w = (profile.watts[id] || 0) * throttleScale;
-      const area = Math.max(1, zoneCounts[z] * cellAreaMm2);
-      zonePowerDensity[z] = w / area;
+      zonePowerDensity[z] = (profile.watts[id] || 0) * throttleScale * zoneInvAreas[z];
     }
 
-    for (let s = 0; s < cflSteps; s++) {
-      for (let j = 0; j < ny; j++) {
-        const jUp = j > 0 ? j - 1 : 0;
-        const jDn = j < ny - 1 ? j + 1 : ny - 1;
-        for (let i = 0; i < nx; i++) {
-          const idx = j * nx + i;
-          const iLt = i > 0 ? i - 1 : 0;
-          const iRt = i < nx - 1 ? i + 1 : nx - 1;
-          const tC = temp[idx];
-          const lap =
-            (temp[j * nx + iRt] + temp[j * nx + iLt] - 2 * tC) * invDx2 +
-            (temp[jDn * nx + i] + temp[jUp * nx + i] - 2 * tC) * invDy2;
-          const z = zoneMap[idx];
-          const qDyn = (z >= 0 ? zonePowerDensity[z] : 0.002) + pulse[idx];
-          // Subthreshold leakage scales exponentially with junction temperature
-          const qLeak = (z >= 0 ? 0.0022 : 0.0003) * Math.exp(Math.min(3.2, Math.max(0, (tC - 25) * 0.032)));
-          const dT = alpha * lap + (qDyn + qLeak) / heatCapPerMm2 - hConv * (tC - ambient);
-          next[idx] = Math.max(ambient, Math.min(125, tC + dt * dT));
-        }
+    const fk = useWasm ? getFastKernelsSync() : null;
+    if (fk?.exports?.fdtd_thermal_step_f64 && fk.arena) {
+      const arena = fk.arena;
+      const saved = arena.mark();
+      try {
+        const tS = arena.allocFloat64(size);
+        const nS = arena.allocFloat64(size);
+        const pPtr = hasPulse ? arena.allocFloat64(size) : null;
+        const zS = arena.allocInt8(size);
+        const zpS = arena.allocFloat64(DIE_HEAT_ZONES.length);
+        tS.view().set(temp);
+        if (pPtr) pPtr.view().set(pulse);
+        zS.view().set(zoneMap);
+        zpS.view().set(zonePowerDensity);
+        const swapped = fk.exports.fdtd_thermal_step_f64(
+          tS.ptr,
+          nS.ptr,
+          pPtr ? pPtr.ptr : 0,
+          zS.ptr,
+          zpS.ptr,
+          nx,
+          ny,
+          alpha,
+          invDx2,
+          invDy2,
+          invHeatCap,
+          hConv,
+          ambient,
+          dt,
+          cflSteps,
+        );
+        temp.set(swapped ? nS.view() : tS.view());
+      } finally {
+        arena.rewind(saved);
       }
-      const swap = temp;
-      temp = next;
-      next = swap;
-      simTime += dt;
+      simTime += dt * cflSteps;
+    } else {
+      for (let s = 0; s < cflSteps; s++) {
+        for (let j = 0; j < ny; j++) {
+          const jUp = j > 0 ? j - 1 : 0;
+          const jDn = j < ny - 1 ? j + 1 : ny - 1;
+          const row = j * nx;
+          const rowUp = jUp * nx;
+          const rowDn = jDn * nx;
+          for (let i = 0; i < nx; i++) {
+            const idx = row + i;
+            const iLt = i > 0 ? i - 1 : 0;
+            const iRt = i < nx - 1 ? i + 1 : nx - 1;
+            const tC = temp[idx];
+            const lap =
+              (temp[row + iRt] + temp[row + iLt] - 2 * tC) * invDx2 +
+              (temp[rowDn + i] + temp[rowUp + i] - 2 * tC) * invDy2;
+            const z = zoneMap[idx];
+            const qDyn = (z >= 0 ? zonePowerDensity[z] : 0.002) + pulse[idx];
+            const qLeak = (z >= 0 ? 0.0022 : 0.0003) * Math.exp(Math.min(3.2, Math.max(0, (tC - 25) * 0.032)));
+            const dT = alpha * lap + (qDyn + qLeak) * invHeatCap - hConv * (tC - ambient);
+            next[idx] = Math.max(ambient, Math.min(125, tC + dt * dT));
+          }
+        }
+        const swap = temp;
+        temp = next;
+        next = swap;
+        simTime += dt;
+      }
     }
 
-    // Decay transient user-injected laser/hotspot probes
-    const decay = Math.exp(-dtSec * 0.85);
-    for (let k = 0; k < size; k++) pulse[k] *= decay;
+    // Decay transient user-injected laser/hotspot probes (skip when zero)
+    if (hasPulse) {
+      const decay = Math.exp(-dtSec * 0.85);
+      let maxP = 0;
+      for (let k = 0; k < size; k++) {
+        const v = pulse[k] * decay;
+        pulse[k] = v;
+        if (v > maxP) maxP = v;
+      }
+      if (maxP < 1e-9) {
+        pulse.fill(0);
+        hasPulse = false;
+      }
+    }
   }
 
   function step(dtSec = 0.08, subSteps = 6) {
@@ -200,11 +301,13 @@ export function createDieThermalGrid({
     const cx = uNorm * nx;
     const cy = vNorm * ny;
     const peakDensity = watts / (Math.PI * (radiusCells * dxMm) ** 2);
+    const r2 = radiusCells * radiusCells;
     for (let j = 0; j < ny; j++) {
       for (let i = 0; i < nx; i++) {
         const d2 = (i + 0.5 - cx) ** 2 + (j + 0.5 - cy) ** 2;
-        if (d2 < radiusCells * radiusCells * 4) {
-          pulse[j * nx + i] += peakDensity * Math.exp(-d2 / (radiusCells * radiusCells));
+        if (d2 < r2 * 4) {
+          pulse[j * nx + i] += peakDensity * Math.exp(-d2 / r2);
+          hasPulse = true;
         }
       }
     }
@@ -215,6 +318,7 @@ export function createDieThermalGrid({
     let minC = Infinity;
     let sum = 0;
     let peakIdx = 0;
+    zonePeakArr.fill(ambient);
     for (let k = 0; k < size; k++) {
       const t = temp[k];
       sum += t;
@@ -223,16 +327,18 @@ export function createDieThermalGrid({
         peakIdx = k;
       }
       if (t < minC) minC = t;
+      const z = zoneMap[k];
+      if (z >= 0 && t > zonePeakArr[z]) zonePeakArr[z] = t;
     }
     const meanC = sum / size;
-    const zonePeaks = {};
-    for (let z = 0; z < DIE_HEAT_ZONES.length; z++) zonePeaks[DIE_HEAT_ZONES[z].id] = ambient;
-    for (let k = 0; k < size; k++) {
-      const z = zoneMap[k];
-      if (z >= 0 && temp[k] > zonePeaks[DIE_HEAT_ZONES[z].id]) zonePeaks[DIE_HEAT_ZONES[z].id] = temp[k];
-    }
-    const baseWatts = Object.values(profile.watts).reduce((a, b) => a + b, 0);
-    const totalWatts = baseWatts * throttleScale + 0.25 * Math.exp(Math.max(0, (meanC - 30) * 0.035));
+    const zonePeaks = {
+      cpu: zonePeakArr[0],
+      gpu: zonePeakArr[1],
+      npu: zonePeakArr[2],
+      slc: zonePeakArr[3],
+      modem: zonePeakArr[4],
+    };
+    const totalWatts = profileBaseWatts * throttleScale + 0.25 * Math.exp(Math.max(0, (meanC - 30) * 0.035));
     return {
       simTime,
       peakC,
@@ -258,6 +364,7 @@ export function createDieThermalGrid({
     temp.fill(ambient);
     next.fill(ambient);
     pulse.fill(0);
+    hasPulse = false;
     simTime = 0;
     throttleScale = 1;
   }
@@ -282,7 +389,10 @@ export function createDieThermalGrid({
       ambient = Math.max(5, Math.min(50, val));
     },
     setProfile(id) {
-      if (THERMAL_PROFILES[id]) profile = THERMAL_PROFILES[id];
+      if (THERMAL_PROFILES[id]) {
+        profile = THERMAL_PROFILES[id];
+        profileBaseWatts = sumWatts(profile.watts);
+      }
     },
     injectHotspot,
     step,

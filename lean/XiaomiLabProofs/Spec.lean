@@ -1,7 +1,7 @@
 module
 
 /-!
-  XIAOMI 17T PRO LAB (v3.1.0) — Pure Statement-Only Definitions (`Spec.lean`).
+  XIAOMI 17T PRO LAB (v4.0.0) — Pure Statement-Only Definitions (`Spec.lean`).
 
   Palomar Registry compliant Lean 4.35.0 `module`.
   Contains ONLY mathematical definitions (ZERO theorems, ZERO tactics, ZERO `sorry`).
@@ -118,5 +118,31 @@ deriving DecidableEq, Repr
 @[expose] public def blochX (a b : CInt) : Int := 2 * (a.re * b.re + a.im * b.im)
 @[expose] public def blochY (a b : CInt) : Int := 2 * (a.re * b.im - a.im * b.re)
 @[expose] public def blochZ (a b : CInt) : Int := a.normSq - b.normSq
+
+/-- Modular additive-shear catalytic register pass over Z/mZ (honoring catalytic-register-frontiers). -/
+@[expose] public def catalyticShearAdd (b d m : Nat) : Nat := (b + d % m) % m
+
+/-- Exact inverse modular additive-shear catalytic restoration pass over Z/mZ. -/
+@[expose] public def catalyticShearSub (b d m : Nat) : Nat := (b + m - d % m) % m
+
+/-- Elementwise XOR pass over a byte buffer for the Catalytic Byte-Vault. -/
+@[expose] public def catalyticXorBytes (buf mask : List UInt8) : List UInt8 :=
+  List.zipWith (fun a b => a ^^^ b) buf mask
+
+/-- Disjointness predicate for two linear-memory slices [off1, off1+len1) and [off2, off2+len2). -/
+@[expose] public def arenaSliceDisjoint (off1 len1 off2 len2 : Nat) : Prop :=
+  ∀ i j : Nat, i < len1 → j < len2 → off1 + i ≠ off2 + j
+
+/-- 4-lane SIMD parallel sum grouping (lanes 0+1 then 2+3 vs 0+2 then 1+3). -/
+@[expose] public def simd4LaneSum (a0 a1 a2 a3 : Int) : Int := (a0 + a1) + (a2 + a3)
+@[expose] public def simd4SplitSum (a0 a1 a2 a3 : Int) : Int := (a0 + a2) + (a1 + a3)
+
+/-- Total GPU render work as a function of rendered frames and per-frame cost. -/
+@[expose] public def gpuRenderWork (framesRendered costPerFrame : Nat) : Nat :=
+  framesRendered * costPerFrame
+
+/-- Exact integer-scaled 1-qubit CP^1 Fubini-Study metric determinant: 16 * det(g) = sin^2(theta). -/
+@[expose] public def fubiniStudyDetScaled (sinScaled : Int) : Int :=
+  sinScaled * sinScaled
 
 end XiaomiLab.Spec

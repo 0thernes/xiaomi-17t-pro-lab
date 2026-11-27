@@ -1,4 +1,5 @@
 import { HBAR2_OVER_2M_EV_NM2, HBAR_EV_FS } from "./constants.js";
+import { getFastKernelsSync } from "./wasm.js";
 
 /**
  * Exact Unitary 1D Time-Dependent Schrödinger Equation (TDSE) Solver
@@ -6,12 +7,8 @@ import { HBAR2_OVER_2M_EV_NM2, HBAR_EV_FS } from "./constants.js";
  *
  * Equation: i * hbar * d(psi)/dt = [ - (hbar^2 / 2 m_eff) d^2/dx^2 + V(x) ] psi
  *
- * Properties:
- * - Strictly unitary: probability norm Integral(|psi(x, t)|^2 dx) = 1.00000000
- *   conserved to floating-point precision for arbitrarily many timesteps.
- * - Unconditionally stable for any barrier height V0 and grid spacing dx.
- * - Models both single HfO2 gate-oxide barriers and double-barrier resonant
- *   tunneling diodes (Fabry-Perot quantum interference).
+ * v4.0.0: Multi-step Thomas sweep accelerated via Rust WASM (`tdse_cn_step_f64`)
+ * using zero-allocation Catalytic Arena slicing, with exact JS parity fallback.
  */
 
 export function createWavePacketSim({
@@ -27,6 +24,7 @@ export function createWavePacketSim({
   sigmaNm = 0.55,
   energyEv = 2.1,
   dtFs = 0.04,
+  useWasm = true,
 } = {}) {
   if (!Number.isInteger(n) || n < 8) throw new RangeError("grid size n must be an integer >= 8");
   if (!Number.isFinite(lengthNm) || lengthNm <= 0) throw new RangeError("lengthNm must be positive");
@@ -89,19 +87,16 @@ export function createWavePacketSim({
   const diagBaseImag = s * ((2 * coeff) / (dx * dx));
 
   function factorMatrix() {
-    // Lower a = (0, offImag), Upper c = (0, offImag), Diagonal b_j = (1, diagBaseImag + s*V[j+1])
     for (let j = 0; j < m; j++) {
       const bR = 1;
       const bI = diagBaseImag + s * V[j + 1];
       let denomR = bR;
       let denomI = bI;
       if (j > 0) {
-        // a * cPrime[j-1] where a = (0, offImag) -> (-offImag * cPrimeI, offImag * cPrimeR)
         denomR -= -offImag * cPrimeI[j - 1];
         denomI -= offImag * cPrimeR[j - 1];
       }
       const mag2 = denomR * denomR + denomI * denomI;
-      // cPrime[j] = c / denom where c = (0, offImag)
       cPrimeR[j] = (offImag * denomI) / mag2;
       cPrimeI[j] = (offImag * denomR) / mag2;
     }
@@ -136,6 +131,50 @@ export function createWavePacketSim({
   launchPacket();
 
   function step(steps = 1) {
+    const fk = useWasm ? getFastKernelsSync() : null;
+    if (fk?.exports?.tdse_cn_step_f64 && fk.arena && steps >= 2) {
+      const arena = fk.arena;
+      const saved = arena.mark();
+      try {
+        const prS = arena.allocFloat64(n);
+        const piS = arena.allocFloat64(n);
+        const vS = arena.allocFloat64(n);
+        const cprS = arena.allocFloat64(m);
+        const cpiS = arena.allocFloat64(m);
+        const dprS = arena.allocFloat64(m);
+        const dpiS = arena.allocFloat64(m);
+        const rrS = arena.allocFloat64(m);
+        const riS = arena.allocFloat64(m);
+        prS.view().set(psiR);
+        piS.view().set(psiI);
+        vS.view().set(V);
+        cprS.view().set(cPrimeR);
+        cpiS.view().set(cPrimeI);
+        fk.exports.tdse_cn_step_f64(
+          prS.ptr,
+          piS.ptr,
+          vS.ptr,
+          cprS.ptr,
+          cpiS.ptr,
+          dprS.ptr,
+          dpiS.ptr,
+          rrS.ptr,
+          riS.ptr,
+          n,
+          s,
+          offImag,
+          diagBaseImag,
+          steps,
+        );
+        psiR.set(prS.view());
+        psiI.set(piS.view());
+      } finally {
+        arena.rewind(saved);
+      }
+      timeFs += dtFs * steps;
+      return;
+    }
+
     for (let iter = 0; iter < steps; iter++) {
       // 1. Compute rhs = B * psi  (B has diag (1, -(diagBaseImag + s*V)) and off (0, -offImag))
       for (let j = 0; j < m; j++) {
@@ -143,10 +182,8 @@ export function createWavePacketSim({
         const pR = psiR[i];
         const pI = psiI[i];
         const dI = -(diagBaseImag + s * V[i]);
-        // (1 + i*dI)*(pR + i*pI) = (pR - dI*pI) + i*(pI + dI*pR)
         let rR = pR - dI * pI;
         let rI = pI + dI * pR;
-        // Neighbors: (0 + i*(-offImag)) * (psiL + psiR) = (offImag*(pLI+pRI)) + i*(-offImag*(pLR+pRR))
         const sumR = psiR[i - 1] + psiR[i + 1];
         const sumI = psiI[i - 1] + psiI[i + 1];
         rR += offImag * sumI;
@@ -166,7 +203,6 @@ export function createWavePacketSim({
         if (j > 0) {
           denomR -= -offImag * cPrimeI[j - 1];
           denomI -= offImag * cPrimeR[j - 1];
-          // a * dPrime[j-1] = (-offImag * dI, offImag * dR)
           numR -= -offImag * dPrimeI[j - 1];
           numI -= offImag * dPrimeR[j - 1];
         }

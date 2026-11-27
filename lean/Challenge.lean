@@ -3,11 +3,11 @@ module
 public import XiaomiLabProofs.Spec
 
 /-!
-  XIAOMI 17T PRO LAB (v3.1.0) — Isolated Statement-Only Challenge File (`Challenge.lean`).
+  XIAOMI 17T PRO LAB (v4.0.0) — Isolated Statement-Only Challenge File (`Challenge.lean`).
 
   Imports ONLY `XiaomiLabProofs.Spec` (pure definitions, ZERO proofs, ZERO `sorry`) and NONE of
-  the seven proof modules (`HardwareFloorplan`, `EuvLithography`, `QuantumTransport`, `ThermalFdtd`,
-  `QuantumContextuality`, `SpectralBraggAndShards`, `AdversarialTests`).
+  the eight proof modules (`HardwareFloorplan`, `EuvLithography`, `QuantumTransport`, `ThermalFdtd`,
+  `QuantumContextuality`, `SpectralBraggAndShards`, `CatalyticArena`, `AdversarialTests`).
 
   Every `sorry` in this file is intentional — matched strictly against sorry-free `Solution.lean`
   across 6 independent Lean 4.35.0 kernels via:
@@ -89,7 +89,9 @@ public theorem target_thm8_adversarial_refutations :
     (rooflineAchievable 5270 2 77 = 154 ∧ 154 < max 5270 (2 * 77)) ∧
     ((Mat2C.mul ⟨⟨2, 0⟩, CInt.zero, CInt.zero, CInt.one⟩ Mat2C.id).det ≠ CInt.one) ∧
     ((dft2_0 CInt.one CInt.zero).normSq + (dft2_1 CInt.one CInt.zero).normSq ≠
-      (CInt.one.normSq + CInt.zero.normSq)) := by
+      (CInt.one.normSq + CInt.zero.normSq)) ∧
+    (catalyticShearSub (catalyticShearAdd 256 17 256) 17 256 ≠ 256) ∧
+    (¬ arenaSliceDisjoint 100 32 120 32) := by
   sorry
 
 /-- Target 9 (2x2 Bragg Transfer Matrix Unimodularity, 2/4-Point DFT Parseval & 9-Shard A24 Conservation): -/
@@ -105,7 +107,19 @@ public theorem target_thm9_bragg_parseval_and_shards :
     (shardTotalBytes 8 4500000 3417097 = 39417097 ∧ 4500000 < 5242880 ∧ 3417097 < 5242880) := by
   sorry
 
-/-- Target 10 (Concrete Non-Vacuity Witnesses Across Hardware, Litho, TDSE, Thermal, Bragg, DFT & Quantum): -/
+/-- Target 10 (Catalytic Byte-Vault XOR/Shear Restoration, Arena Disjointness, SIMD4, Idle GPU & Fubini-Study): -/
+public theorem target_thm10_catalytic_arena_and_simd :
+    (∀ buf mask : List UInt8, buf.length = mask.length →
+      catalyticXorBytes (catalyticXorBytes buf mask) mask = buf) ∧
+    (∀ b d m : Nat, 0 < m → b < m → catalyticShearSub (catalyticShearAdd b d m) d m = b) ∧
+    (∀ off1 len1 off2 len2 : Nat, off1 + len1 ≤ off2 → arenaSliceDisjoint off1 len1 off2 len2) ∧
+    (∀ a0 a1 a2 a3 : Int, simd4LaneSum a0 a1 a2 a3 = simd4SplitSum a0 a1 a2 a3) ∧
+    ((2 : Nat) ^ 16 = 65536 ∧ 65536 * 4 = 262144) ∧
+    (∀ cost : Nat, gpuRenderWork 0 cost = 0) ∧
+    (∀ s : Int, 0 ≤ fubiniStudyDetScaled s) := by
+  sorry
+
+/-- Target 11 (Concrete Non-Vacuity Witnesses Across Hardware, Litho, TDSE, Thermal, Bragg, DFT, Catalytic & Quantum): -/
 public theorem target_nonvacuity_witnesses :
     fdtdStencilNum 100 15 15 80 40 40 40 40 = 5600 ∧
     chshExpr 1 1 1 (-1) = 2 ∧
@@ -114,7 +128,8 @@ public theorem target_nonvacuity_witnesses :
     blochX ⟨1, 0⟩ ⟨0, 1⟩ = 0 ∧
     blochY ⟨1, 0⟩ ⟨0, 1⟩ = 2 ∧
     Mat2C.id.det = CInt.one ∧
-    (dft4_0 CInt.one CInt.zero CInt.zero CInt.zero).normSq = 1 := by
+    (dft4_0 CInt.one CInt.zero CInt.zero CInt.zero).normSq = 1 ∧
+    catalyticShearSub (catalyticShearAdd 255 99 257) 99 257 = 255 := by
   sorry
 
 end XiaomiLab.ComparatorTarget

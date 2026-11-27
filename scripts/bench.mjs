@@ -6,6 +6,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { catalyticBorrowXor } from "../src/sim/catalytic-arena.js";
 import { braggSpectrum, simulateStochasticResist, aerialImageDefocus } from "../src/sim/litho-advanced.js";
 import { simulateLitho2d } from "../src/sim/litho-2d.js";
 import { fillUnit, matmulFp, matmulQuantized, mulberry32, quantizeSymmetricInt8 } from "../src/sim/quant.js";
@@ -13,6 +14,8 @@ import { runChshExperiment, runMermin3Experiment } from "../src/sim/quantum-lab.
 import { infiniteWellEnergies } from "../src/sim/schrodinger.js";
 import { createWavePacketSim } from "../src/sim/tdse.js";
 import { createDieThermalGrid } from "../src/sim/thermal-fdtd.js";
+import { getFastKernelsSync } from "../src/sim/wasm.js";
+import { float16ToFloat32 } from "../src/workloads/safetensors.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -50,6 +53,15 @@ const qB = quantizeSymmetricInt8(matB);
 const tdse = createWavePacketSim({ n: 240 });
 const thermal = createDieThermalGrid({ nx: 44, ny: 52 });
 const aerial1d = aerialImageDefocus({ na: 0.33, pitchNm: 36, sigma: 0.5 });
+const fk = getFastKernelsSync();
+const vaultHost = new Uint8Array(65536);
+const vaultMask = new Uint8Array(65536);
+for (let i = 0; i < 65536; i++) {
+  vaultHost[i] = (i * 37) & 0xff;
+  vaultMask[i] = (i * 91 + 5) & 0xff;
+}
+const fp16Sample = new Uint16Array(262144);
+for (let i = 0; i < fp16Sample.length; i++) fp16Sample[i] = (i * 17) & 0x7bff;
 
 const benchmarks = [
   measure("bragg_40pair_81pt_spectrum", 15, 25, () => braggSpectrum({ pairs: 40, samples: 81 })),
@@ -60,13 +72,19 @@ const benchmarks = [
   measure("tdse_crank_nicolson_50steps_n240", 15, 30, () => tdse.step(50)),
   measure("thermal_fdtd_44x52_frame_80ms", 15, 30, () => thermal.step(0.08)),
   measure("schrodinger_jacobi_n48", 25, 15, () => infiniteWellEnergies(3.0, 48)),
-  measure("quant_int8_matmul_64x64", 10, 40, () => matmulQuantized(qA.q, qA.scale, qB.q, qB.scale, 64)),
+  measure("quant_int8_matmul_64x64", 10, 40, () => matmulQuantized(qA.q, qA.scale, qB.q, BScale(qB), 64)),
   measure("fp64_matmul_64x64", 10, 40, () => matmulFp(matA, matB, 64)),
   measure("chsh_and_mermin3_2000shots", 15, 25, () => {
     runChshExperiment({ shots: 2000, angleDeg: 22.5, seed: 42 });
     runMermin3Experiment({ shots: 2000, phaseDeg: 0, seed: 9500 });
   }),
+  measure("catalytic_xor_64kib_simd128", 5, 40, () => catalyticBorrowXor(vaultHost, vaultMask, null, fk)),
+  measure("fp16_lut_decode_262k_weights", 15, 25, () => float16ToFloat32(fp16Sample.buffer)),
 ];
+
+function BScale(q) {
+  return q.scale;
+}
 
 const report = {
   generatedAt: new Date().toISOString(),

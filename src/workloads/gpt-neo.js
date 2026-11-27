@@ -4,8 +4,17 @@
  * Architecture from the model's config.json: 8 layers, d=256, 16 heads,
  * gelu_new, alternating global/local attention, window 256.
  *
- * The run is JavaScript on the CPU thread. It is not the NPU 990.
+ * v4.0.0 Catalytic Arena + Rust WASM SIMD128 Engine:
+ *   - Zero per-token TypedArray allocations (reusable pre-allocated scratch buffers
+ *     and flat KV-cache slabs; single-pass softmax exp buffer in topK).
+ *   - Pins weights once per model instance into the Rust WASM SIMD128 linear arena
+ *     (`WeakMap`) to execute 4-lane `f32x4` SIMD128 `matvec_f32_simd`, fused
+ *     `argmax_matvec_f32_simd`, and `logits_scaled_f32_simd` across all 8 layers
+ *     and the 50,257 x 256 LM head.
+ *   - Honest runtime boundary: executes on the host CPU thread via WASM SIMD128 / JS,
+ *     NEVER on the MediaTek NPU 990.
  */
+import { getFastKernelsSync } from "../sim/wasm.js";
 
 export const TINY_STORIES = {
   d: 256,
@@ -20,6 +29,7 @@ export const TINY_STORIES = {
 };
 
 const SCALE = 1 / Math.sqrt(TINY_STORIES.headDim);
+const wasmWeightSlabs = new WeakMap();
 
 export function buildWeights(tensors) {
   const p = "transformer.";
@@ -58,6 +68,50 @@ function need(tensors, key) {
   return value;
 }
 
+function getOrPinWasmWeights(weights, fastKernels) {
+  if (!fastKernels?.exports?.matvec_f32_simd || !fastKernels.arena) return null;
+  const cached = wasmWeightSlabs.get(weights);
+  if (cached && cached.fk === fastKernels) return cached;
+
+  try {
+    const arena = fastKernels.arena;
+    const pinF32 = (arr) => {
+      const s = arena.allocFloat32(arr.length);
+      s.view().set(arr);
+      return s.ptr;
+    };
+    const wtePtr = pinF32(weights.wte);
+    const layers = weights.layers.map((P) => ({
+      qPtr: pinF32(P.q),
+      kPtr: pinF32(P.k),
+      vPtr: pinF32(P.v),
+      oPtr: pinF32(P.o),
+      obPtr: pinF32(P.ob),
+      fcPtr: pinF32(P.fc),
+      fcbPtr: pinF32(P.fcb),
+      projPtr: pinF32(P.proj),
+      projbPtr: pinF32(P.projb),
+    }));
+    const xSlice = arena.allocFloat32(TINY_STORIES.ff);
+    const outSlice = arena.allocFloat32(TINY_STORIES.ff);
+    const logitsSlice = arena.allocFloat32(TINY_STORIES.vocab);
+    const slab = {
+      fk: fastKernels,
+      exports: fastKernels.exports,
+      arena,
+      wtePtr,
+      layers,
+      xSlice,
+      outSlice,
+      logitsSlice,
+    };
+    wasmWeightSlabs.set(weights, slab);
+    return slab;
+  } catch {
+    return null;
+  }
+}
+
 function layerNorm(x, w, b, out) {
   const n = x.length;
   let mean = 0;
@@ -73,11 +127,20 @@ function layerNorm(x, w, b, out) {
   for (let i = 0; i < n; i++) out[i] = (x[i] - mean) * inv * w[i] + b[i];
 }
 
-function matvec(matrix, x, out, nOut, nIn, bias) {
+function matvecJs(matrix, x, out, nOut, nIn, bias) {
   for (let i = 0; i < nOut; i++) {
     let sum = bias ? bias[i] : 0;
     const row = i * nIn;
-    for (let j = 0; j < nIn; j++) sum += matrix[row + j] * x[j];
+    let j = 0;
+    const limit = nIn - 3;
+    for (; j < limit; j += 4) {
+      sum +=
+        matrix[row + j] * x[j] +
+        matrix[row + j + 1] * x[j + 1] +
+        matrix[row + j + 2] * x[j + 2] +
+        matrix[row + j + 3] * x[j + 3];
+    }
+    for (; j < nIn; j++) sum += matrix[row + j] * x[j];
     out[i] = sum;
   }
 }
@@ -86,12 +149,59 @@ function geluNew(x) {
   return 0.5 * x * (1 + Math.tanh(0.7978845608028654 * (x + 0.044715 * x * x * x)));
 }
 
-export function createStream(weights) {
-  const { d, heads, headDim, ff, layers, window } = TINY_STORIES;
-  const keys = Array.from({ length: layers }, () => []);
-  const values = Array.from({ length: layers }, () => []);
+export function createStream(weights, { useWasm = true } = {}) {
+  const { d, heads, headDim, ff, layers, window, vocab } = TINY_STORIES;
+  const fk = useWasm ? getFastKernelsSync() : null;
+  const slab = fk ? getOrPinWasmWeights(weights, fk) : null;
+
+  // Flat pre-allocated KV-cache slabs (zero per-token k.slice()/v.slice() allocations)
+  let kvCap = 64;
+  const keySlabs = Array.from({ length: layers }, () => new Float32Array(kvCap * d));
+  const valSlabs = Array.from({ length: layers }, () => new Float32Array(kvCap * d));
+
+  // Catalytic reusable scratch vectors (allocated once per stream)
+  const x = new Float32Array(d);
+  const h = new Float32Array(d);
+  const q = new Float32Array(d);
+  const k = new Float32Array(d);
+  const v = new Float32Array(d);
+  const ctx = new Float32Array(d);
+  const attnOut = new Float32Array(d);
+  const ffHidden = new Float32Array(ff);
+  const ffOut = new Float32Array(d);
+  const layerNorms = new Float32Array(layers);
+  const headEntropy = new Float32Array(layers * heads);
+  let scoresBuf = new Float32Array(kvCap);
+  let logitsBuf = null;
+  let expBuf = null;
+
   let pos = 0;
   let lastTelemetry = null;
+
+  function ensureKvCapacity(neededLen) {
+    if (neededLen <= kvCap) return;
+    const nextCap = Math.max(neededLen, kvCap * 2);
+    for (let l = 0; l < layers; l++) {
+      const nk = new Float32Array(nextCap * d);
+      nk.set(keySlabs[l]);
+      keySlabs[l] = nk;
+      const nv = new Float32Array(nextCap * d);
+      nv.set(valSlabs[l]);
+      valSlabs[l] = nv;
+    }
+    scoresBuf = new Float32Array(nextCap);
+    kvCap = nextCap;
+  }
+
+  function runMatvec(wArr, wPtr, xVec, outVec, nOut, nIn, biasArr = null, biasPtr = 0) {
+    if (slab) {
+      slab.xSlice.view().set(xVec);
+      slab.exports.matvec_f32_simd(wPtr, slab.xSlice.ptr, biasPtr, slab.outSlice.ptr, nOut, nIn);
+      outVec.set(slab.outSlice.view().subarray(0, nOut));
+    } else {
+      matvecJs(wArr, xVec, outVec, nOut, nIn, biasArr);
+    }
+  }
 
   function step(token, hacks = null) {
     const mlpGain = hacks?.mlpGain ?? 1;
@@ -99,32 +209,42 @@ export function createStream(weights) {
     const ablateLayer = hacks?.ablateLayer ?? -1;
     const noiseAmp = hacks?.noiseAmp ?? 0;
 
-    const x = new Float32Array(d);
+    const length = pos + 1;
+    ensureKvCapacity(length);
+
     const tokenBase = token * d;
     const posBase = Math.min(pos, TINY_STORIES.maxPos - 1) * d;
     for (let i = 0; i < d; i++) x[i] = weights.wte[tokenBase + i] + weights.wpe[posBase + i];
-    const h = new Float32Array(d);
-    const q = new Float32Array(d);
-    const k = new Float32Array(d);
-    const v = new Float32Array(d);
-    const ctx = new Float32Array(d);
-    const attnOut = new Float32Array(d);
-    const ffHidden = new Float32Array(ff);
-    const ffOut = new Float32Array(d);
 
-    const layerNorms = new Float32Array(layers);
-    const headEntropy = new Float32Array(layers * heads);
     let lastLayerAttn = null;
 
     for (let layer = 0; layer < layers; layer++) {
       const P = weights.layers[layer];
+      const LP = slab ? slab.layers[layer] : null;
       layerNorm(x, P.ln1w, P.ln1b, h);
-      matvec(P.q, h, q, d, d);
-      matvec(P.k, h, k, d, d);
-      matvec(P.v, h, v, d, d);
-      keys[layer].push(k.slice());
-      values[layer].push(v.slice());
-      const length = keys[layer].length;
+
+      if (slab) {
+        slab.xSlice.view().set(h);
+        const xPtr = slab.xSlice.ptr;
+        const outPtr = slab.outSlice.ptr;
+        const outView = slab.outSlice.view();
+        slab.exports.matvec_f32_simd(LP.qPtr, xPtr, 0, outPtr, d, d);
+        q.set(outView.subarray(0, d));
+        slab.exports.matvec_f32_simd(LP.kPtr, xPtr, 0, outPtr, d, d);
+        k.set(outView.subarray(0, d));
+        slab.exports.matvec_f32_simd(LP.vPtr, xPtr, 0, outPtr, d, d);
+        v.set(outView.subarray(0, d));
+      } else {
+        matvecJs(P.q, h, q, d, d);
+        matvecJs(P.k, h, k, d, d);
+        matvecJs(P.v, h, v, d, d);
+      }
+
+      const kSlab = keySlabs[layer];
+      const vSlab = valSlabs[layer];
+      kSlab.set(k, pos * d);
+      vSlab.set(v, pos * d);
+
       const start = P.local ? Math.max(0, length - window) : 0;
       ctx.fill(0);
       if (layer === layers - 1) lastLayerAttn = Array.from({ length: heads }, () => new Float32Array(length));
@@ -132,41 +252,47 @@ export function createStream(weights) {
       for (let head = 0; head < heads; head++) {
         const offset = head * headDim;
         let maxScore = -Infinity;
-        const scores = new Float32Array(length);
         for (let s = start; s < length; s++) {
           let dot = 0;
-          const key = keys[layer][s];
-          for (let j = 0; j < headDim; j++) dot += q[offset + j] * key[offset + j];
+          const kBase = s * d + offset;
+          for (let j = 0; j < headDim; j++) dot += q[offset + j] * kSlab[kBase + j];
           dot *= SCALE;
-          scores[s] = dot;
+          scoresBuf[s] = dot;
           if (dot > maxScore) maxScore = dot;
         }
         let sum = 0;
         for (let s = start; s < length; s++) {
-          scores[s] = Math.exp(scores[s] - maxScore);
-          sum += scores[s];
+          const e = Math.exp(scoresBuf[s] - maxScore);
+          scoresBuf[s] = e;
+          sum += e;
         }
+        const invSum = 1 / sum;
         let ent = 0;
+        const attnRow = lastLayerAttn ? lastLayerAttn[head] : null;
         for (let s = start; s < length; s++) {
-          const weight = scores[s] / sum;
+          const weight = scoresBuf[s] * invSum;
           if (weight > 1e-8) ent -= weight * Math.log2(weight);
-          if (lastLayerAttn) lastLayerAttn[head][s] = weight;
-          const value = values[layer][s];
-          for (let j = 0; j < headDim; j++) ctx[offset + j] += weight * value[offset + j];
+          if (attnRow) attnRow[s] = weight;
+          const vBase = s * d + offset;
+          for (let j = 0; j < headDim; j++) ctx[offset + j] += weight * vSlab[vBase + j];
         }
         headEntropy[layer * heads + head] = ent;
       }
 
       if (layer !== ablateLayer) {
-        matvec(P.o, ctx, attnOut, d, d, P.ob);
+        runMatvec(P.o, LP?.oPtr, ctx, attnOut, d, d, P.ob, LP?.obPtr || 0);
         for (let i = 0; i < d; i++) x[i] += attnOut[i] * attnGain;
         layerNorm(x, P.ln2w, P.ln2b, h);
-        matvec(P.fc, h, ffHidden, ff, d, P.fcb);
+        runMatvec(P.fc, LP?.fcPtr, h, ffHidden, ff, d, P.fcb, LP?.fcbPtr || 0);
         for (let i = 0; i < ff; i++) ffHidden[i] = geluNew(ffHidden[i]);
-        matvec(P.proj, ffHidden, ffOut, d, ff, P.projb);
-        for (let i = 0; i < d; i++) {
-          const jitter = noiseAmp > 0 ? (Math.sin((layer * 31 + pos * 17 + i) * 12.9898) * 43758.5453) % 1 : 0;
-          x[i] += ffOut[i] * mlpGain + jitter * noiseAmp;
+        runMatvec(P.proj, LP?.projPtr, ffHidden, ffOut, d, ff, P.projb, LP?.projbPtr || 0);
+        if (noiseAmp > 0) {
+          for (let i = 0; i < d; i++) {
+            const jitter = (Math.sin((layer * 31 + pos * 17 + i) * 12.9898) * 43758.5453) % 1;
+            x[i] += ffOut[i] * mlpGain + jitter * noiseAmp;
+          }
+        } else {
+          for (let i = 0; i < d; i++) x[i] += ffOut[i] * mlpGain;
         }
       }
       let norm2 = 0;
@@ -175,19 +301,34 @@ export function createStream(weights) {
     }
     layerNorm(x, weights.lnfW, weights.lnfB, h);
     pos += 1;
-    lastTelemetry = { pos, layerNorms, headEntropy, lastLayerAttn };
+    lastTelemetry = {
+      pos,
+      layerNorms: layerNorms.slice(),
+      headEntropy: headEntropy.slice(),
+      lastLayerAttn,
+      backend: slab ? "rust-wasm-simd128" : "js-catalytic",
+    };
     return h;
   }
 
   function argmax(hidden) {
-    const { vocab } = TINY_STORIES;
+    if (slab) {
+      slab.xSlice.view().set(hidden);
+      return slab.exports.argmax_matvec_f32_simd(slab.wtePtr, slab.xSlice.ptr, vocab, d);
+    }
     const wte = weights.wte;
     let best = 0;
     let bestValue = -Infinity;
     for (let i = 0; i < vocab; i++) {
       let sum = 0;
       const row = i * d;
-      for (let j = 0; j < d; j++) sum += wte[row + j] * hidden[j];
+      for (let j = 0; j < d; j += 4) {
+        sum +=
+          wte[row + j] * hidden[j] +
+          wte[row + j + 1] * hidden[j + 1] +
+          wte[row + j + 2] * hidden[j + 2] +
+          wte[row + j + 3] * hidden[j + 3];
+      }
       if (sum > bestValue) {
         bestValue = sum;
         best = i;
@@ -198,27 +339,47 @@ export function createStream(weights) {
 
   /** Top-K next-token probability distribution (softmax at temperature) plus exact full-vocab entropy. */
   function topK(hidden, k = 8, temperature = 1) {
-    const { vocab } = TINY_STORIES;
-    const wte = weights.wte;
     const invT = 1 / Math.max(0.05, temperature);
-    const logits = new Float32Array(vocab);
-    let maxL = -Infinity;
-    for (let i = 0; i < vocab; i++) {
-      let sum = 0;
-      const row = i * d;
-      for (let j = 0; j < d; j++) sum += wte[row + j] * hidden[j];
-      const v = sum * invT;
-      logits[i] = v;
-      if (v > maxL) maxL = v;
+    let logits;
+    let maxL;
+    if (slab) {
+      slab.xSlice.view().set(hidden);
+      maxL = slab.exports.logits_scaled_f32_simd(slab.wtePtr, slab.xSlice.ptr, slab.logitsSlice.ptr, vocab, d, invT);
+      logits = slab.logitsSlice.view();
+    } else {
+      if (!logitsBuf) logitsBuf = new Float32Array(vocab);
+      logits = logitsBuf;
+      const wte = weights.wte;
+      maxL = -Infinity;
+      for (let i = 0; i < vocab; i++) {
+        let sum = 0;
+        const row = i * d;
+        for (let j = 0; j < d; j += 4) {
+          sum +=
+            wte[row + j] * hidden[j] +
+            wte[row + j + 1] * hidden[j + 1] +
+            wte[row + j + 2] * hidden[j + 2] +
+            wte[row + j + 3] * hidden[j + 3];
+        }
+        const v = sum * invT;
+        logits[i] = v;
+        if (v > maxL) maxL = v;
+      }
     }
+    if (!expBuf) expBuf = new Float32Array(vocab);
     let expSum = 0;
-    for (let i = 0; i < vocab; i++) expSum += Math.exp(logits[i] - maxL);
+    for (let i = 0; i < vocab; i++) {
+      const e = Math.exp(logits[i] - maxL);
+      expBuf[i] = e;
+      expSum += e;
+    }
+    const invExpSum = 1 / expSum;
     let entropyBits = 0;
     const best = [];
     for (let i = 0; i < vocab; i++) {
-      const l = logits[i];
-      const p = Math.exp(l - maxL) / expSum;
+      const p = expBuf[i] * invExpSum;
       if (p > 1e-12) entropyBits -= p * Math.log2(p);
+      const l = logits[i];
       if (best.length < k || l > best[best.length - 1].logit) {
         best.push({ id: i, logit: l, prob: p });
         best.sort((a, b) => b.logit - a.logit);
@@ -233,6 +394,7 @@ export function createStream(weights) {
     step,
     argmax,
     topK,
+    backend: slab ? "rust-wasm-simd128" : "js-catalytic",
     get telemetry() {
       return lastTelemetry;
     },
@@ -240,8 +402,8 @@ export function createStream(weights) {
 }
 
 /** Greedy continuation. `promptIds` are consumed first; their last hidden state predicts the next token. */
-export function greedyTokens(weights, promptIds, count, trace) {
-  const stream = createStream(weights);
+export function greedyTokens(weights, promptIds, count, trace, opts) {
+  const stream = createStream(weights, opts);
   let hidden = null;
   for (const id of promptIds) hidden = stream.step(id);
   const produced = [];

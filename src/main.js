@@ -2,11 +2,13 @@ import { createAudio } from "./audio.js";
 import { mountShell } from "./shell.js";
 import { parseHash } from "./routes.js";
 import { measureCapability } from "./quality.js";
+import { loadFastKernels } from "./sim/wasm.js";
 import { el } from "./dom.js";
 
 const audio = createAudio();
 const shell = mountShell(audio);
 const capability = measureCapability();
+const fastKernelsReady = loadFastKernels();
 
 const loaders = {
   hub: () => import("./labs/hub.js"),
@@ -34,7 +36,8 @@ async function show() {
   const main = shell.main;
   main.dataset.ready = "false";
   main.replaceChildren(el("p", { class: "status", role: "status" }, ["Initializing live instrumentation…"]));
-  const cap = { ...(await capability) };
+  const [capBase] = await Promise.all([capability, fastKernelsReady]);
+  const cap = { ...capBase };
   const forcedTier = new URLSearchParams(location.search).get("tier");
   if (forcedTier === "low" || forcedTier === "medium" || forcedTier === "high" || forcedTier === "ultra") {
     cap.tier = forcedTier;

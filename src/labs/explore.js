@@ -30,6 +30,8 @@ export async function mountExplore(cap, engine, levels) {
   }
   let current = null;
   let flying = false;
+  let flyRaf = 0;
+  let disposed = false;
   const data = { points: null };
 
   function show(level) {
@@ -56,6 +58,11 @@ export async function mountExplore(cap, engine, levels) {
       ),
     );
     if (!view) return;
+    if (flyRaf) {
+      cancelAnimationFrame(flyRaf);
+      flyRaf = 0;
+      flying = false;
+    }
     const previous = current;
     built.group.position.z = previous ? -26 : 0;
     view.root.add(built.group);
@@ -67,19 +74,22 @@ export async function mountExplore(cap, engine, levels) {
     flying = true;
     const start = performance.now();
     const step = (now) => {
+      flyRaf = 0;
+      if (disposed) return;
       const u = Math.min(1, (now - start) / 480);
       const eased = u * u * (3 - 2 * u);
       built.group.position.z = -26 * (1 - eased);
       previous.group.position.z = 22 * eased;
+      view.invalidate({ shadows: true });
       if (u < 1) {
-        requestAnimationFrame(step);
+        flyRaf = requestAnimationFrame(step);
         return;
       }
       view.root.remove(previous.group);
       flying = false;
       view.frame(built.group, 0.86);
     };
-    requestAnimationFrame(step);
+    flyRaf = requestAnimationFrame(step);
   }
 
   for (const level of levels) {
@@ -105,6 +115,8 @@ export async function mountExplore(cap, engine, levels) {
       data.points = points;
     },
     dispose() {
+      disposed = true;
+      if (flyRaf) cancelAnimationFrame(flyRaf);
       view?.dispose();
     },
   };

@@ -201,11 +201,12 @@ Spine for the 2.1.0 hardening sweep. Baseline is `main` at `b76ca54` (v2.0.0), w
 | `src/sim/tiler.js`             |    66 |  2514 |
 | `src/sim/timing.js`            |    33 |   966 |
 | `src/sim/validate-specs.js`    |   128 |  4348 |
-| `src/sim/wasm.js`              |    27 |   822 |
+| `src/sim/wasm.js`              |    97 |  3300 |
+| `src/sim/catalytic-arena.js`   |   198 |  6400 |
+| `src/sim/fast-kernels.wasm`    |   bin |  9667 |
 | `src/specs.js`                 |   161 |  4881 |
 | `src/version.js`               |     2 |    91 |
-| `src/viz/hero.js`              |   202 |  7061 |
-| `src/workloads/gpt-neo.js`     |   252 |  8245 |
+| `src/workloads/gpt-neo.js`     |   320 | 11200 |
 | `src/workloads/safetensors.js` |    80 |  2476 |
 | `src/workloads/tokenizer.js`   |   101 |  2935 |
 

@@ -164,7 +164,7 @@ test("desktop layout places nav sidebar beside main without overlap", async ({ p
   expect(mainBox.x).toBeGreaterThanOrEqual(navBox.x + navBox.width - 1);
 });
 
-test("Lean 4.35.0 Blueprint renders with strict CSP, zero 404s, SVG DAG, and 10 comparator targets", async ({
+test("Lean 4.35.0 Blueprint renders with strict CSP, zero 404s, SVG DAG, and 11 comparator targets", async ({
   page,
 }) => {
   const errors = [];
@@ -179,10 +179,26 @@ test("Lean 4.35.0 Blueprint renders with strict CSP, zero 404s, SVG DAG, and 10 
   await page.goto("/blueprint/");
   await expect(page.locator("h1")).toContainText("Formal Verification Blueprint");
   await expect(page.locator("svg.dag")).toBeVisible();
-  await expect(page.locator("tbody tr")).toHaveCount(10);
+  await expect(page.locator("tbody tr")).toHaveCount(11);
   const csp = await page.locator('meta[http-equiv="Content-Security-Policy"]').getAttribute("content");
   expect(csp).toContain("style-src 'self'");
   expect(csp).not.toContain("unsafe-inline");
   expect(failedReqs).toEqual([]);
+  expect(errors).toEqual([]);
+});
+
+test("v4.0.0 demand-driven 3D view settles to 0 idle GPU renders without visual loss", async ({ page }) => {
+  const errors = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("/?tier=high&pose=front#/");
+  await expect(page.locator("#main[data-ready='true'] canvas")).toBeVisible();
+  // Allow initial 12-frame EffectComposer health check + orbit settle
+  await page.waitForTimeout(900);
+  expect(await brightestCanvas(page)).toBeGreaterThan(12);
+  const beforeIdle = Number((await page.locator("#main canvas").first().getAttribute("data-renders")) || "0");
+  expect(beforeIdle).toBeGreaterThan(0);
+  await page.waitForTimeout(800);
+  const afterIdle = Number((await page.locator("#main canvas").first().getAttribute("data-renders")) || "0");
+  expect(afterIdle - beforeIdle).toBeLessThanOrEqual(1);
   expect(errors).toEqual([]);
 });

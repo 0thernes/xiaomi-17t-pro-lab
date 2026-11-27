@@ -20,11 +20,14 @@ import { ternarizeAbsMean } from "../src/sim/quant.js";
 import {
   buildPresetState,
   entanglementEntropy,
+  fubiniStudyMetric1Qubit,
+  nistSp80090bHealthTest,
   runChshExperiment,
   runMermin3Experiment,
 } from "../src/sim/quantum-lab.js";
 import { rayleighCd } from "../src/sim/rayleigh.js";
 import { infiniteWellAnalyticEv } from "../src/sim/schrodinger.js";
+import { float16ToFloat32 } from "../src/workloads/safetensors.js";
 
 const bragg = braggSpectrum({ pairs: 40 });
 const braggSweep = {};
@@ -97,6 +100,12 @@ const payload = {
   },
   quant: {
     ternaryBits: ternarizeAbsMean(new Float64Array([1, -1, 0.2])).bitsPerWeight,
+    fp16MinSubnormal: float16ToFloat32(new Uint16Array([0x0001]).buffer)[0],
+    fp16MaxNormal: float16ToFloat32(new Uint16Array([0x7bff]).buffer)[0],
+  },
+  qgtl: {
+    piOver3: fubiniStudyMetric1Qubit(Math.PI / 3, 0.5),
+    rctCutoffH1: nistSp80090bHealthTest(new Uint8Array([0, 1, 0, 1]), { minEntropyBits: 1.0, binary: true }).rctCutoff,
   },
 };
 

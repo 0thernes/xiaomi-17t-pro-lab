@@ -1,9 +1,32 @@
-/** In-place radix-2 complex FFT. Forward is unnormalized; inverse divides by n. */
+/**
+ * In-place radix-2 complex FFT. Forward is unnormalized; inverse divides by n.
+ * v4.0.0: Uses Rust WASM `fft_radix2_f64` via Catalytic Arena for n >= 64 (with JS parity fallback).
+ */
+import { getFastKernelsSync } from "./wasm.js";
 
-export function fftRadix2(re, im, inverse = false) {
+export function fftRadix2(re, im, inverse = false, { useWasm = true } = {}) {
   const n = re.length;
   if (im.length !== n || n < 2 || (n & (n - 1)) !== 0) {
     throw new Error("FFT length must be a power of two and re/im must match");
+  }
+  if (useWasm && n >= 256) {
+    const fk = getFastKernelsSync();
+    if (fk?.exports?.fft_radix2_f64 && fk.arena) {
+      const arena = fk.arena;
+      const saved = arena.mark();
+      try {
+        const reS = arena.allocFloat64(n);
+        const imS = arena.allocFloat64(n);
+        reS.view().set(re);
+        imS.view().set(im);
+        fk.exports.fft_radix2_f64(reS.ptr, imS.ptr, n, inverse ? 1 : 0);
+        re.set(reS.view());
+        im.set(imS.view());
+      } finally {
+        arena.rewind(saved);
+      }
+      return;
+    }
   }
   for (let i = 1, j = 0; i < n; i++) {
     let bit = n >> 1;

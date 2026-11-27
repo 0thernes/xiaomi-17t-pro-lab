@@ -56,6 +56,18 @@
 'XiaomiLab.SpectralBragg.dft4_parseval_exact' depends on axioms: [propext, Quot.sound]
 'XiaomiLab.SpectralBragg.tinystories_9_shards_exact_total' does not depend on any axioms
 'XiaomiLab.SpectralBragg.shard_total_monotone' does not depend on any axioms
+'XiaomiLab.Catalytic.catalytic_xor_byte_involution' depends on axioms: [propext, Quot.sound]
+'XiaomiLab.Catalytic.catalytic_xor_bytes_restoration' depends on axioms: [propext, Quot.sound]
+'XiaomiLab.Catalytic.catalytic_shear_int_restoration' depends on axioms: [propext, Quot.sound]
+'XiaomiLab.Catalytic.catalytic_shear_mod_restoration' depends on axioms: [propext, Quot.sound]
+'XiaomiLab.Catalytic.catalytic_shear_mod_range' does not depend on any axioms
+'XiaomiLab.Catalytic.arena_bump_slices_disjoint' depends on axioms: [propext, Quot.sound]
+'XiaomiLab.Catalytic.arena_align16_preserves_order' depends on axioms: [propext, Quot.sound]
+'XiaomiLab.Catalytic.arena_mark_rewind_exact' depends on axioms: [propext, Quot.sound]
+'XiaomiLab.Catalytic.simd4_lane_reassociation_exact' depends on axioms: [propext, Quot.sound]
+'XiaomiLab.Catalytic.fp16_lut_covers_all_bit_patterns' does not depend on any axioms
+'XiaomiLab.Catalytic.demand_idle_zero_gpu_work' does not depend on any axioms
+'XiaomiLab.Catalytic.fubini_study_metric_nonneg' depends on axioms: [propext, Quot.sound]
 'XiaomiLab.Adversarial.adv_fdtd_cfl_violation_undershoots' does not depend on any axioms
 'XiaomiLab.Adversarial.adv_chsh_relaxed_domain_breaks_bound' does not depend on any axioms
 'XiaomiLab.Adversarial.adv_massless_dirac_not_subluminal' does not depend on any axioms
@@ -63,6 +75,8 @@
 'XiaomiLab.Adversarial.adv_roofline_max_violates_memory_wall' does not depend on any axioms
 'XiaomiLab.Adversarial.adv_bragg_non_unimodular_breaks_det_one' does not depend on any axioms
 'XiaomiLab.Adversarial.adv_dft2_parseval_breaks_without_factor_2' does not depend on any axioms
+'XiaomiLab.Adversarial.adv_catalytic_shear_out_of_range_fails' does not depend on any axioms
+'XiaomiLab.Adversarial.adv_arena_overlap_collides' does not depend on any axioms
 'XiaomiLab.ComparatorTarget.target_thm1_hardware_and_roofline' depends on axioms: [propext, Quot.sound]
 'XiaomiLab.ComparatorTarget.target_thm2_euv_rayleigh_and_dof' depends on axioms: [propext, Quot.sound]
 'XiaomiLab.ComparatorTarget.target_thm3_dirac_finfet_and_crank_nicolson' depends on axioms: [propext, Quot.sound]
@@ -72,4 +86,5 @@
 'XiaomiLab.ComparatorTarget.target_thm7_bloch_purity_bounds' depends on axioms: [propext, Quot.sound]
 'XiaomiLab.ComparatorTarget.target_thm8_adversarial_refutations' does not depend on any axioms
 'XiaomiLab.ComparatorTarget.target_thm9_bragg_parseval_and_shards' depends on axioms: [propext, Quot.sound]
+'XiaomiLab.ComparatorTarget.target_thm10_catalytic_arena_and_simd' depends on axioms: [propext, Quot.sound]
 'XiaomiLab.ComparatorTarget.target_nonvacuity_witnesses' does not depend on any axioms

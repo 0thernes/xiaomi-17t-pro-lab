@@ -1,3 +1,5 @@
+import { getFastKernelsSync } from "./wasm.js";
+
 /** Seeded RNG so tests and the lab can replay a matrix. */
 export function mulberry32(seed) {
   let a = seed >>> 0;
@@ -64,7 +66,27 @@ export function matmulFp(A, B, n) {
 }
 
 /** Integer matrix product of int8 factors, then dequantized by scaleA * scaleB. */
-export function matmulQuantized(Aq, scaleA, Bq, scaleB, n) {
+export function matmulQuantized(Aq, scaleA, Bq, scaleB, n, { useWasm = true } = {}) {
+  const scale = scaleA * scaleB;
+  if (useWasm && Aq instanceof Int8Array && Bq instanceof Int8Array && n >= 16) {
+    const fk = getFastKernelsSync();
+    if (fk?.exports?.int8_matmul_simd && fk.arena) {
+      const total = n * n;
+      const arena = fk.arena;
+      const saved = arena.mark();
+      try {
+        const aS = arena.allocInt8(total);
+        const bS = arena.allocInt8(total);
+        const cS = arena.allocFloat64(total);
+        aS.view().set(Aq);
+        bS.view().set(Bq);
+        fk.exports.int8_matmul_simd(aS.ptr, bS.ptr, cS.ptr, n, scale);
+        return cS.view().slice();
+      } finally {
+        arena.rewind(saved);
+      }
+    }
+  }
   const C = new Float64Array(n * n);
   for (let i = 0; i < n; i++) {
     for (let k = 0; k < n; k++) {
@@ -73,7 +95,6 @@ export function matmulQuantized(Aq, scaleA, Bq, scaleB, n) {
       for (let j = 0; j < n; j++) C[row + j] += aik * Bq[k * n + j];
     }
   }
-  const scale = scaleA * scaleB;
   for (let i = 0; i < C.length; i++) C[i] *= scale;
   return C;
 }

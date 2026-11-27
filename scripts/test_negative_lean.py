@@ -62,6 +62,18 @@ theorem bad_dft2 : ∀ x0 x1 : CInt,
   omega
 """,
     ),
+    (
+        "false_catalytic_shear_no_range_bound",
+        """
+import XiaomiLabProofs.Spec
+open XiaomiLab.Spec
+theorem bad_catalytic : ∀ b d m : Nat, 0 < m →
+    catalyticShearSub (catalyticShearAdd b d m) d m = b := by
+  intro b d m hm
+  unfold catalyticShearSub catalyticShearAdd
+  omega
+""",
+    ),
 ]
 
 
@@ -88,7 +100,8 @@ def main() -> int:
         tmp = Path(tmpdir)
         for name, src in FALSE_CLAIMS:
             fp = tmp / f"{name}.lean"
-            fp.write_text(src.lstrip(), encoding="utf-8", newline="\n")
+            with fp.open("w", encoding="utf-8", newline="\n") as fh:
+                fh.write(src.lstrip())
             proc = subprocess.run(
                 [lake_bin, "env", "lean", str(fp)],
                 cwd=LEAN_DIR,
@@ -105,13 +118,12 @@ def main() -> int:
         if args.check_comparator:
             # Verify comparator rejects when a target theorem name is mutated to a non-matching theorem
             bad_cfg = tmp / "bad_comparator.json"
-            bad_cfg.write_text(
-                '{"challenge_module": "Challenge", "solution_module": "Solution", '
-                '"theorem_names": ["XiaomiLab.ComparatorTarget.nonexistent_tampered_target"], '
-                '"permitted_axioms": ["propext", "Quot.sound"]}\n',
-                encoding="utf-8",
-                newline="\n",
-            )
+            with bad_cfg.open("w", encoding="utf-8", newline="\n") as fh:
+                fh.write(
+                    '{"challenge_module": "Challenge", "solution_module": "Solution", '
+                    '"theorem_names": ["XiaomiLab.ComparatorTarget.nonexistent_tampered_target"], '
+                    '"permitted_axioms": ["propext", "Quot.sound"]}\n'
+                )
             proc = subprocess.run(
                 [lake_bin, "comparator", "--config", str(bad_cfg), "--paranoid"],
                 cwd=LEAN_DIR,

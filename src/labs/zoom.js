@@ -80,13 +80,16 @@ export async function mount(main, { cap }) {
       activeUpdater = () => u.update(0.016);
     } else if (id === "finfet") {
       subject = buildFinfet(materials);
+      const drifters = [];
+      subject.traverse((o) => {
+        if (o.userData.drift) drifters.push(o);
+      });
       activeUpdater = () => {
-        subject.traverse((o) => {
-          if (o.userData.drift) {
-            o.position.z += 0.03 * o.userData.drift.speed;
-            if (o.position.z > 3.5) o.position.z = -3.5;
-          }
-        });
+        for (let i = 0; i < drifters.length; i++) {
+          const o = drifters[i];
+          o.position.z += 0.03 * o.userData.drift.speed;
+          if (o.position.z > 3.5) o.position.z = -3.5;
+        }
       };
     } else if (id === "lattice") {
       subject = buildLattice(materials);

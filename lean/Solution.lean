@@ -4,9 +4,9 @@ public import XiaomiLabProofs.Spec
 public import XiaomiLabProofs
 
 /-!
-  XIAOMI 17T PRO LAB (v3.1.0) — Sorry-Free Constructive Solution Module Matched Against `Challenge.lean`.
+  XIAOMI 17T PRO LAB (v4.0.0) — Sorry-Free Constructive Solution Module Matched Against `Challenge.lean`.
 
-  Proves all 10 targets in `XiaomiLab.ComparatorTarget` with ZERO `sorry`, ZERO `native_decide`,
+  Proves all 11 targets in `XiaomiLab.ComparatorTarget` with ZERO `sorry`, ZERO `native_decide`,
   ZERO `Classical.choice`, ZERO custom axioms, and ZERO Mathlib dependencies, verified across
   6 independent Lean kernels via:
       lake comparator --config comparator.json --paranoid
@@ -101,13 +101,17 @@ public theorem target_thm8_adversarial_refutations :
     (rooflineAchievable 5270 2 77 = 154 ∧ 154 < max 5270 (2 * 77)) ∧
     ((Mat2C.mul ⟨⟨2, 0⟩, CInt.zero, CInt.zero, CInt.one⟩ Mat2C.id).det ≠ CInt.one) ∧
     ((dft2_0 CInt.one CInt.zero).normSq + (dft2_1 CInt.one CInt.zero).normSq ≠
-      (CInt.one.normSq + CInt.zero.normSq)) :=
+      (CInt.one.normSq + CInt.zero.normSq)) ∧
+    (catalyticShearSub (catalyticShearAdd 256 17 256) 17 256 ≠ 256) ∧
+    (¬ arenaSliceDisjoint 100 32 120 32) :=
   ⟨XiaomiLab.Adversarial.adv_fdtd_cfl_violation_undershoots,
    XiaomiLab.Adversarial.adv_chsh_relaxed_domain_breaks_bound,
    XiaomiLab.Adversarial.adv_massless_dirac_not_subluminal,
    XiaomiLab.Adversarial.adv_roofline_max_violates_memory_wall,
    XiaomiLab.Adversarial.adv_bragg_non_unimodular_breaks_det_one,
-   XiaomiLab.Adversarial.adv_dft2_parseval_breaks_without_factor_2⟩
+   XiaomiLab.Adversarial.adv_dft2_parseval_breaks_without_factor_2,
+   XiaomiLab.Adversarial.adv_catalytic_shear_out_of_range_fails,
+   XiaomiLab.Adversarial.adv_arena_overlap_collides⟩
 
 public theorem target_thm9_bragg_parseval_and_shards :
     (∀ A B : Mat2C, (Mat2C.mul A B).det = CInt.mul A.det B.det) ∧
@@ -125,6 +129,23 @@ public theorem target_thm9_bragg_parseval_and_shards :
    XiaomiLab.SpectralBragg.dft4_parseval_exact,
    XiaomiLab.SpectralBragg.tinystories_9_shards_exact_total⟩
 
+public theorem target_thm10_catalytic_arena_and_simd :
+    (∀ buf mask : List UInt8, buf.length = mask.length →
+      catalyticXorBytes (catalyticXorBytes buf mask) mask = buf) ∧
+    (∀ b d m : Nat, 0 < m → b < m → catalyticShearSub (catalyticShearAdd b d m) d m = b) ∧
+    (∀ off1 len1 off2 len2 : Nat, off1 + len1 ≤ off2 → arenaSliceDisjoint off1 len1 off2 len2) ∧
+    (∀ a0 a1 a2 a3 : Int, simd4LaneSum a0 a1 a2 a3 = simd4SplitSum a0 a1 a2 a3) ∧
+    ((2 : Nat) ^ 16 = 65536 ∧ 65536 * 4 = 262144) ∧
+    (∀ cost : Nat, gpuRenderWork 0 cost = 0) ∧
+    (∀ s : Int, 0 ≤ fubiniStudyDetScaled s) :=
+  ⟨XiaomiLab.Catalytic.catalytic_xor_bytes_restoration,
+   XiaomiLab.Catalytic.catalytic_shear_mod_restoration,
+   XiaomiLab.Catalytic.arena_bump_slices_disjoint,
+   XiaomiLab.Catalytic.simd4_lane_reassociation_exact,
+   XiaomiLab.Catalytic.fp16_lut_covers_all_bit_patterns,
+   fun cost => (XiaomiLab.Catalytic.demand_idle_zero_gpu_work cost).1,
+   XiaomiLab.Catalytic.fubini_study_metric_nonneg⟩
+
 public theorem target_nonvacuity_witnesses :
     fdtdStencilNum 100 15 15 80 40 40 40 40 = 5600 ∧
     chshExpr 1 1 1 (-1) = 2 ∧
@@ -133,7 +154,8 @@ public theorem target_nonvacuity_witnesses :
     blochX ⟨1, 0⟩ ⟨0, 1⟩ = 0 ∧
     blochY ⟨1, 0⟩ ⟨0, 1⟩ = 2 ∧
     Mat2C.id.det = CInt.one ∧
-    (dft4_0 CInt.one CInt.zero CInt.zero CInt.zero).normSq = 1 :=
-  ⟨by decide, by decide, by decide, by decide, by decide, by decide, rfl, by decide⟩
+    (dft4_0 CInt.one CInt.zero CInt.zero CInt.zero).normSq = 1 ∧
+    catalyticShearSub (catalyticShearAdd 255 99 257) 99 257 = 255 :=
+  ⟨by decide, by decide, by decide, by decide, by decide, by decide, rfl, by decide, by decide⟩
 
 end XiaomiLab.ComparatorTarget

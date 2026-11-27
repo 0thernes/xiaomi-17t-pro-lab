@@ -24,7 +24,7 @@ import {
   setPhoneFinish,
 } from "./subjects.js";
 
-export async function mountView(canvas, cap) {
+export async function mountView(canvas, cap, options = {}) {
   const { renderer, backend } = createRenderer(canvas, cap);
   renderer.setPixelRatio(Math.min(cap.pixelRatio || window.devicePixelRatio || 1, 2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -36,6 +36,8 @@ export async function mountView(canvas, cap) {
   const shadows = cap.tier === "high" || cap.tier === "ultra";
   renderer.shadowMap.enabled = shadows;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.shadowMap.autoUpdate = false;
+  renderer.shadowMap.needsUpdate = true;
 
   const scene = new THREE.Scene();
   scene.background = studioBackdrop();
@@ -104,15 +106,49 @@ export async function mountView(canvas, cap) {
 
   const root = new THREE.Group();
   scene.add(root);
-  const orbit = attachOrbit(canvas, camera, cap.reducedMotion);
 
   let frame = 0;
   let frames = 0;
+  let renderCount = 0;
+  let skippedFrames = 0;
   let last = performance.now();
+  let lastRenderTime = 0;
   let frameMs = 16;
   let running = true;
+  let tabVisible = typeof document === "undefined" ? true : !document.hidden;
+  let inViewport = true;
+  let dirty = true;
+  let shadowsDirty = true;
+  let sleeping = false;
   let onFrame = null;
   let framed = null;
+  let timedMaterials = [];
+  const uncapped = Boolean(options.uncapped);
+  const minFrameIntervalMs = uncapped ? 0 : 15.5;
+
+  function syncSceneCaches() {
+    timedMaterials = [];
+    root.traverse((obj) => {
+      const m = obj.material;
+      if (m?.uniforms?.uTime) timedMaterials.push(m);
+    });
+  }
+
+  function isPaused() {
+    return !running || !tabVisible || !inViewport;
+  }
+
+  function wake(markShadows = false) {
+    dirty = true;
+    if (markShadows) shadowsDirty = true;
+    sleeping = false;
+    if (!isPaused() && !frame) {
+      last = performance.now();
+      frame = requestAnimationFrame(loop);
+    }
+  }
+
+  const orbit = attachOrbit(canvas, camera, () => wake(false));
 
   // Interactive 3D Raycast Probe (hover any inspectable part to highlight & click to focus)
   const raycaster = new THREE.Raycaster();
@@ -161,6 +197,7 @@ export async function mountView(canvas, cap) {
         canvas.classList.remove("probe-hot");
         probeCallbacks.onHover?.(null, null);
       }
+      wake(false);
     }
     return target;
   }
@@ -188,6 +225,7 @@ export async function mountView(canvas, cap) {
       probeBox.visible = false;
       canvas.classList.remove("probe-hot");
       probeCallbacks?.onHover?.(null, null);
+      wake(false);
     }
   }
   function onKeyReset(ev) {
@@ -195,6 +233,18 @@ export async function mountView(canvas, cap) {
     if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
     if ((ev.key === "r" || ev.key === "R") && !ev.ctrlKey && !ev.metaKey && framed) {
       fit(framed.object, framed.fill);
+      wake(false);
+    }
+  }
+  function onVisibility() {
+    tabVisible = !document.hidden;
+    if (isPaused()) {
+      if (frame) {
+        cancelAnimationFrame(frame);
+        frame = 0;
+      }
+    } else {
+      wake(false);
     }
   }
   canvas.addEventListener("pointermove", onCanvasMove);
@@ -202,6 +252,28 @@ export async function mountView(canvas, cap) {
   canvas.addEventListener("click", onCanvasClick);
   canvas.addEventListener("pointerleave", onCanvasLeave);
   window.addEventListener("keydown", onKeyReset);
+  document.addEventListener("visibilitychange", onVisibility);
+
+  let ioObserver = null;
+  if (typeof IntersectionObserver !== "undefined") {
+    ioObserver = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.some((e) => e.isIntersecting);
+        if (visible === inViewport) return;
+        inViewport = visible;
+        if (isPaused()) {
+          if (frame) {
+            cancelAnimationFrame(frame);
+            frame = 0;
+          }
+        } else {
+          wake(false);
+        }
+      },
+      { rootMargin: "80px", threshold: 0.01 },
+    );
+    ioObserver.observe(canvas);
+  }
 
   function resize() {
     const w = Math.max(1, canvas.clientWidth);
@@ -211,26 +283,54 @@ export async function mountView(canvas, cap) {
     renderer.setSize(w, h, false);
     composer?.setSize?.(w, h);
     if (framed && w > 2 && h > 2) fit(framed.object, framed.fill);
+    wake(false);
   }
   const observer = new ResizeObserver(resize);
   observer.observe(canvas);
   resize();
 
   function loop(now) {
-    if (!running) return;
-    frame = requestAnimationFrame(loop);
-    frameMs = frameMs * 0.82 + Math.min(100, now - last) * 0.18;
+    frame = 0;
+    if (isPaused()) return;
+    const autoSpin = !cap.reducedMotion && orbit.auto;
+    const hasAnimated = Boolean(onFrame || timedMaterials.length > 0 || autoSpin);
+
+    // Smooth 60 Hz pacing on high-refresh-rate laptop displays (unless uncapped or actively dragging)
+    if (minFrameIntervalMs > 0 && !dirty && !orbit.dragging && now - lastRenderTime < minFrameIntervalMs) {
+      skippedFrames += 1;
+      frame = requestAnimationFrame(loop);
+      return;
+    }
+
+    const dtMs = Math.min(100, Math.max(1, now - last));
+    frameMs = frameMs * 0.82 + dtMs * 0.18;
     last = now;
-    // Animate any ShaderMaterials with uTime uniform automatically
-    const sec = now * 0.001;
-    root.traverse((obj) => {
-      const m = obj.material;
-      if (m?.uniforms?.uTime) m.uniforms.uTime.value = sec;
-    });
+
+    if (autoSpin) orbit.spin(0.0022 * Math.min(2.5, dtMs / 16.667));
+    const orbitMoving = orbit.tick();
+
+    if (!dirty && !orbitMoving && !hasAnimated) {
+      sleeping = true;
+      skippedFrames += 1;
+      return;
+    }
+
+    // Update cached ShaderMaterials with uTime uniform (zero per-frame scene-graph traverse)
+    if (timedMaterials.length > 0) {
+      const sec = now * 0.001;
+      for (let i = 0; i < timedMaterials.length; i++) {
+        timedMaterials[i].uniforms.uTime.value = sec;
+      }
+    }
+
     onFrame?.(now);
-    if (!cap.reducedMotion && orbit.auto) orbit.spin(0.0022);
-    orbit.tick();
     if (probeBox.visible && hoveredMesh) probeBox.update();
+
+    if (shadows && (shadowsDirty || onFrame)) {
+      renderer.shadowMap.needsUpdate = true;
+      shadowsDirty = false;
+    }
+
     try {
       if (composer) composer.render();
       else renderer.render(scene, camera);
@@ -240,6 +340,11 @@ export async function mountView(canvas, cap) {
       renderer.render(scene, camera);
       reportViewport(canvas, `Post-processing fell back to direct render (${error.message}).`);
     }
+    dirty = false;
+    sleeping = false;
+    lastRenderTime = now;
+    renderCount += 1;
+    canvas.dataset.renders = String(renderCount);
     frames += 1;
     if (frames === 12 && composer && !droppedComposer) {
       let brightest = 255;
@@ -248,11 +353,19 @@ export async function mountView(canvas, cap) {
       } catch {
         brightest = 255;
       }
-      if (brightest >= 12) return;
-      droppedComposer = true;
-      composer = null;
-      renderer.setRenderTarget(null);
-      renderer.render(scene, camera);
+      if (brightest < 12) {
+        droppedComposer = true;
+        composer = null;
+        renderer.setRenderTarget(null);
+        renderer.render(scene, camera);
+      }
+    }
+
+    // Continue scheduling only while animating, orbiting, or before initial composer health check
+    if (hasAnimated || orbitMoving || (composer && frames < 12)) {
+      frame = requestAnimationFrame(loop);
+    } else {
+      sleeping = true;
     }
   }
   frame = requestAnimationFrame(loop);
@@ -287,28 +400,44 @@ export async function mountView(canvas, cap) {
     get frameMs() {
       return frameMs;
     },
+    get stats() {
+      return { renderCount, skippedFrames, paused: isPaused(), sleeping };
+    },
+    invalidate({ shadows: markShadows = false } = {}) {
+      syncSceneCaches();
+      wake(markShadows);
+    },
     setFrame(fn) {
       onFrame = fn;
+      wake(false);
     },
     enableProbe(callbacks) {
       probeCallbacks = callbacks;
     },
     look(distance, target = new THREE.Vector3()) {
       orbit.set(distance, target);
+      wake(false);
     },
     frame(object, fillRatio = 0.88) {
       framed = { object, fill: fillRatio };
       fit(object, fillRatio);
+      syncSceneCaches();
+      wake(true);
     },
     clear() {
       hoveredMesh = null;
       probeBox.visible = false;
       root.clear();
+      timedMaterials = [];
+      wake(true);
     },
     dispose() {
       running = false;
       cancelAnimationFrame(frame);
+      frame = 0;
       observer.disconnect();
+      ioObserver?.disconnect();
+      document.removeEventListener("visibilitychange", onVisibility);
       orbit.dispose();
       canvas.removeEventListener("pointermove", onCanvasMove);
       canvas.removeEventListener("pointerdown", onCanvasDown);
@@ -485,7 +614,7 @@ function studioScene() {
   return env;
 }
 
-function attachOrbit(canvas, camera) {
+function attachOrbit(canvas, camera, onWake = () => {}) {
   const state = {
     theta: 0.48,
     phi: 1.02,
@@ -513,11 +642,13 @@ function attachOrbit(canvas, camera) {
     if (event.target !== canvas) return;
     drag = { x: event.clientX, y: event.clientY, theta: state.targetTheta, phi: state.targetPhi };
     state.auto = false;
+    onWake();
   }
   function move(event) {
     if (!drag) return;
     state.targetTheta = drag.theta - (event.clientX - drag.x) * 0.006;
     state.targetPhi = Math.min(1.52, Math.max(0.18, drag.phi - (event.clientY - drag.y) * 0.006));
+    onWake();
   }
   function up() {
     drag = null;
@@ -525,6 +656,7 @@ function attachOrbit(canvas, camera) {
   function wheel(event) {
     event.preventDefault();
     state.targetRadius = Math.min(900, Math.max(1.2, state.targetRadius * (event.deltaY > 0 ? 1.08 : 0.92)));
+    onWake();
   }
 
   canvas.addEventListener("pointerdown", down);
@@ -534,11 +666,15 @@ function attachOrbit(canvas, camera) {
   apply();
 
   return {
+    get dragging() {
+      return drag !== null;
+    },
     get auto() {
       return state.auto;
     },
     set auto(v) {
       state.auto = Boolean(v);
+      if (state.auto) onWake();
     },
     spin(d) {
       state.targetTheta += d;
@@ -554,12 +690,14 @@ function attachOrbit(canvas, camera) {
         if (immediate) state.phi = clamped;
       }
       if (immediate) apply();
+      onWake();
     },
     set(radius, target) {
       state.radius = state.targetRadius = radius;
       state.target.copy(target);
       state.goalTarget.copy(target);
       apply();
+      onWake();
     },
     flyTo(radius, target, theta = null, phi = null) {
       state.auto = false;
@@ -567,14 +705,29 @@ function attachOrbit(canvas, camera) {
       if (target) state.goalTarget.copy(target);
       if (theta != null) state.targetTheta = theta;
       if (phi != null) state.targetPhi = Math.min(1.5, Math.max(0.2, phi));
+      onWake();
     },
     tick() {
+      const dTheta = state.targetTheta - state.theta;
+      const dPhi = state.targetPhi - state.phi;
+      const dRadius = state.targetRadius - state.radius;
+      const dTargetSq = state.target.distanceToSquared(state.goalTarget);
+      const moving =
+        Math.abs(dTheta) > 1e-4 || Math.abs(dPhi) > 1e-4 || Math.abs(dRadius) > 1e-3 || dTargetSq > 1e-6;
+      if (!moving) {
+        state.theta = state.targetTheta;
+        state.phi = state.targetPhi;
+        state.radius = state.targetRadius;
+        state.target.copy(state.goalTarget);
+        return false;
+      }
       const k = 0.14;
-      state.theta += (state.targetTheta - state.theta) * k;
-      state.phi += (state.targetPhi - state.phi) * k;
-      state.radius += (state.targetRadius - state.radius) * k;
+      state.theta += dTheta * k;
+      state.phi += dPhi * k;
+      state.radius += dRadius * k;
       state.target.lerp(state.goalTarget, k);
       apply();
+      return true;
     },
     dispose() {
       canvas.removeEventListener("pointerdown", down);

@@ -1,6 +1,6 @@
 {
   "oracle_precision_digits": 60,
-  "checks_passed": 54,
+  "checks_passed": 60,
   "max_relative_error": 2.1590595273733875e-14,
   "manifests_verified": {},
   "checks": [
@@ -379,6 +379,48 @@
       "name": "bitnet_log2_3_bits",
       "js": 1.584962500721156,
       "ref": "1.5849625007211561814537",
+      "rel_err": 0.0,
+      "pass": true
+    },
+    {
+      "name": "fp16_min_subnormal_2m24",
+      "js": 5.960464477539063e-08,
+      "ref": "5.9604644775390625E-8",
+      "rel_err": 0.0,
+      "pass": true
+    },
+    {
+      "name": "fp16_max_normal_65504",
+      "js": 65504,
+      "ref": "65504",
+      "rel_err": 0.0,
+      "pass": true
+    },
+    {
+      "name": "qgtl_g_theta_theta",
+      "js": 0.25,
+      "ref": "0.25",
+      "rel_err": 0.0,
+      "pass": true
+    },
+    {
+      "name": "qgtl_g_phi_phi_pi3",
+      "js": 0.18749999999999997,
+      "ref": "0.1875000000000000000000",
+      "rel_err": 1.4802973661668753e-16,
+      "pass": true
+    },
+    {
+      "name": "qgtl_berry_curv_pi3",
+      "js": -0.4330127018922193,
+      "ref": "-0.433012701892219323381",
+      "rel_err": 0.0,
+      "pass": true
+    },
+    {
+      "name": "nist_sp80090b_rct_cutoff_H1",
+      "js": 21.0,
+      "ref": "21",
       "rel_err": 0.0,
       "pass": true
     }

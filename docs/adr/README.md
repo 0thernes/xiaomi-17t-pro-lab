@@ -12,3 +12,4 @@ All foundational architectural decisions for `xiaomi-17t-pro-lab` (Build Standar
 | [0006-one-subject.md](0006-one-subject.md)                             | One Interactive Physical Subject Per Route                                                     | Accepted |
 | [0007-design-system.md](0007-design-system.md)                         | Phone-First Accessible Design System & Strict `style-src 'self'` CSP                           | Accepted |
 | [0008-sharded-weights-and-lean4.md](0008-sharded-weights-and-lean4.md) | Deterministic 9-Shard TinyStories Delivery (`≤ 4.5 MB`) & Zero-Mathlib Lean 4.35.0 Formal Core | Accepted |
+| [0009-catalytic-wasm-and-native-stack.md](0009-catalytic-wasm-and-native-stack.md) | Catalytic Zero-Allocation Arena, Rust WASM SIMD128 & Honest Native-Stack Evaluation | Accepted |

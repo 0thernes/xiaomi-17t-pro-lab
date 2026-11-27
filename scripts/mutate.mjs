@@ -70,6 +70,20 @@ const MUTANTS = [
     find: 'if (relative.startsWith("..") || path.isAbsolute(relative)) return null;',
     replace: "/* mutant: traversal guard removed */",
   },
+  {
+    id: "M9",
+    file: "src/sim/catalytic-arena.js",
+    desc: "Catalytic XOR restoration drops second XOR pass (corrupts borrowed bytes)",
+    find: "fastKernels.exports.catalytic_xor_simd(bSlice.ptr, mSlice.ptr, n);\n      hostBytes.set(bSlice.view());\n    } finally {",
+    replace: "/* mutant: restoration pass skipped */\n      hostBytes.set(bSlice.view());\n    } finally {",
+  },
+  {
+    id: "M10",
+    file: "src/workloads/safetensors.js",
+    desc: "FP16 LUT corrupts IEEE-754 exponent bias (127 - 15 -> 127 - 14)",
+    find: "_scratchU32[0] = sign | ((exp + (127 - 15)) << 23) | (mant << 13);",
+    replace: "_scratchU32[0] = sign | ((exp + (127 - 14)) << 23) | (mant << 13);",
+  },
 ];
 
 const stage = mkdtempSync(path.join(tmpdir(), "xiaomi-lab-mutants-"));
@@ -90,11 +104,12 @@ try {
     path.join(stage, "assets", "textures", "cc0", "metal_plate", "metal_plate_diff_1k.jpg"),
   );
 
-  // Fast subset of test files that cover all 8 mutant targets without 8s TinyStories decode
+  // Fast subset of test files that cover all 10 mutant targets without 8s TinyStories decode
   const fastTests = [
     "tests/engines.test.mjs",
     "tests/v1-engines.test.mjs",
     "tests/v2-engines.test.mjs",
+    "tests/catalytic-wasm.test.mjs",
     "tests/server.test.mjs",
     "tests/properties-and-regressions.test.mjs",
   ];

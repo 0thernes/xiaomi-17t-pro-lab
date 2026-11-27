@@ -144,6 +144,7 @@ export async function mount(main, { cap, audio }) {
     btn.addEventListener("click", () => {
       currentFinish = name;
       setPhoneFinish(materials, name);
+      view?.invalidate();
       for (const s of swatches) s.setAttribute("aria-pressed", s === btn ? "true" : "false");
     });
     swatches.push(btn);
@@ -162,7 +163,12 @@ export async function mount(main, { cap, audio }) {
   });
 
   const timer = window.setInterval(() => {
-    if (!view) return;
+    if (!view || document.hidden) return;
+    if (view.stats.sleeping) {
+      frameReadout.textContent = "idle (0% GPU)";
+      fpsReadout.textContent = "IDLE · 0% GPU";
+      return;
+    }
     frameReadout.textContent = `${view.frameMs.toFixed(1)} ms`;
     fpsReadout.textContent = `${Math.round(1000 / Math.max(1, view.frameMs))} FPS (${view.frameMs.toFixed(1)} ms)`;
   }, 250);

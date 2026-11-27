@@ -172,20 +172,19 @@ def main() -> int:
     print(f"INFO [Software Heritage] {swh}")
 
     receipt_path = PROOFS_DIR / "provenance-receipts.json"
-    receipt_path.write_text(
-        json.dumps(
-            {
-                "version": (ROOT / "VERSION").read_text(encoding="utf-8").strip(),
-                "rfc3161_digicert": rfc_results,
-                "opentimestamps_bitcoin": ots_results,
-                "software_heritage": swh,
-            },
-            indent=2,
+    with receipt_path.open("w", encoding="utf-8", newline="\n") as fh:
+        fh.write(
+            json.dumps(
+                {
+                    "version": (ROOT / "VERSION").read_text(encoding="utf-8").strip(),
+                    "rfc3161_digicert": rfc_results,
+                    "opentimestamps_bitcoin": ots_results,
+                    "software_heritage": swh,
+                },
+                indent=2,
+            )
+            + "\n"
         )
-        + "\n",
-        encoding="utf-8",
-        newline="\n",
-    )
     print(f"PASS: Wrote {receipt_path.relative_to(ROOT).as_posix()}.")
     return 0
 

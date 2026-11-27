@@ -321,20 +321,42 @@ function drawAerial(p, state) {
   );
 }
 
+let _resistOffscreen = null;
+let _resistOffCtx = null;
+let _resistOffImg = null;
+
 function drawResist(p, state) {
   p.background("#06080c");
   const st = state.stoch;
   if (!st) return;
-  const cw = (p.width - 24) / st.cols;
-  const ch = (p.height - 34) / st.rows;
-  p.noStroke();
-  for (let r = 0; r < st.rows; r++) {
-    for (let c = 0; c < st.cols; c++) {
-      const cleared = st.resist[r * st.cols + c];
-      p.fill(cleared ? "#19293f" : "#ff6900");
-      p.rect(12 + c * cw, 22 + r * ch, cw + 0.5, ch + 0.5);
-    }
+  if (!_resistOffscreen || _resistOffscreen.width !== st.cols || _resistOffscreen.height !== st.rows) {
+    _resistOffscreen = document.createElement("canvas");
+    _resistOffscreen.width = st.cols;
+    _resistOffscreen.height = st.rows;
+    _resistOffCtx = _resistOffscreen.getContext("2d");
+    _resistOffImg = _resistOffCtx.createImageData(st.cols, st.rows);
   }
+  const d = _resistOffImg.data;
+  const n = st.rows * st.cols;
+  for (let i = 0; i < n; i++) {
+    const o = i << 2;
+    if (st.resist[i]) {
+      d[o] = 25;
+      d[o + 1] = 41;
+      d[o + 2] = 63;
+    } else {
+      d[o] = 255;
+      d[o + 1] = 105;
+      d[o + 2] = 0;
+    }
+    d[o + 3] = 255;
+  }
+  _resistOffCtx.putImageData(_resistOffImg, 0, 0);
+  const ctx = p.drawingContext;
+  ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(_resistOffscreen, 12, 22, p.width - 24, p.height - 34);
+
+  p.noStroke();
   p.fill("#eef3fa");
   p.textSize(10);
   p.text(`TOP-DOWN DEVELOPED RESIST (orange = fin/metal line · 3σ LER = ${st.ler3SigmaNm.toFixed(2)} nm)`, 12, 14);
@@ -384,6 +406,10 @@ function drawBragg(p, state) {
   p.text("14.4 nm", padL + w, p.height - 8);
 }
 
+let _fourierOff = null;
+let _fourierOffCtx = null;
+let _fourierImg = null;
+
 function drawFourier2d(p, state) {
   p.background("#06080c");
   const res = state.res;
@@ -409,13 +435,18 @@ function drawFourier2d(p, state) {
     { data: res.resist, mode: "resist" },
   ];
 
+  if (!_fourierOff || _fourierOff.width !== n || _fourierOff.height !== n) {
+    _fourierOff = document.createElement("canvas");
+    _fourierOff.width = _fourierOff.height = n;
+    _fourierOffCtx = _fourierOff.getContext("2d");
+    _fourierImg = _fourierOffCtx.createImageData(n, n);
+  }
   const ctx = p.drawingContext;
   p.textAlign(p.LEFT);
   for (let idx = 0; idx < 4; idx++) {
     const ox = startX + idx * (boxSize + gap);
     const oy = padTop;
-    const img = ctx.createImageData(n, n);
-    const d = img.data;
+    const d = _fourierImg.data;
     const arr = panels[idx].data;
     const mode = panels[idx].mode;
 
@@ -469,11 +500,9 @@ function drawFourier2d(p, state) {
       d[o + 3] = 255;
     }
 
-    const off = document.createElement("canvas");
-    off.width = off.height = n;
-    off.getContext("2d").putImageData(img, 0, 0);
+    _fourierOffCtx.putImageData(_fourierImg, 0, 0);
     ctx.imageSmoothingEnabled = mode === "aerial";
-    ctx.drawImage(off, ox, oy, boxSize, boxSize);
+    ctx.drawImage(_fourierOff, ox, oy, boxSize, boxSize);
 
     p.noFill();
     p.stroke("rgba(255,255,255,0.16)");

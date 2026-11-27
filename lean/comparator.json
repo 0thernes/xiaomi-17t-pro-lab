@@ -11,6 +11,7 @@
     "XiaomiLab.ComparatorTarget.target_thm7_bloch_purity_bounds",
     "XiaomiLab.ComparatorTarget.target_thm8_adversarial_refutations",
     "XiaomiLab.ComparatorTarget.target_thm9_bragg_parseval_and_shards",
+    "XiaomiLab.ComparatorTarget.target_thm10_catalytic_arena_and_simd",
     "XiaomiLab.ComparatorTarget.target_nonvacuity_witnesses"
   ],
   "permitted_axioms": [

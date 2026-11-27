@@ -3,8 +3,8 @@
   "sha256": "9999a42aa4cb668c19760c02448ab97b0458c89871013fa8d0c5cae2a569c28f",
   "totalBytes": 39417097,
   "shards": 9,
-  "loadAndParseMs": 5470.47,
-  "neuraleseAblationL4EntropyDeltaBits": 0.519174,
+  "loadAndParseMs": 296.68,
+  "neuraleseAblationL4EntropyDeltaBits": 0.519175,
   "pass": true,
   "cases": [
     {
@@ -24,7 +24,7 @@
       "top1Prob": 0.944807,
       "exactEntropyBits": 0.332117,
       "perplexity": 1.2589,
-      "avgMsPerToken": 29.97
+      "avgMsPerToken": 13.17
     },
     {
       "id": "small_dog",
@@ -41,9 +41,9 @@
       ],
       "decoded": " named Max. He was very excited to",
       "top1Prob": 0.725026,
-      "exactEntropyBits": 2.055098,
+      "exactEntropyBits": 2.055099,
       "perplexity": 4.1557,
-      "avgMsPerToken": 30.54
+      "avgMsPerToken": 11.25
     },
     {
       "id": "sunny_park",
@@ -60,9 +60,9 @@
       ],
       "decoded": ". He saw a big, red and",
       "top1Prob": 0.593051,
-      "exactEntropyBits": 2.190375,
+      "exactEntropyBits": 2.190374,
       "perplexity": 4.5642,
-      "avgMsPerToken": 28.15
+      "avgMsPerToken": 11.44
     },
     {
       "id": "rainy_day",
@@ -81,7 +81,7 @@
       "top1Prob": 0.568785,
       "exactEntropyBits": 2.566743,
       "perplexity": 5.9247,
-      "avgMsPerToken": 33.1
+      "avgMsPerToken": 12.82
     },
     {
       "id": "red_ball",
@@ -100,7 +100,7 @@
       "top1Prob": 0.157036,
       "exactEntropyBits": 6.386761,
       "perplexity": 83.6771,
-      "avgMsPerToken": 25.69
+      "avgMsPerToken": 11.44
     }
   ]
 }
